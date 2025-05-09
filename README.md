@@ -96,17 +96,3 @@ git clone https://github.com/seu-usuario/Guardou-Pagou.git
 cd Guardou-Pagou
 ```
 
----
-
-## 📃 Licença
-
-Este projeto está sob a licença [MIT](LICENSE).
-
----
-
-```
-
----
-
-Se quiser, posso adaptar esse README para português formal, tom mais técnico ou até adicionar badges de build, Java version etc. Deseja isso?
-```
