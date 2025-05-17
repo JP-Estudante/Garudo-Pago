@@ -58,6 +58,7 @@ CREATE TABLE faturas (
     nota_fiscal_id INTEGER REFERENCES notas_fiscais(id) ON DELETE CASCADE,
     vencimento DATE NOT NULL,
     valor DECIMAL(10,2) NOT NULL,
+    numero_fatura CHARACTER VARYING(50),
     status VARCHAR(20) DEFAULT 'Não Emitida',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
