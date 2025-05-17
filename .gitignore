@@ -1,1 +1,2 @@
-/build/
+# Ignorar arquivo de conexão com banco de dados
+src/com/GuardouPagou/models/DatabaseConnection.java
