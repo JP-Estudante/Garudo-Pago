@@ -63,6 +63,12 @@ CREATE TABLE faturas (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+UPDATE notas_fiscais n
+SET marca_id = m.id
+FROM marcas m
+WHERE m.nome = n.marca;
+
 ```
 
 ---
