@@ -18,7 +18,7 @@ public class NotaFaturaView {
     private final Button adicionarFaturaButton;
     private final VBox faturasContainer;
     private final Button salvarButton;
-
+    
     public NotaFaturaView() {
         numeroNotaField = new TextField();
         dataEmissaoPicker = new DatePicker();
