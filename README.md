@@ -50,6 +50,8 @@ CREATE TABLE notas_fiscais (
     marca VARCHAR(100) NOT NULL,
     status VARCHAR(20) DEFAULT 'Ativa',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    arquivada BOOLEAN DEFAULT FALSE,
+    data_arquivamento DATE,
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -60,10 +62,24 @@ CREATE TABLE faturas (
     valor DECIMAL(10,2) NOT NULL,
     status VARCHAR(20) DEFAULT 'Não Emitida',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    numero_fatura CHARACTER VARYING(50),
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
+Alteraçõs, para o banco antigo.
+```
+ALTER TABLE faturas
+ADD COLUMN numero_fatura CHARACTER VARYING(50);
 
+ALTER TABLE notas_fiscais
+ADD COLUMN arquivada BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE notas_fiscais
+ADD COLUMN data_arquivamento DATE;
+
+ALTER TABLE faturas
+ADD COLUMN atualizado_em TIMESTAMP;
+```
 ---
 
 ## 📂 Estrutura do Projeto
