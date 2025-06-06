@@ -1,6 +1,6 @@
 package com.GuardouPagou.controllers;
 
-import com.GuardouPagou.models.NotaFiscalView;
+import com.GuardouPagou.views.NotaFiscalView;
 import com.GuardouPagou.models.Fatura;
 import com.GuardouPagou.models.Marca;
 import com.GuardouPagou.models.NotaFiscal;

@@ -1,4 +1,4 @@
-package com.GuardouPagou.models;
+package com.GuardouPagou.views;
 
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
