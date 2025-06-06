@@ -28,24 +28,24 @@ public class MarcaDAO {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nome);
-            stmt.setString(2, descricao);
+            stmt.setString(2, descricao.isEmpty() ? null : descricao); // Salva null se descrição vazia
             stmt.setString(3, cor);
             return stmt.executeUpdate();
         }
     }
     
     public int excluirMarca(int id) throws SQLException {
-    String sql = "DELETE FROM marcas WHERE id = ?";
-    try (Connection conn = DatabaseConnection.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setInt(1, id);
-        return stmt.executeUpdate();
+        String sql = "DELETE FROM marcas WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            return stmt.executeUpdate();
+        }
     }
-}
 
     public ObservableList<Marca> listarMarcas() throws SQLException {
         ObservableList<Marca> marcas = FXCollections.observableArrayList();
-        String sql = "SELECT * FROM marcas";
+        String sql = "SELECT * FROM marcas ORDER BY nome ASC"; // Ordenação alfabética
         
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);

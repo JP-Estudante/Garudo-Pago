@@ -1,5 +1,6 @@
 package com.GuardouPagou.models;
 
+import com.GuardouPagou.views.MainView;
 import com.GuardouPagou.controllers.MainController;
 import javafx.application.Application;
 import javafx.scene.Scene;

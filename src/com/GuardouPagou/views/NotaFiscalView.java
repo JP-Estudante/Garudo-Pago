@@ -1,27 +1,27 @@
-package com.GuardouPagou.models;
+package com.GuardouPagou.views;
 
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.geometry.*;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.paint.Color;
 
-public class MarcaView {
+public class NotaFiscalView {
 
     private final BorderPane root;
-    private final TextField nomeField;
-    private final TextArea descricaoArea;
-    private final ColorPicker corPicker;
+    private final TextField numeroNotaField;
+    private final DatePicker dataEmissaoPicker;
+    private final ComboBox<String> marcaComboBox;
+    private final Button adicionarFaturaButton;
+    private final VBox faturasContainer;
     private final Button salvarButton;
-    private final Button cancelarButton;
 
-    public MarcaView() {
-        nomeField = new TextField();
-        descricaoArea = new TextArea();
-        corPicker = new ColorPicker();
+    public NotaFiscalView() {
+        numeroNotaField = new TextField();
+        dataEmissaoPicker = new DatePicker();
+        marcaComboBox = new ComboBox<>();
+        adicionarFaturaButton = new Button("Adicionar Nova Fatura");
+        faturasContainer = new VBox(10);
         salvarButton = new Button("Salvar");
-        cancelarButton = new Button("Cancelar");
         root = new BorderPane();
         criarUI();
     }
@@ -41,7 +41,7 @@ public class MarcaView {
         );
 
         // Título
-        Label titulo = new Label("CADASTRO DE MARCA");
+        Label titulo = new Label("CADASTRO DE NOTA FISCAL");
         titulo.setStyle(
                 "-fx-font-family: Arial; "
                 + "-fx-font-weight: bold; "
@@ -49,16 +49,19 @@ public class MarcaView {
                 + "-fx-text-fill: #F0A818;"
         );
 
-        // Campo Nome da Marca
-        VBox nomeBox = new VBox(5);
-        Label nomeLabel = new Label("Nome da Marca*:");
-        nomeLabel.setStyle(
+        // Campos principais
+        VBox camposBox = new VBox(10);
+
+        // Número da Nota
+        VBox numeroNotaBox = new VBox(5);
+        Label numeroNotaLabel = new Label("Número da Nota*:");
+        numeroNotaLabel.setStyle(
                 "-fx-font-family: Arial; "
                 + "-fx-font-size: 16px; "
                 + "-fx-text-fill: #BDBDBD;"
         );
-        nomeField.setPromptText("Digite o nome da marca");
-        nomeField.setStyle(
+        numeroNotaField.setPromptText("Digite o número da nota");
+        numeroNotaField.setStyle(
                 "-fx-background-color: #2A2A2A; "
                 + "-fx-text-fill: #FFFFFF; "
                 + "-fx-font-size: 14px; "
@@ -68,9 +71,9 @@ public class MarcaView {
                 + "-fx-border-radius: 5; "
                 + "-fx-prompt-text-fill: #BDBDBD;"
         );
-        nomeField.focusedProperty().addListener((obs, oldVal, newVal) -> {
+        numeroNotaField.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
-                nomeField.setStyle(
+                numeroNotaField.setStyle(
                         "-fx-background-color: #2A2A2A; "
                         + "-fx-text-fill: #FFFFFF; "
                         + "-fx-font-size: 14px; "
@@ -81,7 +84,7 @@ public class MarcaView {
                         + "-fx-prompt-text-fill: #BDBDBD;"
                 );
             } else {
-                nomeField.setStyle(
+                numeroNotaField.setStyle(
                         "-fx-background-color: #2A2A2A; "
                         + "-fx-text-fill: #FFFFFF; "
                         + "-fx-font-size: 14px; "
@@ -93,101 +96,123 @@ public class MarcaView {
                 );
             }
         });
-        nomeField.setPrefWidth(400);
-        nomeBox.getChildren().addAll(nomeLabel, nomeField);
+        numeroNotaField.setPrefWidth(200);
+        numeroNotaBox.getChildren().addAll(numeroNotaLabel, numeroNotaField);
 
-        // Campo Descrição
-        VBox descricaoBox = new VBox(5);
-        Label descricaoLabel = new Label("Descrição:");
-        descricaoLabel.setStyle(
+        // Data de Emissão
+        VBox dataEmissaoBox = new VBox(5);
+        Label dataEmissaoLabel = new Label("Data de Emissão*:");
+        dataEmissaoLabel.setStyle(
                 "-fx-font-family: Arial; "
                 + "-fx-font-size: 16px; "
                 + "-fx-text-fill: #BDBDBD;"
         );
-        descricaoArea.setPromptText("Digite a descrição da marca");
-        descricaoArea.setStyle(
-                "-fx-control-inner-background: #2A2A2A; "
+        dataEmissaoPicker.setStyle(
+                "-fx-background-color: #2A2A2A; "
                 + "-fx-text-fill: #FFFFFF; "
                 + "-fx-font-size: 14px; "
                 + "-fx-border-color: #4A4A4A; "
                 + "-fx-border-width: 1; "
                 + "-fx-background-radius: 5; "
-                + "-fx-border-radius: 5; "
-                + "-fx-prompt-text-fill: #BDBDBD;"
+                + "-fx-border-radius: 5;"
         );
-        descricaoArea.focusedProperty().addListener((obs, oldVal, newVal) -> {
+        dataEmissaoPicker.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
-                descricaoArea.setStyle(
-                        "-fx-control-inner-background: #2A2A2A; "
+                dataEmissaoPicker.setStyle(
+                        "-fx-background-color: #2A2A2A; "
                         + "-fx-text-fill: #FFFFFF; "
                         + "-fx-font-size: 14px; "
                         + "-fx-border-color: #F0A818; "
                         + "-fx-border-width: 1; "
                         + "-fx-background-radius: 5; "
-                        + "-fx-border-radius: 5; "
-                        + "-fx-prompt-text-fill: #BDBDBD;"
+                        + "-fx-border-radius: 5;"
                 );
             } else {
-                descricaoArea.setStyle(
-                        "-fx-control-inner-background: #2A2A2A; "
+                dataEmissaoPicker.setStyle(
+                        "-fx-background-color: #2A2A2A; "
                         + "-fx-text-fill: #FFFFFF; "
                         + "-fx-font-size: 14px; "
                         + "-fx-border-color: #4A4A4A; "
                         + "-fx-border-width: 1; "
                         + "-fx-background-radius: 5; "
-                        + "-fx-border-radius: 5; "
-                        + "-fx-prompt-text-fill: #BDBDBD;"
+                        + "-fx-border-radius: 5;"
                 );
             }
         });
-        descricaoArea.setPrefWidth(400);
-        descricaoArea.setPrefRowCount(6);
-        descricaoBox.getChildren().addAll(descricaoLabel, descricaoArea);
+        dataEmissaoPicker.setPrefWidth(200);
+        dataEmissaoBox.getChildren().addAll(dataEmissaoLabel, dataEmissaoPicker);
 
-        // Campo Cor
-        VBox corBox = new VBox(5);
-        Label corLabel = new Label("Cor*:");
-        corLabel.setStyle(
+        // Marca
+        VBox marcaBox = new VBox(5);
+        Label marcaLabel = new Label("Marca*:");
+        marcaLabel.setStyle(
                 "-fx-font-family: Arial; "
                 + "-fx-font-size: 16px; "
                 + "-fx-text-fill: #BDBDBD;"
         );
-        corPicker.setStyle(
+        marcaComboBox.setPromptText("Selecione uma marca");
+        marcaComboBox.setStyle(
                 "-fx-background-color: #2A2A2A; "
+                + "-fx-text-fill: #FFFFFF; "
+                + "-fx-font-size: 14px; "
                 + "-fx-border-color: #4A4A4A; "
                 + "-fx-border-width: 1; "
                 + "-fx-background-radius: 5; "
-                + "-fx-border-radius: 5; "
-                + "-fx-color-label-visible: false;"
+                + "-fx-border-radius: 5;"               
         );
-        corPicker.focusedProperty().addListener((obs, oldVal, newVal) -> {
+        marcaComboBox.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
-                corPicker.setStyle(
+                marcaComboBox.setStyle(
                         "-fx-background-color: #2A2A2A; "
+                        + "-fx-text-fill: #FFFFFF; "
+                        + "-fx-font-size: 14px; "
                         + "-fx-border-color: #F0A818; "
                         + "-fx-border-width: 1; "
                         + "-fx-background-radius: 5; "
-                        + "-fx-border-radius: 5; "
-                        + "-fx-color-label-visible: false;"
+                        + "-fx-border-radius: 5;"
                 );
             } else {
-                corPicker.setStyle(
+                marcaComboBox.setStyle(
                         "-fx-background-color: #2A2A2A; "
+                        + "-fx-text-fill: #FFFFFF; "
+                        + "-fx-font-size: 14px; "
                         + "-fx-border-color: #4A4A4A; "
                         + "-fx-border-width: 1; "
                         + "-fx-background-radius: 5; "
-                        + "-fx-border-radius: 5; "
-                        + "-fx-color-label-visible: false;"
+                        + "-fx-border-radius: 5;"
                 );
             }
         });
-        corPicker.setPrefWidth(100); // Menor para melhor visibilidade
-        corBox.getChildren().addAll(corLabel, corPicker);
+        marcaComboBox.setPrefWidth(200);
+        marcaBox.getChildren().addAll(marcaLabel, marcaComboBox);
 
-        formPanel.getChildren().addAll(nomeBox, descricaoBox, corBox);
+        // Botão Adicionar Nova Fatura
+        String buttonStyle
+                = "-fx-background-color: #F0A818 !important; "
+                + "-fx-text-fill: #000000 !important; "
+                + "-fx-font-family: Arial !important; "
+                + "-fx-font-weight: bold !important; "
+                + "-fx-font-size: 14px !important; "
+                + "-fx-background-radius: 5 !important;";
+        adicionarFaturaButton.setStyle(buttonStyle);
+        adicionarFaturaButton.setOnMouseEntered(e -> adicionarFaturaButton.setStyle(buttonStyle));
+        adicionarFaturaButton.setOnMouseExited(e -> adicionarFaturaButton.setStyle(buttonStyle));
+        adicionarFaturaButton.setPrefWidth(200);
 
-        // Botões
-        HBox buttonBox = new HBox(10);
+        camposBox.getChildren().addAll(numeroNotaBox, dataEmissaoBox, marcaBox, adicionarFaturaButton);
+
+        // Container de faturas
+        faturasContainer.setStyle(
+                "-fx-background-color: #2A2A2A; "
+                + "-fx-padding: 10; "
+                + "-fx-border-color: #4A4A4A; "
+                + "-fx-border-width: 1; "
+                + "-fx-background-radius: 5;"
+        );
+
+        // Botão Salvar
+        HBox salvarBox = new HBox();
+        salvarBox.setAlignment(Pos.CENTER_RIGHT);
         salvarButton.setStyle(
                 "-fx-background-color: #F0A818; "
                 + "-fx-text-fill: #000000; "
@@ -212,38 +237,11 @@ public class MarcaView {
                 + "-fx-font-size: 14px; "
                 + "-fx-background-radius: 5;"
         ));
-        cancelarButton.setStyle(
-                "-fx-background-color: #F0A818; "
-                + "-fx-text-fill: #000000; "
-                + "-fx-font-family: Arial; "
-                + "-fx-font-weight: bold; "
-                + "-fx-font-size: 14px; "
-                + "-fx-background-radius: 5;"
-        );
-        cancelarButton.setOnMouseEntered(e -> cancelarButton.setStyle(
-                "-fx-background-color: #FFC107; "
-                + "-fx-text-fill: #000000; "
-                + "-fx-font-family: Arial; "
-                + "-fx-font-weight: bold; "
-                + "-fx-font-size: 14px; "
-                + "-fx-background-radius: 5;"
-        ));
-        cancelarButton.setOnMouseExited(e -> cancelarButton.setStyle(
-                "-fx-background-color: #F0A818; "
-                + "-fx-text-fill: #000000; "
-                + "-fx-font-family: Arial; "
-                + "-fx-font-weight: bold; "
-                + "-fx-font-size: 14px; "
-                + "-fx-background-radius: 5;"
-        ));
-        buttonBox.getChildren().addAll(salvarButton, cancelarButton);
-        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+        salvarBox.getChildren().add(salvarButton);
 
-        // Layout principal
-        VBox mainBox = new VBox(20);
-        mainBox.getChildren().addAll(titulo, formPanel, buttonBox);
+        formPanel.getChildren().addAll(titulo, camposBox, faturasContainer, salvarBox);
 
-        root.setCenter(mainBox);
+        root.setCenter(formPanel);
     }
 
     // Getters
@@ -251,23 +249,27 @@ public class MarcaView {
         return root;
     }
 
-    public TextField getNomeField() {
-        return nomeField;
+    public TextField getNumeroNotaField() {
+        return numeroNotaField;
     }
 
-    public TextArea getDescricaoArea() {
-        return descricaoArea;
+    public DatePicker getDataEmissaoPicker() {
+        return dataEmissaoPicker;
     }
 
-    public ColorPicker getCorPicker() {
-        return corPicker;
+    public ComboBox<String> getMarcaComboBox() {
+        return marcaComboBox;
+    }
+
+    public Button getAdicionarFaturaButton() {
+        return adicionarFaturaButton;
+    }
+
+    public VBox getFaturasContainer() {
+        return faturasContainer;
     }
 
     public Button getSalvarButton() {
         return salvarButton;
-    }
-
-    public Button getCancelarButton() {
-        return cancelarButton;
     }
 }

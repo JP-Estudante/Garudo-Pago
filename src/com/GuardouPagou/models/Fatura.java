@@ -9,7 +9,11 @@ public class Fatura {
     private int numeroFatura;
     private LocalDate vencimento;
     private double valor;
-    private String status;
+    private String status; // Este campo já existe e representa o status geral da fatura
+    private String marca; // Adicionado para coluna MARCA
+
+    // NOVO CAMPO ADICIONADO AQUI
+    private String statusFaturaIndividual; // Novo campo para o status individual da fatura
 
     // Construtor vazio
     public Fatura() {
@@ -85,5 +89,22 @@ public class Fatura {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getMarca() {
+        return marca;
+    }
+
+    public void setMarca(String marca) {
+        this.marca = marca;
+    }
+
+    // NOVOS GETTERS E SETTERS ADICIONADOS AQUI
+    public String getStatusFaturaIndividual() {
+        return statusFaturaIndividual;
+    }
+
+    public void setStatusFaturaIndividual(String statusFaturaIndividual) {
+        this.statusFaturaIndividual = statusFaturaIndividual;
     }
 }

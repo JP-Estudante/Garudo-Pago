@@ -7,7 +7,7 @@ import com.GuardouPagou.models.DatabaseConnection;
 import com.GuardouPagou.models.Fatura;
 import com.GuardouPagou.models.Marca;
 import com.GuardouPagou.models.NotaFiscal;
-import com.GuardouPagou.models.NotaFaturaView;
+import com.GuardouPagou.views.NotaFaturaView;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;

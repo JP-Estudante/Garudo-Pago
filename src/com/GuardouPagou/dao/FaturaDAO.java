@@ -13,12 +13,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class FaturaDAO {
+
     public void inserirFaturas(List<Fatura> faturas, int notaFiscalId) throws SQLException {
         String sql = "INSERT INTO faturas (nota_fiscal_id, numero_fatura, vencimento, valor, status) VALUES (?, ?, ?, ?, ?)";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             for (Fatura fatura : faturas) {
                 stmt.setInt(1, notaFiscalId);
                 stmt.setInt(2, fatura.getNumeroFatura());
@@ -27,29 +27,102 @@ public class FaturaDAO {
                 stmt.setString(5, "Não Emitida");
                 stmt.addBatch();
             }
-            
+
             stmt.executeBatch();
         }
     }
 
+    // Adicione este novo método para marcar uma fatura específica como emitida
+    public boolean marcarFaturaIndividualComoEmitida(int faturaId) throws SQLException {
+        String sql = "UPDATE faturas SET status = 'Emitida' WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, faturaId);
+            int affectedRows = stmt.executeUpdate();
+            return affectedRows > 0;
+        }
+    }
+
+// Adicione este novo método para verificar se todas as faturas de uma nota fiscal foram emitidas
+    public boolean todasFaturasDaNotaEmitidas(int notaFiscalId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM faturas WHERE nota_fiscal_id = ? AND status != 'Emitida'";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, notaFiscalId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) == 0; // Retorna true se a contagem de 'Não Emitida' for zero
+                }
+            }
+        }
+        return false;
+    }
+
     public ObservableList<Fatura> listarFaturas() throws SQLException {
         ObservableList<Fatura> faturas = FXCollections.observableArrayList();
-        String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, f.vencimento, f.valor, f.status " +
-                     "FROM faturas f " +
-                     "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
+        String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, f.vencimento, f.valor, f.status, "
+                + "COALESCE(m.nome, n.marca) AS marca "
+                + "FROM faturas f "
+                + "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id "
+                + "LEFT JOIN marcas m ON n.marca_id = m.id "
+                + "ORDER BY n.numero_nota ASC, f.numero_fatura ASC";
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
                 Fatura fatura = new Fatura();
                 fatura.setId(rs.getInt("id"));
+                fatura.setNotaFiscalId(rs.getInt("nota_fiscal_id"));
                 fatura.setNumeroNota(rs.getString("numero_nota"));
                 fatura.setNumeroFatura(rs.getInt("numero_fatura"));
                 fatura.setVencimento(rs.getDate("vencimento").toLocalDate());
                 fatura.setValor(rs.getDouble("valor"));
                 fatura.setStatus(rs.getString("status"));
+                fatura.setMarca(rs.getString("marca"));
+                faturas.add(fatura);
+            }
+        }
+        return faturas;
+    }
+
+    /**
+     * Lista faturas, opcionalmente filtrando por notas fiscais arquivadas
+     * (emitidas) ou não arquivadas (não emitidas).
+     *
+     * @param exibirSomenteArquivadas Se true, lista apenas faturas de notas
+     * arquivadas (emitidas). Se false, lista apenas faturas de notas NÃO
+     * arquivadas (não emitidas).
+     * @return Uma ObservableList de Faturas filtradas.
+     * @throws SQLException Se ocorrer um erro de banco de dados.
+     */
+    public ObservableList<Fatura> listarFaturas(boolean exibirSomenteArquivadas) throws SQLException {
+        ObservableList<Fatura> faturas = FXCollections.observableArrayList();
+        StringBuilder sqlBuilder = new StringBuilder(
+                "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, f.vencimento, f.valor, f.status, "
+                + "COALESCE(m.nome, n.marca) AS marca, n.arquivada "
+                + "FROM faturas f "
+                + "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id "
+                + "LEFT JOIN marcas m ON n.marca_id = m.id "
+        );
+
+        if (exibirSomenteArquivadas) {
+            sqlBuilder.append("WHERE n.arquivada = TRUE ");
+        } else {
+            sqlBuilder.append("WHERE n.arquivada = FALSE ");
+        }
+
+        sqlBuilder.append("ORDER BY n.numero_nota ASC, f.numero_fatura ASC");
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sqlBuilder.toString()); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Fatura fatura = new Fatura();
+                fatura.setId(rs.getInt("id"));
+                fatura.setNotaFiscalId(rs.getInt("nota_fiscal_id"));
+                fatura.setNumeroNota(rs.getString("numero_nota"));
+                fatura.setNumeroFatura(rs.getInt("numero_fatura"));
+                fatura.setVencimento(rs.getDate("vencimento").toLocalDate());
+                fatura.setValor(rs.getDouble("valor"));
+                fatura.setStatus(rs.getString("status")); // Usa o status original da fatura
+                fatura.setMarca(rs.getString("marca"));
                 faturas.add(fatura);
             }
         }

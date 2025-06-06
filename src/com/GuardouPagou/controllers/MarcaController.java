@@ -1,6 +1,6 @@
 package com.GuardouPagou.controllers;
 
-import com.GuardouPagou.models.MarcaView;
+import com.GuardouPagou.views.MarcaView;
 import com.GuardouPagou.dao.MarcaDAO;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Control;
