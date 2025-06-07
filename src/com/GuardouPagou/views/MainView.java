@@ -33,6 +33,13 @@ public class MainView {
     private Button btnNovaFatura, btnNovaMarca, btnSalvarEmail;
     private Label labelText; // Alterado de conteudoLabel para labelText para corresponder ao uso em criarUI
     private TextField emailField;
+    private RadioButton rbFiltraPeriodo = new RadioButton("Filtrar por Perí­odo");
+    private RadioButton rbFiltraMarca = new RadioButton("Filtrar por Marca");
+    ;
+    private ToggleGroup filtroToggleGroup;
+    private DatePicker dpFiltroPeriodo;
+    private ComboBox<Marca> cbFiltroMarca;
+    private VBox filtroContainer;
 
     public BorderPane getRoot() {
         return this.root;
@@ -40,7 +47,7 @@ public class MainView {
 
     public MainView() {
         criarUI();
-        // Carregar a listagem de faturas na inicialização
+        filtroToggleGroup = new ToggleGroup();
         try {
             // Mudar de new FaturaDAO().listarFaturas() para:
             ObservableList<Fatura> faturas = new FaturaDAO().listarFaturas(false); // Listar apenas não arquivadas
@@ -60,7 +67,43 @@ public class MainView {
     private void atualizarListaFaturas() {
         try {
             // Mudar de new FaturaDAO().listarFaturas() para:
-            ObservableList<Fatura> faturas = new FaturaDAO().listarFaturas(false); // Listar apenas não arquivadas
+            ObservableList<Fatura> faturas;
+            if (rbFiltraPeriodo.isSelected()) {
+                LocalDate dataSelecionada = dpFiltroPeriodo.getValue();
+                if (dataSelecionada != null) {
+                    System.out.println("Atualizando lista por período: " + dataSelecionada);
+                    // por Periodo
+                    faturas = new FaturaDAO().listarFaturasPorPeriodo(dataSelecionada);
+
+                } else {
+                    faturas = new FaturaDAO().listarFaturas(false);
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Atencao");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Selecione uma data para filtrar por periodo.");
+                    alert.showAndWait();
+                }
+
+            } else if (rbFiltraMarca.isSelected()) {
+                Marca selectedMarcaObject = cbFiltroMarca.getValue();
+                String marcaSelecionada = (selectedMarcaObject != null) ? selectedMarcaObject.getNome() : null;
+
+                if (marcaSelecionada != null && !marcaSelecionada.isEmpty()) {
+                    System.out.println("Atualizando lista por marca: " + marcaSelecionada);
+                    // Por Marca
+                    faturas = new FaturaDAO().listarFaturasPorMarca(marcaSelecionada);
+                } else {
+                    faturas = new FaturaDAO().listarFaturas(false);
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Atenção");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Selecione uma marca para filtrar.");
+                    alert.showAndWait();
+                }
+            } else {
+                faturas = new FaturaDAO().listarFaturas(false);
+                //faturas = new FaturaDAO().listarFaturas();
+            }
             mostrarListaFaturas(faturas);
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -284,7 +327,7 @@ public class MainView {
             }
         });
         colunaAcoes.setPrefWidth(150);
-        
+
         tabela.getColumns().addAll(colunaId, colunaNome, colunaDescricao, colunaAcoes); // Adicionando coluna Ações
         tabela.setItems(marcas);
 
@@ -373,6 +416,7 @@ public class MainView {
         colunaVencimento.setCellValueFactory(new PropertyValueFactory<>("vencimento"));
         colunaVencimento.setCellFactory(column -> new TableCell<Fatura, LocalDate>() {
             private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
             @Override
             protected void updateItem(LocalDate vencimento, boolean empty) {
                 super.updateItem(vencimento, empty);
@@ -474,13 +518,106 @@ public class MainView {
         Button btnAtualizar = new Button("Atualizar");
         btnAtualizar.setStyle("-fx-background-color: #C88200; -fx-text-fill: #000000; -fx-font-weight: bold;");
 
-        toolbar.getChildren().addAll(btnAtualizar);
+       // --- filtros - RADIOBUTTONS E TOGGLEGROUP ---
+
+        rbFiltraPeriodo.setToggleGroup(filtroToggleGroup);
+        rbFiltraPeriodo.setStyle("-fx-text-fill: #000000;");
+
+        rbFiltraMarca.setToggleGroup(filtroToggleGroup);
+        rbFiltraMarca.setStyle("-fx-text-fill: #000000;");
+        
+        // Inicializa o DatePicker e ComboBox AQUI
+        if (dpFiltroPeriodo == null) {
+            dpFiltroPeriodo = new DatePicker();
+            dpFiltroPeriodo.setPromptText("Selecione a data");
+            dpFiltroPeriodo.setStyle("-fx-background-color: #FFFFFF; -fx-text-fill: #000000;");
+            dpFiltroPeriodo.setPrefWidth(200);
+            dpFiltroPeriodo.setVisible(false);
+            dpFiltroPeriodo.setManaged(false); // Não ocupa espaço quando invisível
+        }
+
+        if (cbFiltroMarca == null) {
+            cbFiltroMarca = new ComboBox<>();
+            cbFiltroMarca.setPromptText("Selecione a Marca");
+            cbFiltroMarca.setStyle("-fx-background-color: #FFFFFF; -fx-text-fill: #000000;");
+            cbFiltroMarca.setPrefWidth(200);
+            cbFiltroMarca.setVisible(false);
+            cbFiltroMarca.setManaged(false); // Nao ocupa espaco quando invisivel
+
+            try {
+                ObservableList<Marca> marcas = new MarcaDAO().listarMarcas();
+                cbFiltroMarca.setItems(marcas);
+                cbFiltroMarca.setCellFactory(lv -> new ListCell<Marca>() {
+                    @Override
+                    protected void updateItem(Marca item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty ? "" : item.getNome());
+                    }
+                });
+                cbFiltroMarca.setButtonCell(new ListCell<Marca>() {
+                    @Override
+                    protected void updateItem(Marca item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty ? "" : item.getNome());
+                    }
+                });
+            } catch (SQLException e) {
+                System.err.println("Erro ao carregar marcas para o ComboBox: " + e.getMessage());
+            }
+        }
+
+        if (filtroContainer == null) {
+            filtroContainer = new VBox(10);
+            filtroContainer.setAlignment(Pos.CENTER_LEFT);
+            filtroContainer.setPadding(new Insets(0, 0, 10, 0));
+            filtroContainer.getChildren().addAll(dpFiltroPeriodo, cbFiltroMarca);
+        }
+
+
+
+        toolbar.getChildren().clear();
+        toolbar.getChildren().addAll(rbFiltraPeriodo, rbFiltraMarca, btnAtualizar);
+        toolbar.setSpacing(15);
+        // --- FIM DA ADIÇÃO DOS RADIOBUTTONS E TOGGLEGROUP ---
         toolbar.setAlignment(Pos.CENTER_RIGHT);
 
         container.getChildren().addAll(titulo, toolbar, tabela);
         root.setCenter(container);
 
         btnAtualizar.setOnAction(e -> atualizarListaFaturas());
+
+        // Adiciona os listeners para os RadioButtons e o botão de atualização apenas uma vez
+        if (rbFiltraPeriodo.getOnAction() == null) {
+            btnAtualizar.setOnAction(e -> atualizarListaFaturas());
+
+            rbFiltraPeriodo.setOnAction(e -> {
+                System.out.println("Filtrar por Periodo selecionado");
+                dpFiltroPeriodo.setVisible(true);
+                dpFiltroPeriodo.setManaged(true);
+                cbFiltroMarca.setVisible(false);
+                cbFiltroMarca.setManaged(false);
+
+                dpFiltroPeriodo.setOnAction(event -> {
+                    System.out.println("Data selecionada: " + dpFiltroPeriodo.getValue());
+
+                });
+            });
+
+            rbFiltraMarca.setOnAction(e -> {
+                System.out.println("Filtrar por Marca selecionado");
+                cbFiltroMarca.setVisible(true);
+                cbFiltroMarca.setManaged(true);
+                dpFiltroPeriodo.setVisible(false);
+                dpFiltroPeriodo.setManaged(false);
+
+                cbFiltroMarca.setOnAction(event -> {
+                    Marca selectedMarca = cbFiltroMarca.getSelectionModel().getSelectedItem();
+                    if (selectedMarca != null) {
+                        System.out.println("Marca selecionada: " + selectedMarca.getNome());
+                    }
+                });
+            });
+        }
     }
 
     // MÉTODO marcarFaturaComoEmitida - ADICIONADO
@@ -551,7 +688,6 @@ public class MainView {
             }
         }
     }
-
 
     private void atualizarListaMarcas() {
         try {
