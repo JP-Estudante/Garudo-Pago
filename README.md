@@ -67,11 +67,10 @@ CREATE TABLE faturas (
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-UPDATE notas_fiscais n (
-  SET marca_id = m.id
-  FROM marcas m
-  WHERE m.nome = n.marca;
-);
+UPDATE notas_fiscais n
+SET marca_id = m.id
+FROM marcas m
+WHERE m.nome = n.marca;
 
 ```
 Alteraçõs, para o banco antigo.
