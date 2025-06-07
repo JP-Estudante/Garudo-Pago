@@ -581,7 +581,7 @@ public class MainView {
         // --- FIM DA ADIÇÃO DOS RADIOBUTTONS E TOGGLEGROUP ---
         toolbar.setAlignment(Pos.CENTER_RIGHT);
 
-        container.getChildren().addAll(titulo, toolbar, tabela);
+        container.getChildren().addAll(titulo, toolbar,filtroContainer, tabela);
         root.setCenter(container);
 
         btnAtualizar.setOnAction(e -> atualizarListaFaturas());
