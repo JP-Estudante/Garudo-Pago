@@ -1,0 +1,33 @@
+/* styles.css */
+
+.menu-button {
+    -fx-background-color: #4C4F53;
+    -fx-text-fill: #000000;
+    -fx-background-radius: 22;
+}
+
+.menu-button:hover {
+    -fx-background-color: #8A8B8C;
+}
+
+.menu-button:focused {
+    -fx-border-color: #C88200;
+    -fx-border-width: 2;
+    -fx-border-radius: 22;
+}
+
+.modal-button {
+    -fx-background-color: #4C4F53;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 22;
+}
+
+.modal-button:hover {
+    -fx-background-color: #8A8B8C;
+}
+
+.modal-button:focused {
+    -fx-border-color: #C88200;
+    -fx-border-width: 2;
+    -fx-border-radius: 22;
+}
