@@ -1,7 +1,7 @@
 package com.GuardouPagou.controllers;
 
-import com.GuardouPagou.models.Marca;
 import com.GuardouPagou.models.Fatura;
+import com.GuardouPagou.models.Marca;
 import com.GuardouPagou.views.ArquivadasView;
 import com.GuardouPagou.views.MainView;
 import com.GuardouPagou.views.MarcaView;
@@ -10,11 +10,14 @@ import com.GuardouPagou.dao.MarcaDAO;
 import com.GuardouPagou.dao.FaturaDAO;
 import com.GuardouPagou.controllers.MarcaController;
 import com.GuardouPagou.controllers.NotaFaturaController;
+import javafx.collections.ObservableList;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.collections.ObservableList; 
-import java.sql.SQLException;             
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+
+import java.sql.SQLException;
 
 public class MainController {
     private MainView view;
@@ -57,11 +60,35 @@ public class MainController {
         });
         
         view.getBtnNovaFatura().setOnAction(e -> {
-            NotaFaturaView notaFaturaView = new NotaFaturaView();
-            new NotaFaturaController(notaFaturaView);
-            view.getRoot().setCenter(notaFaturaView.getRoot());
+            // CRIA NOVA JANELA MODAL
+            Stage modal = new Stage();
+            Window owner = view.getRoot().getScene().getWindow();
+            modal.initOwner(owner);
+            modal.initModality(Modality.WINDOW_MODAL);
+            modal.setTitle("Cadastro de Nota Fiscal");
+
+            // Instancia view e controller do formulário
+            NotaFaturaView notaView = new NotaFaturaView();
+            new NotaFaturaController(notaView);
+
+            // Coloca no modal
+            Scene cena = new Scene(notaView.getRoot());
+            modal.setScene(cena);
+            modal.setResizable(false);
+
+            // Centraliza em relação à janela pai
+            modal.setOnShown(ev -> {
+                modal.setX(owner.getX() + (owner.getWidth() - modal.getWidth()) / 2);
+                modal.setY(owner.getY() + (owner.getHeight() - modal.getHeight()) / 2);
+            });
+
+            // Exibe e aguarda fechamento
+            modal.showAndWait();
+
+            // Mantém destaque no botão
             destacarBotao(view.getBtnNovaFatura());
         });
+
         
         view.getBtnNovaMarca().setOnAction(e -> {
             MarcaView marcaView = new MarcaView();

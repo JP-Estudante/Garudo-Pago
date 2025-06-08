@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 // As importações de HBox e Pos já estavam implícitas mas vou garantir que estejam explícitas.
 import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import com.GuardouPagou.controllers.ArquivadasController; // Adicionado: para navegar para a tela de arquivadas
 
 public class MainView {
@@ -118,7 +119,10 @@ public class MainView {
     private void criarUI() {
         root = new BorderPane();
         root.setStyle("-fx-background-color: #BDBDBD;");
-
+        root.getStylesheets().add(
+                getClass().getResource("button-style.css").toExternalForm()
+        );
+        
         VBox menuLateral = new VBox(20);
         menuLateral.setPadding(new Insets(20));
         menuLateral.setStyle("-fx-background-color: #323437; -fx-min-width: 250px;");
@@ -220,8 +224,9 @@ public class MainView {
     // MÉTODO mostrarListaMarcas - CORRIGIDO E ORIGINAL
     public void mostrarListaMarcas(ObservableList<Marca> marcas) {
         TableView<Marca> tabela = new TableView<>();
-        tabela.setStyle("-fx-background-color: #3d4043; -fx-border-color: #4A4A4A; -fx-border-width: 1; -fx-background-radius: 5; -fx-border-radius: 5;");
+        tabela.setStyle("-fx-border-color: #4A4A4A; -fx-border-width: 1; -fx-background-radius: 5; -fx-border-radius: 5;");
         tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tabela.getStylesheets().add(getClass().getResource("table-style.css").toExternalForm());
 
         TableColumn<Marca, Integer> colunaId = new TableColumn<>("ID");
         colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -358,8 +363,9 @@ public class MainView {
     // MÉTODO mostrarListaFaturas - ADICIONADO E CORRIGIDO
     public void mostrarListaFaturas(ObservableList<Fatura> faturas) {
         TableView<Fatura> tabela = new TableView<>();
-        tabela.setStyle("-fx-background-color: #3d4043; -fx-border-color: #4A4A4A; -fx-border-width: 1; -fx-background-radius: 5; -fx-border-radius: 5;");
+        tabela.setStyle("-fx-border-color: #4A4A4A; -fx-border-width: 1; -fx-background-radius: 5; -fx-border-radius: 5;");
         tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tabela.getStylesheets().add(getClass().getResource("table-style.css").toExternalForm());
 
         TableColumn<Fatura, Integer> colunaId = new TableColumn<>("ID");
         colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -518,14 +524,13 @@ public class MainView {
         Button btnAtualizar = new Button("Atualizar");
         btnAtualizar.setStyle("-fx-background-color: #C88200; -fx-text-fill: #000000; -fx-font-weight: bold;");
 
-       // --- filtros - RADIOBUTTONS E TOGGLEGROUP ---
-
+        // --- filtros - RADIOBUTTONS E TOGGLEGROUP ---
         rbFiltraPeriodo.setToggleGroup(filtroToggleGroup);
         rbFiltraPeriodo.setStyle("-fx-text-fill: #000000;");
 
         rbFiltraMarca.setToggleGroup(filtroToggleGroup);
         rbFiltraMarca.setStyle("-fx-text-fill: #000000;");
-        
+
         // Inicializa o DatePicker e ComboBox AQUI
         if (dpFiltroPeriodo == null) {
             dpFiltroPeriodo = new DatePicker();
@@ -573,15 +578,13 @@ public class MainView {
             filtroContainer.getChildren().addAll(dpFiltroPeriodo, cbFiltroMarca);
         }
 
-
-
         toolbar.getChildren().clear();
         toolbar.getChildren().addAll(rbFiltraPeriodo, rbFiltraMarca, btnAtualizar);
         toolbar.setSpacing(15);
         // --- FIM DA ADIÇÃO DOS RADIOBUTTONS E TOGGLEGROUP ---
         toolbar.setAlignment(Pos.CENTER_RIGHT);
 
-        container.getChildren().addAll(titulo, toolbar,filtroContainer, tabela);
+        container.getChildren().addAll(titulo, toolbar, filtroContainer, tabela);
         root.setCenter(container);
 
         btnAtualizar.setOnAction(e -> atualizarListaFaturas());
