@@ -38,7 +38,7 @@ Em seguida, execute os comandos SQL abaixo para criar as tabelas:
 CREATE TABLE marcas (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL UNIQUE,
-    descricao VARCHAR(256),
+    descricao VARCHAR(500),
     cor VARCHAR(7) NOT NULL
 );
 
@@ -86,6 +86,9 @@ ALTER TABLE notas_fiscais
 ADD CONSTRAINT fk_marca
 FOREIGN KEY (marca_id)
 REFERENCES marcas(id);
+
+ALTER TABLE marcas
+ALTER COLUMN descricao TYPE VARCHAR(500);
 ```
 ---
 
