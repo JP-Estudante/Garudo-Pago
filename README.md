@@ -31,10 +31,9 @@ Crie um banco de dados com o nome:
 
 ```sql
 CREATE DATABASE guardoupagou;
-````
+```
 
 Em seguida, execute os comandos SQL abaixo para criar as tabelas:
-
 ```sql
 CREATE TABLE marcas (
     id SERIAL PRIMARY KEY,
@@ -47,12 +46,13 @@ CREATE TABLE notas_fiscais (
     id SERIAL PRIMARY KEY,
     numero_nota VARCHAR(50) NOT NULL UNIQUE,
     data_emissao DATE NOT NULL,
-    marca VARCHAR(100) NOT NULL,
+    marca_id INTEGER, -- FK para marcas
     status VARCHAR(20) DEFAULT 'Ativa',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     arquivada BOOLEAN DEFAULT FALSE,
     data_arquivamento DATE,
-    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_marca FOREIGN KEY (marca_id) REFERENCES marcas(id)
 );
 
 CREATE TABLE faturas (
@@ -60,48 +60,64 @@ CREATE TABLE faturas (
     nota_fiscal_id INTEGER REFERENCES notas_fiscais(id) ON DELETE CASCADE,
     vencimento DATE NOT NULL,
     valor DECIMAL(10,2) NOT NULL,
-    numero_fatura CHARACTER VARYING(50),
+    numero_fatura VARCHAR(50),
     status VARCHAR(20) DEFAULT 'Não Emitida',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    numero_fatura CHARACTER VARYING(50),
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-UPDATE notas_fiscais n (
-  SET marca_id = m.id
-  FROM marcas m
-  WHERE m.nome = n.marca;
-);
-
 ```
-Alteraçõs, para o banco antigo.
-```
-ALTER TABLE faturas
-ADD COLUMN numero_fatura CHARACTER VARYING(50);
+
+-- Se migrando dados de um banco antigo:
+```sql
+ALTER TABLE notas_fiscais ADD COLUMN marca_id INTEGER;
+
+UPDATE notas_fiscais n
+SET marca_id = m.id
+FROM marcas m
+WHERE m.nome = n.marca;
 
 ALTER TABLE notas_fiscais
-ADD COLUMN arquivada BOOLEAN DEFAULT FALSE;
-
-ALTER TABLE notas_fiscais
-ADD COLUMN data_arquivamento DATE;
-
-ALTER TABLE faturas
-ADD COLUMN atualizado_em TIMESTAMP;
+ADD CONSTRAINT fk_marca
+FOREIGN KEY (marca_id)
+REFERENCES marcas(id);
 ```
 ---
 
 ## 📂 Estrutura do Projeto
 
 ```
-Guardou-Pagou/
-├── src/
-│   ├── main/
-│   │   └── java/
-│   └── resources/
-├── lib/
-│   └── postgresql-42.7.5.jar
-├── README.md
-└── ...
+GuardouPagou/
+src/
+└── com/
+    └── GuardouPagou/
+        ├── controllers/
+        │   ├── ArquivadasController.java
+        │   ├── MainController.java
+        │   ├── MarcaController.java
+        │   ├── NotaFaturaController.java
+        │   └── NotaFiscalController.java
+        ├── dao/
+        │   ├── FaturaDAO.java
+        │   ├── MarcaDAO.java
+        │   ├── NotaFiscalArquivadaDAO.java
+        │   └── NotaFiscalDAO.java
+        ├── models/
+        │   ├── DatabaseConnection.java
+        │   ├── Fatura.java
+        │   ├── Main.java
+        │   ├── Marca.java
+        │   └── NotaFiscal.java
+        └── views/
+            ├── ArquivadasView.java
+            ├── MainView.java
+            ├── MarcaView.java
+            ├── NotaFaturaView.java
+            ├── NotaFiscalView.java
+            ├── button-style.css
+            └── table-style.css
+README.md
+build.xml
+manifest.mf
 ```
 
 ---
@@ -110,6 +126,7 @@ Guardou-Pagou/
 
 * Certifique-se de adicionar o `postgresql-42.7.5.jar` ao **classpath** do projeto no NetBeans ou no seu ambiente Java.
 * Configure corretamente o **usuário, senha e URL** do banco de dados no seu código Java para a conexão funcionar.
+* O arquivo `DataBaseConnection.java` está na raiz do projeto caso não tenha ou foi perdido.
 
 ---
 
