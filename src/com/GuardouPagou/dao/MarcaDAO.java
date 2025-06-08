@@ -62,4 +62,16 @@ public class MarcaDAO {
         }
         return marcas;
     }
+    
+        public int getNextId() throws SQLException {
+        String sql = "SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM marcas";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("next_id");
+            }
+            return 1;
+        }
+    }
 }

@@ -20,14 +20,15 @@ import javafx.stage.Window;
 import java.sql.SQLException;
 
 public class MainController {
+
     private MainView view;
     private Button botaoSelecionado;
-    
+
     public MainController(MainView view) {
         this.view = view;
         configurarEventos();
     }
-    
+
     private void configurarEventos() {
         view.getBtnListarFaturas().setOnAction(e -> {
             try {
@@ -39,7 +40,7 @@ public class MainController {
                 ex.printStackTrace();
             }
         });
-        
+
         view.getBtnListarMarcas().setOnAction(e -> {
             try {
                 ObservableList<Marca> marcas = new MarcaDAO().listarMarcas();
@@ -50,15 +51,15 @@ public class MainController {
                 ex.printStackTrace();
             }
         });
-        
+
         view.getBtnArquivadas().setOnAction(e -> {
-         // Em vez de: atualizarConteudo("Documentos Arquivados");
-         ArquivadasView arquivadasView = new ArquivadasView();
-         new ArquivadasController(arquivadasView); // O controller carrega os dados
-         view.getRoot().setCenter(arquivadasView.getRoot());
-         destacarBotao(view.getBtnArquivadas());
+            // Em vez de: atualizarConteudo("Documentos Arquivados");
+            ArquivadasView arquivadasView = new ArquivadasView();
+            new ArquivadasController(arquivadasView); // O controller carrega os dados
+            view.getRoot().setCenter(arquivadasView.getRoot());
+            destacarBotao(view.getBtnArquivadas());
         });
-        
+
         view.getBtnNovaFatura().setOnAction(e -> {
             // CRIA NOVA JANELA MODAL
             Stage modal = new Stage();
@@ -89,14 +90,41 @@ public class MainController {
             destacarBotao(view.getBtnNovaFatura());
         });
 
-        
         view.getBtnNovaMarca().setOnAction(e -> {
+            // 1) Cria uma Stage modal
+            Stage modal = new Stage();
+            Window owner = view.getRoot().getScene().getWindow();
+            modal.initOwner(owner);
+            modal.initModality(Modality.WINDOW_MODAL);
+            modal.setTitle("Cadastro de Marca");
+
+            // 2) Instancia view e controller
             MarcaView marcaView = new MarcaView();
             new MarcaController(marcaView);
-            view.getRoot().setCenter(marcaView.getRoot());
+
+            // 3) Cria a Scene e CARREGA O CSS do pacote com.GuardouPagou.views
+            Scene scene = new Scene(marcaView.getRoot());
+            scene.getStylesheets().add(
+                    MarcaView.class
+                            .getResource("styles.css") // procura em com/GuardouPagou/views/styles.css
+                            .toExternalForm()
+            );
+            modal.setScene(scene);
+            modal.setResizable(false);
+
+            // 4) Centraliza em relação à janela pai
+            modal.setOnShown(ev -> {
+                modal.setX(owner.getX() + (owner.getWidth() - modal.getWidth()) / 2);
+                modal.setY(owner.getY() + (owner.getHeight() - modal.getHeight()) / 2);
+            });
+
+            // 5) Exibe e aguarda
+            modal.showAndWait();
+
+            // 6) Mantém destaque no botão
             destacarBotao(view.getBtnNovaMarca());
         });
-        
+
         view.getBtnSalvarEmail().setOnAction(e -> {
             String email = view.getEmailField().getText();
             if (validarEmail(email)) {
@@ -106,33 +134,33 @@ public class MainController {
             }
         });
     }
-   
+
     private void destacarBotao(Button botao) {
         // Remove destaque do botão anterior
         if (botaoSelecionado != null) {
-            String corOriginal = botaoSelecionado == view.getBtnNovaFatura() || 
-                               botaoSelecionado == view.getBtnNovaMarca() ? 
-                               "#f0a818" : "#C88200";
-            botaoSelecionado.setStyle("-fx-background-color: " + corOriginal + "; " +
-                                    "-fx-text-fill: #000000; " +
-                                    "-fx-font-weight: bold; " +
-                                    "-fx-border-width: 0;");
+            String corOriginal = botaoSelecionado == view.getBtnNovaFatura()
+                    || botaoSelecionado == view.getBtnNovaMarca()
+                    ? "#f0a818" : "#C88200";
+            botaoSelecionado.setStyle("-fx-background-color: " + corOriginal + "; "
+                    + "-fx-text-fill: #000000; "
+                    + "-fx-font-weight: bold; "
+                    + "-fx-border-width: 0;");
         }
-        
+
         // Aplica destaque ao novo botão
-        botao.setStyle("-fx-background-color: #f0a818; " +
-                     "-fx-text-fill: #000000; " +
-                     "-fx-font-weight: bold; " +
-                     "-fx-border-color: #BDBDBD; " +
-                     "-fx-border-width: 2px;");
-        
+        botao.setStyle("-fx-background-color: #f0a818; "
+                + "-fx-text-fill: #000000; "
+                + "-fx-font-weight: bold; "
+                + "-fx-border-color: #BDBDBD; "
+                + "-fx-border-width: 2px;");
+
         botaoSelecionado = botao;
     }
-    
+
     private void atualizarConteudo(String texto) {
         view.getConteudoLabel().setText(texto);
     }
-    
+
     private boolean validarEmail(String email) {
         return email != null && email.matches("^[\\w.-]+@[\\w.-]+\\.[a-z]{2,}$");
     }

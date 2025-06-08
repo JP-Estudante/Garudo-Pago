@@ -1,273 +1,155 @@
 package com.GuardouPagou.views;
 
+import java.net.URL;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.geometry.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.paint.Color;
 
 public class MarcaView {
 
-    private final BorderPane root;
-    private final TextField nomeField;
-    private final TextArea descricaoArea;
-    private final ColorPicker corPicker;
-    private final Button salvarButton;
-    private final Button cancelarButton;
+    private BorderPane root;
+    private Label lblTitulo, lblSubtitle;
+    private HBox pillFields;
+    private TextField tfNome;
+    private ColorPicker colorPicker;
+    private TextArea taDescricao;
+    private Button btnLimpar, btnGravar;      // Renomeado aqui
+    private Label lblId;
 
     public MarcaView() {
-        nomeField = new TextField();
-        descricaoArea = new TextArea();
-        corPicker = new ColorPicker();
-        salvarButton = new Button("Salvar");
-        cancelarButton = new Button("Cancelar");
-        root = new BorderPane();
         criarUI();
     }
 
     private void criarUI() {
-        root.setStyle("-fx-background-color: #BDBDBD; -fx-padding: 20;");
+        // Raiz e CSS
+        root = new BorderPane();
+        root.setStyle("-fx-background-color: #323437; -fx-padding: 20;");
+        URL cssUrl = MarcaView.class.getResource("styles.css");
+        if (cssUrl == null) {
+            throw new IllegalStateException("styles.css não encontrado em com/GuardouPagou/views");
+        }
+        root.getStylesheets().add(cssUrl.toExternalForm());
 
-        // Painel de formulário
-        VBox formPanel = new VBox(15);
-        formPanel.setPadding(new Insets(20));
-        formPanel.setStyle(
-                "-fx-background-color: #323437; "
-                + "-fx-border-color: #C88200; "
-                + "-fx-border-width: 2; "
+        // ——— HEADER ———
+        lblTitulo = new Label("Cadastro de Marcas");
+        lblTitulo.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        lblTitulo.setTextFill(Color.web("#F0A818"));
+        lblSubtitle = new Label("Dados da nova marca");
+        lblSubtitle.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
+        lblSubtitle.setTextFill(Color.web("#7890A8"));
+        Separator sep1 = new Separator();
+        sep1.setStyle("-fx-background-color: #7890A8;");
+        VBox headerBox = new VBox(5, lblTitulo, lblSubtitle, sep1);
+        headerBox.setAlignment(Pos.CENTER_LEFT);
+
+        // ——— CAMPOS “PILL” ———
+        // Cria HBox que conterá os três campos e centraliza
+        HBox pillFields = new HBox(15);
+        pillFields.setAlignment(Pos.CENTER);
+
+        // ID (com largura aumentada)
+        lblId = new Label();
+        lblId.setTextFill(Color.web("#181848"));
+        Label idLabel = new Label("# ID - Marca:");
+        idLabel.getStyleClass().add("field-subtitle");
+        VBox idBox = new VBox(3, idLabel, lblId);
+        idBox.getStyleClass().add("pill-field");
+        idBox.setPrefWidth(100);
+
+        // Nome da Marca
+        tfNome = new TextField();
+        tfNome.setPromptText("Digite um nome");
+        Label nomeLabel = new Label("Nome da Marca:");
+        nomeLabel.getStyleClass().add("field-subtitle");
+        VBox nomeBox = new VBox(3, nomeLabel, tfNome);
+        nomeBox.getStyleClass().add("pill-field");
+
+        // Cor
+        colorPicker = new ColorPicker();
+        Label corLabel = new Label("Cor:");
+        corLabel.getStyleClass().add("field-subtitle");
+        VBox corBox = new VBox(3, corLabel, colorPicker);
+        corBox.getStyleClass().add("pill-field");
+        colorPicker.getStyleClass().add("pill-color-picker");
+
+        // Adiciona os três campos e centraliza-os
+        HBox pillContainer = new HBox(pillFields);
+        pillContainer.setAlignment(Pos.CENTER);
+        pillFields.getChildren().addAll(idBox, nomeBox, corBox);
+
+        // ——— DESCRIÇÃO ——— (inalterado)
+        taDescricao = new TextArea();
+        taDescricao.setPromptText("Descrição (opcional, até 500 caracteres)");
+        taDescricao.setWrapText(true);
+        taDescricao.setPrefRowCount(5);
+        taDescricao.getStyleClass().add("text-area-pill");
+        Label descLabel = new Label("Descrição");
+        descLabel.getStyleClass().add("field-subtitle");
+        VBox descBox = new VBox(5, descLabel, taDescricao);
+        descBox.setStyle(
+                "-fx-background-color: #BDBDBD; "
                 + "-fx-background-radius: 10; "
-                + "-fx-border-radius: 10;"
+                + "-fx-padding: 10;"
         );
 
-        // Título
-        Label titulo = new Label("CADASTRO DE MARCA");
-        titulo.setStyle(
-                "-fx-font-family: Arial; "
-                + "-fx-font-weight: bold; "
-                + "-fx-font-size: 24px; "
-                + "-fx-text-fill: #F0A818;"
-        );
+        // ——— BOTÕES ———
+        btnLimpar = new Button("Limpar");
+        btnLimpar.getStyleClass().add("modal-button");
+        btnLimpar.setPrefWidth(100);
 
-        // Campo Nome da Marca
-        VBox nomeBox = new VBox(5);
-        Label nomeLabel = new Label("Nome da Marca*:");
-        nomeLabel.setStyle(
-                "-fx-font-family: Arial; "
-                + "-fx-font-size: 16px; "
-                + "-fx-text-fill: #BDBDBD;"
-        );
-        nomeField.setPromptText("Digite o nome da marca");
-        nomeField.setStyle(
-                "-fx-background-color: #2A2A2A; "
-                + "-fx-text-fill: #FFFFFF; "
-                + "-fx-font-size: 14px; "
-                + "-fx-border-color: #4A4A4A; "
-                + "-fx-border-width: 1; "
-                + "-fx-background-radius: 5; "
-                + "-fx-border-radius: 5; "
-                + "-fx-prompt-text-fill: #BDBDBD;"
-        );
-        nomeField.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal) {
-                nomeField.setStyle(
-                        "-fx-background-color: #2A2A2A; "
-                        + "-fx-text-fill: #FFFFFF; "
-                        + "-fx-font-size: 14px; "
-                        + "-fx-border-color: #F0A818; "
-                        + "-fx-border-width: 1; "
-                        + "-fx-background-radius: 5; "
-                        + "-fx-border-radius: 5; "
-                        + "-fx-prompt-text-fill: #BDBDBD;"
-                );
-            } else {
-                nomeField.setStyle(
-                        "-fx-background-color: #2A2A2A; "
-                        + "-fx-text-fill: #FFFFFF; "
-                        + "-fx-font-size: 14px; "
-                        + "-fx-border-color: #4A4A4A; "
-                        + "-fx-border-width: 1; "
-                        + "-fx-background-radius: 5; "
-                        + "-fx-border-radius: 5; "
-                        + "-fx-prompt-text-fill: #BDBDBD;"
-                );
-            }
-        });
-        nomeField.setPrefWidth(400);
-        nomeBox.getChildren().addAll(nomeLabel, nomeField);
+        btnGravar = new Button("Gravar");
+        btnGravar.getStyleClass().add("modal-button");
+        btnGravar.setPrefWidth(100);
 
-        // Campo Descrição
-        VBox descricaoBox = new VBox(5);
-        Label descricaoLabel = new Label("Descrição:");
-        descricaoLabel.setStyle(
-                "-fx-font-family: Arial; "
-                + "-fx-font-size: 16px; "
-                + "-fx-text-fill: #BDBDBD;"
-        );
-        descricaoArea.setPromptText("Digite a descrição da marca");
-        descricaoArea.setStyle(
-                "-fx-control-inner-background: #2A2A2A; "
-                + "-fx-text-fill: #FFFFFF; "
-                + "-fx-font-size: 14px; "
-                + "-fx-border-color: #4A4A4A; "
-                + "-fx-border-width: 1; "
-                + "-fx-background-radius: 5; "
-                + "-fx-border-radius: 5; "
-                + "-fx-prompt-text-fill: #BDBDBD;"
-        );
-        descricaoArea.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal) {
-                descricaoArea.setStyle(
-                        "-fx-control-inner-background: #2A2A2A; "
-                        + "-fx-text-fill: #FFFFFF; "
-                        + "-fx-font-size: 14px; "
-                        + "-fx-border-color: #F0A818; "
-                        + "-fx-border-width: 1; "
-                        + "-fx-background-radius: 5; "
-                        + "-fx-border-radius: 5; "
-                        + "-fx-prompt-text-fill: #BDBDBD;"
-                );
-            } else {
-                descricaoArea.setStyle(
-                        "-fx-control-inner-background: #2A2A2A; "
-                        + "-fx-text-fill: #FFFFFF; "
-                        + "-fx-font-size: 14px; "
-                        + "-fx-border-color: #4A4A4A; "
-                        + "-fx-border-width: 1; "
-                        + "-fx-background-radius: 5; "
-                        + "-fx-border-radius: 5; "
-                        + "-fx-prompt-text-fill: #BDBDBD;"
-                );
-            }
-        });
-        descricaoArea.setPrefWidth(400);
-        descricaoArea.setPrefRowCount(6);
-        descricaoBox.getChildren().addAll(descricaoLabel, descricaoArea);
-
-        // Campo Cor
-        VBox corBox = new VBox(5);
-        Label corLabel = new Label("Cor*:");
-        corLabel.setStyle(
-                "-fx-font-family: Arial; "
-                + "-fx-font-size: 16px; "
-                + "-fx-text-fill: #BDBDBD;"
-        );
-        corPicker.setStyle(
-                "-fx-background-color: #2A2A2A; "
-                + "-fx-border-color: #4A4A4A; "
-                + "-fx-border-width: 1; "
-                + "-fx-background-radius: 5; "
-                + "-fx-border-radius: 5; "
-                + "-fx-color-label-visible: false;"
-        );
-        corPicker.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal) {
-                corPicker.setStyle(
-                        "-fx-background-color: #2A2A2A; "
-                        + "-fx-border-color: #F0A818; "
-                        + "-fx-border-width: 1; "
-                        + "-fx-background-radius: 5; "
-                        + "-fx-border-radius: 5; "
-                        + "-fx-color-label-visible: false;"
-                );
-            } else {
-                corPicker.setStyle(
-                        "-fx-background-color: #2A2A2A; "
-                        + "-fx-border-color: #4A4A4A; "
-                        + "-fx-border-width: 1; "
-                        + "-fx-background-radius: 5; "
-                        + "-fx-border-radius: 5; "
-                        + "-fx-color-label-visible: false;"
-                );
-            }
-        });
-        corPicker.setPrefWidth(100); // Menor para melhor visibilidade
-        corBox.getChildren().addAll(corLabel, corPicker);
-
-        formPanel.getChildren().addAll(nomeBox, descricaoBox, corBox);
-
-        // Botões
-        HBox buttonBox = new HBox(10);
-        salvarButton.setStyle(
-                "-fx-background-color: #F0A818; "
-                + "-fx-text-fill: #000000; "
-                + "-fx-font-family: Arial; "
-                + "-fx-font-weight: bold; "
-                + "-fx-font-size: 14px; "
-                + "-fx-background-radius: 5;"
-        );
-        salvarButton.setOnMouseEntered(e -> salvarButton.setStyle(
-                "-fx-background-color: #FFC107; "
-                + "-fx-text-fill: #000000; "
-                + "-fx-font-family: Arial; "
-                + "-fx-font-weight: bold; "
-                + "-fx-font-size: 14px; "
-                + "-fx-background-radius: 5;"
-        ));
-        salvarButton.setOnMouseExited(e -> salvarButton.setStyle(
-                "-fx-background-color: #F0A818; "
-                + "-fx-text-fill: #000000; "
-                + "-fx-font-family: Arial; "
-                + "-fx-font-weight: bold; "
-                + "-fx-font-size: 14px; "
-                + "-fx-background-radius: 5;"
-        ));
-        cancelarButton.setStyle(
-                "-fx-background-color: #F0A818; "
-                + "-fx-text-fill: #000000; "
-                + "-fx-font-family: Arial; "
-                + "-fx-font-weight: bold; "
-                + "-fx-font-size: 14px; "
-                + "-fx-background-radius: 5;"
-        );
-        cancelarButton.setOnMouseEntered(e -> cancelarButton.setStyle(
-                "-fx-background-color: #FFC107; "
-                + "-fx-text-fill: #000000; "
-                + "-fx-font-family: Arial; "
-                + "-fx-font-weight: bold; "
-                + "-fx-font-size: 14px; "
-                + "-fx-background-radius: 5;"
-        ));
-        cancelarButton.setOnMouseExited(e -> cancelarButton.setStyle(
-                "-fx-background-color: #F0A818; "
-                + "-fx-text-fill: #000000; "
-                + "-fx-font-family: Arial; "
-                + "-fx-font-weight: bold; "
-                + "-fx-font-size: 14px; "
-                + "-fx-background-radius: 5;"
-        ));
-        buttonBox.getChildren().addAll(salvarButton, cancelarButton);
+        HBox buttonBox = new HBox(10, btnLimpar, btnGravar);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
+        buttonBox.setPadding(new Insets(10, 0, 0, 0));
 
-        // Layout principal
-        VBox mainBox = new VBox(20);
-        mainBox.getChildren().addAll(titulo, formPanel, buttonBox);
+        // ——— MONTA CONTAINER PRINCIPAL ———
+        VBox container = new VBox(15,
+                headerBox,
+                pillContainer, // usa o container centralizado
+                descBox,
+                buttonBox
+        );
+        container.setAlignment(Pos.TOP_LEFT);
 
-        root.setCenter(mainBox);
+        root.setCenter(container);
     }
 
-    // Getters
+    public void setNextId(int id) {
+        lblId.setText(String.valueOf(id));
+    }
+
+    // === GETTERS ===
     public BorderPane getRoot() {
         return root;
     }
 
     public TextField getNomeField() {
-        return nomeField;
+        return tfNome;
     }
 
     public TextArea getDescricaoArea() {
-        return descricaoArea;
+        return taDescricao;
     }
 
     public ColorPicker getCorPicker() {
-        return corPicker;
+        return colorPicker;
+    }
+
+    /**
+     * Antes era getCancelarButton(), agora fica getLimparButton()
+     */
+    public Button getLimparButton() {
+        return btnLimpar;
     }
 
     public Button getSalvarButton() {
-        return salvarButton;
-    }
-
-    public Button getCancelarButton() {
-        return cancelarButton;
+        return btnGravar;
     }
 }
