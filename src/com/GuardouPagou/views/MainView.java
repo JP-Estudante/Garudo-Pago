@@ -120,7 +120,7 @@ public class MainView {
         root = new BorderPane();
         root.setStyle("-fx-background-color: #BDBDBD;");
         root.getStylesheets().add(
-                getClass().getResource("button-style.css").toExternalForm()
+                getClass().getResource("styles.css").toExternalForm()
         );
         
         VBox menuLateral = new VBox(20);
@@ -226,7 +226,7 @@ public class MainView {
         TableView<Marca> tabela = new TableView<>();
         tabela.setStyle("-fx-border-color: #4A4A4A; -fx-border-width: 1; -fx-background-radius: 5; -fx-border-radius: 5;");
         tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tabela.getStylesheets().add(getClass().getResource("table-style.css").toExternalForm());
+        tabela.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
 
         TableColumn<Marca, Integer> colunaId = new TableColumn<>("ID");
         colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -365,7 +365,7 @@ public class MainView {
         TableView<Fatura> tabela = new TableView<>();
         tabela.setStyle("-fx-border-color: #4A4A4A; -fx-border-width: 1; -fx-background-radius: 5; -fx-border-radius: 5;");
         tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tabela.getStylesheets().add(getClass().getResource("table-style.css").toExternalForm());
+        tabela.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
 
         TableColumn<Fatura, Integer> colunaId = new TableColumn<>("ID");
         colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));

@@ -42,7 +42,7 @@ public class NotaFaturaView {
 
     private void criarUI() {
         // Carrega o CSS de estilos
-        root.getStylesheets().add(getClass().getResource("button-style.css").toExternalForm());
+        root.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
 
         // Estilo base do modal
         root.setStyle("-fx-background-color: #323437; -fx-padding: 20;");
