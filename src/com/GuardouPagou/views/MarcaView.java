@@ -17,6 +17,7 @@ public class MarcaView {
     private TextField tfNome;
     private ColorPicker colorPicker;
     private TextArea taDescricao;
+    private Label lblDescCounter;
     private Button btnLimpar, btnGravar;      // Renomeado aqui
     private Label lblId;
 
@@ -81,15 +82,27 @@ public class MarcaView {
         pillContainer.setAlignment(Pos.CENTER);
         pillFields.getChildren().addAll(idBox, nomeBox, corBox);
 
-        // ——— DESCRIÇÃO ——— (inalterado)
+        // ——— DESCRIÇÃO ———
         taDescricao = new TextArea();
         taDescricao.setPromptText("Descrição (opcional, até 500 caracteres)");
         taDescricao.setWrapText(true);
         taDescricao.setPrefRowCount(5);
         taDescricao.getStyleClass().add("text-area-pill");
+
+        // rótulo de descrição
         Label descLabel = new Label("Descrição");
         descLabel.getStyleClass().add("field-subtitle");
-        VBox descBox = new VBox(5, descLabel, taDescricao);
+
+        // contador de caracteres
+        lblDescCounter = new Label("0/500");
+        lblDescCounter.getStyleClass().add("desc-counter");
+
+        // HBox para alinhar contador à direita
+        HBox counterBox = new HBox(lblDescCounter);
+        counterBox.setAlignment(Pos.CENTER_RIGHT);
+
+        // VBox de descrição: label, textarea e counter
+        VBox descBox = new VBox(5, descLabel, taDescricao, counterBox);
         descBox.setStyle(
                 "-fx-background-color: #BDBDBD; "
                 + "-fx-background-radius: 10; "
@@ -121,10 +134,6 @@ public class MarcaView {
         root.setCenter(container);
     }
 
-    public void setNextId(int id) {
-        lblId.setText(String.valueOf(id));
-    }
-
     // === GETTERS ===
     public BorderPane getRoot() {
         return root;
@@ -142,14 +151,19 @@ public class MarcaView {
         return colorPicker;
     }
 
-    /**
-     * Antes era getCancelarButton(), agora fica getLimparButton()
-     */
     public Button getLimparButton() {
         return btnLimpar;
     }
 
     public Button getSalvarButton() {
         return btnGravar;
+    }
+
+    public void setNextId(int id) {
+        lblId.setText(String.format("%04d", id));
+    }
+
+    public Label getDescCounterLabel() {
+        return lblDescCounter;
     }
 }

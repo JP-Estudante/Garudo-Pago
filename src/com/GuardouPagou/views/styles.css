@@ -72,6 +72,12 @@
     -fx-padding: 0;
 }
 
+/* texto do counter fica menor e em #181848 */
+.desc-counter {
+  -fx-font-size: 12px;
+  -fx-text-fill: #181848;
+}
+
 /* Botões pill */
 .button-pill {
     -fx-background-color: #323437;

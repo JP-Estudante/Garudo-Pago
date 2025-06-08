@@ -7,6 +7,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.paint.Color;
 
 import java.sql.SQLException;
+import javafx.stage.Stage;
 
 public class MarcaController {
 
@@ -32,6 +33,17 @@ public class MarcaController {
     private void configurarEventos() {
         view.getSalvarButton().setOnAction(e -> salvarMarca());
         view.getLimparButton().setOnAction(e -> limparFormulario());
+
+        // listener de contador de descrição
+        view.getDescricaoArea().textProperty().addListener((obs, oldText, newText) -> {
+            int length = newText.length();
+            if (length > 500) {
+                // opcional: corta o excesso
+                view.getDescricaoArea().setText(newText.substring(0, 500));
+                length = 500;
+            }
+            view.getDescCounterLabel().setText(length + "/500");
+        });
     }
 
     private void configurarDepuracaoCor() {
@@ -53,7 +65,11 @@ public class MarcaController {
 
             marcaDAO.inserirMarca(nome, descricao, cor);
             mostrarSucesso("Marca cadastrada com sucesso!");
-            limparFormulario();
+
+            // Fecha o modal
+            Stage stage = (Stage) view.getRoot().getScene().getWindow();
+            stage.close();
+
         } catch (SQLException e) {
             mostrarErro("Erro ao salvar marca: " + e.getMessage());
         }
