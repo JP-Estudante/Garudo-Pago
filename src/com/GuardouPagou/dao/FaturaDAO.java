@@ -118,9 +118,11 @@ public class FaturaDAO {
                 + "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id "
                 + "WHERE n.marca ILIKE ?";
 
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, nomeMarca);
+            // Permitir busca parcial ignorando maiúsculas/minúsculas
+            stmt.setString(1, "%" + nomeMarca + "%");
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
