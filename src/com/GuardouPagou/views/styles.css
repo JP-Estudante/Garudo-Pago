@@ -5,7 +5,9 @@
     -fx-text-fill: #000000;
     -fx-background-radius: 22;
 }
-.menu-button:hover { -fx-background-color: #8A8B8C; }
+.menu-button:hover {
+    -fx-background-color: #8A8B8C;
+}
 .menu-button:focused {
     -fx-border-color: #C88200;
     -fx-border-width: 2;
@@ -21,7 +23,9 @@
     -fx-background-radius: 22;
 }
 .modal-button:hover,
-.button-pill:hover { -fx-background-color: #8A8B8C; }
+.button-pill:hover {
+    -fx-background-color: #8A8B8C;
+}
 .modal-button:focused,
 .button-pill:focused {
     -fx-border-color: #C88200;
@@ -35,10 +39,16 @@
     -fx-background-color: #3F5B92;
     -fx-control-inner-background: #3F5B92;
 }
-.table-view .column-header-background { -fx-background-color: #7890A8; }
+.table-view .column-header-background {
+    -fx-background-color: #7890A8;
+}
 .table-view .column-header,
-.table-view .filler    { -fx-background-color: #7890A8; }
-.table-view .column-header .label { -fx-text-fill: #181848; }
+.table-view .filler {
+    -fx-background-color: #7890A8;
+}
+.table-view .column-header .label {
+    -fx-text-fill: #181848;
+}
 
 /* ———————————————— */
 /* Cadastro de Marca Styles */
@@ -61,6 +71,7 @@
     -fx-underline: true;
 }
 
+/* ———————————————— */
 /* Campo-pills */
 .pill-field {
     -fx-background-color: #BDBDBD;
@@ -73,10 +84,32 @@
     -fx-padding: 0;
 }
 
+/* Campos de DatePicker e ComboBox dentro de .pill-field */
+.pill-field .date-picker,
+.pill-field .combo-box {
+    -fx-background-color: #BDBDBD;
+    -fx-background-radius: 20px;
+    -fx-padding: 5px 10px;
+}
+/* Transparência no interior do DatePicker */
+.pill-field .date-picker .editor,
+.pill-field .date-picker .arrow-button {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-border-width: 0;
+}
+/* Transparência no interior do ComboBox */
+.pill-field .combo-box .text-field,
+.pill-field .combo-box .arrow-button {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-border-width: 0;
+}
+
 /* texto do counter fica menor e em #181848 */
 .desc-counter {
-  -fx-font-size: 12px;
-  -fx-text-fill: #181848;
+    -fx-font-size: 12px;
+    -fx-text-fill: #181848;
 }
 
 /* Botões pill */
@@ -87,12 +120,23 @@
     -fx-text-fill: #F04818;
     -fx-alignment: CENTER_LEFT;
 }
-.button-pill:hover { -fx-background-color: #2A2A2A; }
+.button-pill:hover {
+    -fx-background-color: #2A2A2A;
+}
 
 /* Ícones */
-.icon-clean { -fx-graphic: url("icons/clean.png"); -fx-graphic-text-gap: 10px; }
-.icon-cancel { -fx-graphic: url("icons/cancel.png"); -fx-graphic-text-gap: 10px; }
-.icon-save   { -fx-graphic: url("icons/save.png");   -fx-graphic-text-gap: 10px; }
+.icon-clean {
+    -fx-graphic: url("icons/clean.png");
+    -fx-graphic-text-gap: 10px;
+}
+.icon-cancel {
+    -fx-graphic: url("icons/cancel.png");
+    -fx-graphic-text-gap: 10px;
+}
+.icon-save {
+    -fx-graphic: url("icons/save.png");
+    -fx-graphic-text-gap: 10px;
+}
 
 /* ———————————————— */
 /* Field Subtitles */
@@ -124,6 +168,13 @@
 }
 
 /* ———————————————— */
+/* Remove padding interno que inflava só o DatePicker */
+.pill-field .date-picker,
+.pill-field .combo-box {
+    -fx-padding: 0;
+}
+
+/* ———————————————— */
 /* Overrides TextArea */
 .text-area-pill {
     -fx-background-color: transparent;
@@ -137,4 +188,15 @@
 .text-area-pill .content {
     -fx-background-color: #BDBDBD;
     -fx-padding: 10px;
+}
+
+.scroll-pane {
+    /* fundo e cantos arredondados */
+    -fx-background-color: #7890A8;
+    -fx-background-radius: 5;
+}
+/* a viewport (área interna onde o conteúdo fica) */
+.scroll-pane .viewport {
+    -fx-background-color: #7890A8;
+    -fx-background-radius: 5;
 }
