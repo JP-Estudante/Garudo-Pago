@@ -186,6 +186,13 @@
 }
 
 /* ———————————————— */
+/* Anula o fundo azul só para o ScrollPane interno do TextArea-Pill */
+.text-area-pill .scroll-pane,
+.text-area-pill .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* ———————————————— */
 /* Overrides TextArea */
 .text-area-pill {
     -fx-background-color: transparent;

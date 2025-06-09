@@ -84,10 +84,10 @@ public class MarcaView {
 
         // ——— DESCRIÇÃO ———
         taDescricao = new TextArea();
-
+            
         taDescricao.setPrefWidth(600);
         taDescricao.setPrefHeight(200);
-
+        
         taDescricao.setPromptText("Descrição (opcional, até 500 caracteres)");
         taDescricao.setWrapText(true);
         taDescricao.setPrefRowCount(5);
@@ -122,11 +122,12 @@ public class MarcaView {
         btnGravar.getStyleClass().addAll("modal-button", "icon-save");
         btnGravar.setFont(Font.font("Arial", FontWeight.BOLD, 16));
 
-        btnLimpar.setPrefSize(120, 40);
+                btnLimpar.setPrefSize(120, 40);
         btnGravar.setPrefSize(120, 40);
-
+        
         HBox buttonBox = new HBox(10, btnLimpar, btnGravar);
-        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.prefWidthProperty().bind(descBox.widthProperty());
         buttonBox.setPadding(new Insets(10, 0, 0, 0));
 
         // ——— MONTA CONTAINER PRINCIPAL ———
