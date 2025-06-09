@@ -89,8 +89,9 @@
 .button-pill:hover { -fx-background-color: #2A2A2A; }
 
 /* Ícones */
-.icon-cancel { -fx-graphic: url("/icons/cancel.png"); -fx-graphic-text-gap: 10px; }
-.icon-save   { -fx-graphic: url("/icons/save.png");   -fx-graphic-text-gap: 10px; }
+.icon-clean { -fx-graphic: url("icons/clean.png"); -fx-graphic-text-gap: 10px; }
+.icon-cancel { -fx-graphic: url("icons/cancel.png"); -fx-graphic-text-gap: 10px; }
+.icon-save   { -fx-graphic: url("icons/save.png");   -fx-graphic-text-gap: 10px; }
 
 /* ———————————————— */
 /* Field Subtitles */

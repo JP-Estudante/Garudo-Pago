@@ -111,11 +111,11 @@ public class MarcaView {
 
         // ——— BOTÕES ———
         btnLimpar = new Button("Limpar");
-        btnLimpar.getStyleClass().add("modal-button");
+        btnLimpar.getStyleClass().addAll("modal-button", "icon-clean");
         btnLimpar.setPrefWidth(100);
 
         btnGravar = new Button("Gravar");
-        btnGravar.getStyleClass().add("modal-button");
+        btnGravar.getStyleClass().addAll("modal-button", "icon-save");
         btnGravar.setPrefWidth(100);
 
         HBox buttonBox = new HBox(10, btnLimpar, btnGravar);
