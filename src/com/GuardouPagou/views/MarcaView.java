@@ -18,7 +18,7 @@ public class MarcaView {
     private ColorPicker colorPicker;
     private TextArea taDescricao;
     private Label lblDescCounter;
-    private Button btnLimpar, btnGravar;      // Renomeado aqui
+    private Button btnLimpar, btnGravar;
     private Label lblId;
 
     public MarcaView() {
@@ -84,10 +84,10 @@ public class MarcaView {
 
         // ——— DESCRIÇÃO ———
         taDescricao = new TextArea();
-            
+
         taDescricao.setPrefWidth(600);
         taDescricao.setPrefHeight(200);
-        
+
         taDescricao.setPromptText("Descrição (opcional, até 500 caracteres)");
         taDescricao.setWrapText(true);
         taDescricao.setPrefRowCount(5);
@@ -116,11 +116,14 @@ public class MarcaView {
         // ——— BOTÕES ———
         btnLimpar = new Button("Limpar");
         btnLimpar.getStyleClass().addAll("modal-button", "icon-clean");
-        btnLimpar.setPrefWidth(100);
+        btnLimpar.setFont(Font.font("Arial", FontWeight.BOLD, 16));
 
         btnGravar = new Button("Gravar");
         btnGravar.getStyleClass().addAll("modal-button", "icon-save");
-        btnGravar.setPrefWidth(100);
+        btnGravar.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+
+        btnLimpar.setPrefSize(120, 40);
+        btnGravar.setPrefSize(120, 40);
 
         HBox buttonBox = new HBox(10, btnLimpar, btnGravar);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);

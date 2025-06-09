@@ -174,6 +174,17 @@
     -fx-padding: 0;
 }
 
+.scroll-pane {
+    /* fundo e cantos arredondados */
+    -fx-background-color: #7890A8;
+    -fx-background-radius: 5;
+}
+/* a viewport (área interna onde o conteúdo fica) */
+.scroll-pane .viewport {
+    -fx-background-color: #7890A8;
+    -fx-background-radius: 5;
+}
+
 /* ———————————————— */
 /* Overrides TextArea */
 .text-area-pill {
@@ -188,15 +199,4 @@
 .text-area-pill .content {
     -fx-background-color: #BDBDBD;
     -fx-padding: 10px;
-}
-
-.scroll-pane {
-    /* fundo e cantos arredondados */
-    -fx-background-color: #7890A8;
-    -fx-background-radius: 5;
-}
-/* a viewport (área interna onde o conteúdo fica) */
-.scroll-pane .viewport {
-    -fx-background-color: #7890A8;
-    -fx-background-radius: 5;
 }
