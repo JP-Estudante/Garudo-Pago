@@ -84,6 +84,10 @@ public class MarcaView {
 
         // ——— DESCRIÇÃO ———
         taDescricao = new TextArea();
+            
+        taDescricao.setPrefWidth(600);
+        taDescricao.setPrefHeight(200);
+        
         taDescricao.setPromptText("Descrição (opcional, até 500 caracteres)");
         taDescricao.setWrapText(true);
         taDescricao.setPrefRowCount(5);

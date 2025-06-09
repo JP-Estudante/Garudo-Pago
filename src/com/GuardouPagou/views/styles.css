@@ -17,7 +17,7 @@
 .modal-button,
 .button-pill {
     -fx-background-color: #4C4F53;
-    -fx-text-fill: #FFFFFF;
+    -fx-text-fill: #F0A818;
     -fx-background-radius: 22;
 }
 .modal-button:hover,
@@ -46,6 +46,7 @@
 .cadastro-marca-root {
     -fx-background-color: #323437;
     -fx-padding: 20px;
+    -fx-font-size: 14px;
 }
 /* Header principal */
 .cadastro-header {
