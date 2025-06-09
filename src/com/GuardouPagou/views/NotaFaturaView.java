@@ -101,9 +101,12 @@ public class NotaFaturaView {
 
         // Botões
         btnLimpar.getStyleClass().addAll("modal-button", "icon-clean");
+        btnLimpar.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         btnGravar.getStyleClass().addAll("modal-button", "icon-save");
-        btnLimpar.setPrefWidth(120);
-        btnGravar.setPrefWidth(120);
+        btnGravar.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        
+        btnLimpar.setPrefSize(120, 40);
+        btnGravar.setPrefSize(120, 40);
 
         VBox leftPanel = new VBox(20, spinnerBox, btnLimpar, btnGravar);
         leftPanel.setAlignment(Pos.TOP_CENTER);
