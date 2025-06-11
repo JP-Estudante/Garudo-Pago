@@ -168,6 +168,26 @@
 }
 
 /* ———————————————— */
+/* ComboBox dentro de .pill-field: mesmo estilo de TextField */
+.pill-field .combo-box .text-field,
+.pill-field .combo-box .text-field:focused {
+    -fx-font-family: "Arial";
+    -fx-font-size: 14px;
+    -fx-text-fill: #181848;
+    -fx-prompt-text-fill: #181848;
+}
+
+/* ─── ComboBox não-editável dentro de .pill-field ─── */
+.pill-field .combo-box .button-cell,
+.pill-field .combo-box .cell {
+    -fx-background-color: transparent;
+    -fx-font-family: "Arial";
+    -fx-font-size: 14px;
+    -fx-text-fill: #181848;
+    -fx-prompt-text-fill: #181848; /* caso use prompt */
+}
+
+/* ———————————————— */
 /* Remove padding interno que inflava só o DatePicker */
 .pill-field .date-picker,
 .pill-field .combo-box {

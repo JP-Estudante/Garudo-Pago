@@ -78,6 +78,8 @@ public class NotaFaturaView {
         marcaComboBox.setPromptText("Selecione");
         marcaComboBox.setPrefWidth(250);
         VBox marcaBox = new VBox(6, lblMarca, marcaComboBox);
+        // força aplicação da classe TextField no editor do ComboBox
+        marcaComboBox.getEditor().getStyleClass().add("text-field");
         marcaBox.getStyleClass().add("pill-field");
 
         HBox dadosNota = new HBox(20, numeroBox, dataBox, marcaBox);
