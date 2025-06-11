@@ -15,9 +15,12 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.collections.ObservableList;
 import javafx.scene.control.cell.PropertyValueFactory;
+
 import java.sql.SQLException;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+
 import java.util.Optional;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -122,16 +125,16 @@ public class MainView {
         root.getStylesheets().add(
                 getClass().getResource("styles.css").toExternalForm()
         );
-        
+
         VBox menuLateral = new VBox(20);
         menuLateral.setPadding(new Insets(20));
-        menuLateral.setStyle("-fx-background-color: #323437; -fx-min-width: 250px;");
+        menuLateral.getStyleClass().add("menu-lateral-root");
 
-        btnListarFaturas = criarBotao("Listar Faturas", "#C88200");
-        btnListarMarcas = criarBotao("Listar Marcas", "#C88200");
-        btnArquivadas = criarBotao("Arquivadas", "#C88200");
-        btnNovaFatura = criarBotao("Cadastrar Nota com Faturas", "#f0a818");
-        btnNovaMarca = criarBotao("Cadastrar nova marca", "#f0a818");
+        btnListarFaturas = criarBotao("Listar Faturas", "/com/GuardouPagou/views/icons/list.png");
+        btnListarMarcas = criarBotao("Listar Marcas", "/com/GuardouPagou/views/icons/list.png");
+        btnArquivadas = criarBotao("Arquivadas", "/com/GuardouPagou/views/icons/archive.png");
+        btnNovaFatura = criarBotao("Cadastrar Faturas", "/com/GuardouPagou/views/icons/plus.png");
+        btnNovaMarca = criarBotao("Cadastrar Marca", "/com/GuardouPagou/views/icons/plus.png");
 
         // O labelText foi declarado no início da classe e agora é inicializado aqui
         labelText = new Label("Bem-vindo ao GuardouPagou");
@@ -152,41 +155,50 @@ public class MainView {
         root.setCenter(labelText);
     }
 
-    private Button criarBotao(String texto, String cor) {
-        Button btn = new Button(texto);
+    private Button criarBotao(String texto, String iconPath) {
+        Button btn = new Button(" " + texto);
         btn.setMaxWidth(Double.MAX_VALUE);
-        btn.setStyle("-fx-background-color: " + cor + "; "
-                + "-fx-text-fill: #000000; "
-                + "-fx-font-weight: bold;");
+        btn.getStyleClass().add("menu-button");
+
+        if (iconPath != null) {
+            ImageView icon = new ImageView(getClass().getResource(iconPath).toExternalForm());
+            icon.setFitHeight(16);
+            icon.setFitWidth(16);
+            btn.setGraphic(icon);
+        }
+
         return btn;
     }
 
     private VBox criarLogo() {
         VBox logoContainer = new VBox();
-        logoContainer.setAlignment(Pos.CENTER);
-        logoContainer.setPadding(new Insets(0, 0, 20, 0));
-        logoContainer.setMinHeight(150);
+        logoContainer.setAlignment(Pos.CENTER_LEFT); // Alinhamento à esquerda
+        logoContainer.setPadding(new Insets(0, 0, 10, 0)); // Reduz a distância inferior
+        logoContainer.setSpacing(0); // Sem espaçamento vertical entre elementos
+        logoContainer.setMinHeight(60); // Pode reduzir ainda mais se necessário
 
         try {
-            Image logoImage = new Image("file:logo.png");
+            Image logoImage = new Image(getClass().getResource("/com/GuardouPagou/views/icons/logo.png").toExternalForm());
             ImageView logoView = new ImageView(logoImage);
-            logoView.setFitWidth(180);
+            logoView.setFitWidth(60);  // Ajuste fino no tamanho
             logoView.setPreserveRatio(true);
+
             logoContainer.getChildren().add(logoView);
         } catch (Exception e) {
             Label logoPlaceholder = new Label("LOGO DA LOJA");
-            logoPlaceholder.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+            logoPlaceholder.setFont(Font.font("Arial", FontWeight.BOLD, 14));
             logoPlaceholder.setTextFill(Color.web("#f0a818"));
-            logoPlaceholder.setStyle("-fx-border-color: #C88200; -fx-border-width: 2px; -fx-padding: 40px;");
+            logoPlaceholder.setStyle("-fx-border-color: #C88200; -fx-border-width: 1.5px; -fx-padding: 20px;");
             logoContainer.getChildren().add(logoPlaceholder);
         }
+
         return logoContainer;
     }
 
+
     private Label criarTitulo(String texto) {
         Label label = new Label(texto);
-        label.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        label.setTextFill(Color.web("#f0a818"));
+        label.getStyleClass().add("menu-subtitle");
         return label;
     }
 

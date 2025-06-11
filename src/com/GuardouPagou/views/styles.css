@@ -1,3 +1,55 @@
+/* ——————————————————————————— */
+/* Menu Lateral */
+.menu-lateral-root {
+    -fx-background-color: #323437;
+    -fx-padding: 15;
+    -fx-spacing: 20;
+}
+
+.menu-section {
+    -fx-background-color: #2A2B2F;
+    -fx-background-radius: 10;
+    -fx-padding: 15;
+    -fx-spacing: 10;
+}
+
+.menu-subtitle {
+    -fx-font-size: 14px;
+    -fx-font-family: "Arial";
+    -fx-text-fill: #7890A8;
+    -fx-font-weight: bold;
+}
+
+/* Botões de menu com estilo dos "botões pill" */
+.menu-button {
+    -fx-background-color: #4C4F53;
+    -fx-background-radius: 22px;
+    -fx-text-fill: #F0A818;
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-graphic-text-gap: 10px;
+    -fx-padding: 6 15 6 15;
+}
+.menu-button:hover {
+    -fx-background-color: #8A8B8C;
+}
+.menu-button:focused {
+    -fx-border-color: #C88200;
+    -fx-border-width: 2;
+    -fx-border-radius: 22;
+}
+
+/* Rodapé */
+.menu-footer {
+    -fx-background-color: #2A2B2F;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+}
+
+.menu-logo {
+    -fx-padding: 0 0 10 0;
+}
+
 /* ———————————————— */
 /* Menu Button Styles */
 .menu-button {
@@ -71,7 +123,6 @@
     -fx-underline: true;
 }
 
-/* ———————————————— */
 /* Campo-pills */
 .pill-field {
     -fx-background-color: #BDBDBD;
@@ -138,7 +189,6 @@
     -fx-graphic-text-gap: 10px;
 }
 
-/* ———————————————— */
 /* Field Subtitles */
 .field-subtitle {
     -fx-font-family: "Arial";
@@ -146,7 +196,6 @@
     -fx-text-fill: #3F5B92;
 }
 
-/* ———————————————— */
 /* Overrides TextField & ColorPicker */
 .pill-field .text-field,
 .pill-field .text-field:focused {
@@ -167,7 +216,7 @@
     -fx-border-width: 0;
 }
 
-/* ———————————————— */
+
 /* ComboBox dentro de .pill-field: mesmo estilo de TextField */
 .pill-field .combo-box .text-field,
 .pill-field .combo-box .text-field:focused {
@@ -187,7 +236,6 @@
     -fx-prompt-text-fill: #181848; /* caso use prompt */
 }
 
-/* ———————————————— */
 /* Remove padding interno que inflava só o DatePicker */
 .pill-field .date-picker,
 .pill-field .combo-box {
