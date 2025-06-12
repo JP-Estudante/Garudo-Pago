@@ -6,6 +6,7 @@ import com.GuardouPagou.dao.FaturaDAO;
 import com.GuardouPagou.dao.NotaFiscalDAO; // Adicionado: para marcar nota fiscal como arquivada
 import com.GuardouPagou.models.Fatura;
 import com.GuardouPagou.models.Marca;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.geometry.*;
@@ -172,29 +173,48 @@ public class MainView {
 
     private VBox criarLogo() {
         VBox logoContainer = new VBox();
-        logoContainer.setAlignment(Pos.CENTER_LEFT); // Alinhamento à esquerda
-        logoContainer.setPadding(new Insets(0, 0, 10, 0)); // Reduz a distância inferior
-        logoContainer.setSpacing(0); // Sem espaçamento vertical entre elementos
-        logoContainer.setMinHeight(60); // Pode reduzir ainda mais se necessário
+        logoContainer.setPadding(new Insets(10, 0, 5, 10)); // margem interna
+        logoContainer.setSpacing(0);
+        logoContainer.setAlignment(Pos.TOP_LEFT);
 
         try {
-            Image logoImage = new Image(getClass().getResource("/com/GuardouPagou/views/icons/logo.png").toExternalForm());
+            // Logo principal
+            Image logoImage = new Image(getClass().getResource("/com/GuardouPagou/views/icons/home-logo-x2.png").toExternalForm());
             ImageView logoView = new ImageView(logoImage);
-            logoView.setFitWidth(60);  // Ajuste fino no tamanho
+            logoView.setFitWidth(60);
             logoView.setPreserveRatio(true);
 
-            logoContainer.getChildren().add(logoView);
+            // Texto Guardou-Pagou
+            Label textoLogo = new Label("Guardou-Pagou");
+            textoLogo.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 24));
+            textoLogo.setTextFill(Color.web("#F0A818"));
+
+            DropShadow sombra = new DropShadow();
+            sombra.setOffsetX(0);
+            sombra.setOffsetY(4);
+            sombra.setRadius(4);
+            sombra.setColor(Color.rgb(0, 0, 0, 0.35));
+            textoLogo.setEffect(sombra);
+
+            // Alinha o texto à direita da largura da imagem
+            HBox textoBox = new HBox(textoLogo);
+            textoBox.setAlignment(Pos.BASELINE_RIGHT);
+            textoBox.setPadding(new Insets(1, 0, 0, 0)); // pequena margem acima do texto
+
+            // Largura total do logo + texto alinhado à direita
+            logoContainer.setPrefWidth(150);
+
+            logoContainer.getChildren().addAll(logoView, textoBox);
+
         } catch (Exception e) {
-            Label logoPlaceholder = new Label("LOGO DA LOJA");
-            logoPlaceholder.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-            logoPlaceholder.setTextFill(Color.web("#f0a818"));
-            logoPlaceholder.setStyle("-fx-border-color: #C88200; -fx-border-width: 1.5px; -fx-padding: 20px;");
-            logoContainer.getChildren().add(logoPlaceholder);
+            Label fallback = new Label("Guardou-Pagou");
+            fallback.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+            fallback.setTextFill(Color.web("#F0A818"));
+            logoContainer.getChildren().add(fallback);
         }
 
         return logoContainer;
     }
-
 
     private Label criarTitulo(String texto) {
         Label label = new Label(texto);
