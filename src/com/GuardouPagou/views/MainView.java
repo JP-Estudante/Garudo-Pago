@@ -175,7 +175,6 @@ public class MainView {
         if (iconPath != null) {
             try {
                 ImageView icon = new ImageView(getClass().getResource(iconPath).toExternalForm());
-                icon.setFitHeight(20);
                 icon.setPreserveRatio(true);
                 btn.setGraphic(icon);
             } catch (Exception e) {
