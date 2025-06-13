@@ -179,10 +179,12 @@ public class MainView {
 
         try {
             // Logo principal
-            Image logoImage = new Image(getClass().getResource("/com/GuardouPagou/views/icons/home-logo-x2.png").toExternalForm());
+            Image logoImage = new Image(getClass().getResource("/com/GuardouPagou/views/icons/G-Clock_bg.png").toExternalForm());
             ImageView logoView = new ImageView(logoImage);
-            logoView.setFitWidth(60);
+            logoView.setFitWidth(100);
             logoView.setPreserveRatio(true);
+            logoView.setSmooth(true);
+            logoView.setCache(true);
 
             // Texto Guardou-Pagou
             Label textoLogo = new Label("Guardou-Pagou");

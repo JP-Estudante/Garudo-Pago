@@ -19,7 +19,7 @@ public class Main extends Application {
         primaryStage.getIcons().add(
                 new Image(
                         getClass().getResourceAsStream(
-                                "/com/GuardouPagou/views/icons/logo.png"
+                                "/com/GuardouPagou/views/icons/G-Clock.png"
                         )
                 )
         );
