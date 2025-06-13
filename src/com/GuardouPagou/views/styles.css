@@ -31,13 +31,16 @@
     -fx-alignment: CENTER_LEFT;
     -fx-graphic-text-gap: 10px;
     -fx-padding: 12 20 12 20;
-    -fx-border-color: transparent;
-    -fx-border-width: 0;
+    -fx-border-color: transparent; /* borda oculta */
+    -fx-border-width: 2px;         /* já reserva espaço */
     -fx-border-radius: 22px;
-    -fx-min-height: 45px;
-    -fx-max-height: 45px;
-    -fx-pref-height: 45px;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-min-height: 49px;
+    -fx-max-height: 49px;
+    -fx-pref-height: 49px;
 }
+
 
 .menu-button:hover {
     -fx-background-color: #8A8B8C;
