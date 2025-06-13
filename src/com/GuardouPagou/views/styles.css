@@ -93,6 +93,7 @@
     -fx-background-color: #646566;
 }
 
+/* Botões de rodapé (ex: salvar e-mail) */
 .botao-footer {
     -fx-background-color: #C88200;
     -fx-text-fill: #000000;
@@ -101,13 +102,15 @@
     -fx-font-weight: bold;
     -fx-alignment: CENTER_LEFT;
     -fx-padding: 12 20 12 20;
+    -fx-border-width: 2px;
     -fx-border-color: transparent;
-    -fx-border-width: 0;
     -fx-border-radius: 22px;
-    -fx-min-height: 45px;
-    -fx-pref-height: 45px;
-    -fx-max-height: 45px;
-    -fx-pref-width: 220px;  /* <— LARGURA SUGERIDA */
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-min-height: 49px;
+    -fx-pref-height: 49px;
+    -fx-max-height: 49px;
+    -fx-pref-width: 220px;
 }
 
 .botao-footer:pressed {
@@ -116,13 +119,6 @@
     -fx-border-radius: 22px;
     -fx-background-insets: 0;
     -fx-border-insets: 0;
-}
-
-
-/* Botões de rodapé (ex: salvar e-mail) */
-.botao-footer {
-    -fx-background-color: #C88200;
-    -fx-text-fill: #000000;
 }
 
 /* Contêiner preto translúcido arredondado */

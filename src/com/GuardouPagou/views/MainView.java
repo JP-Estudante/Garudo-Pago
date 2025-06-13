@@ -146,7 +146,7 @@ public class MainView {
         secaoCadastros.getStyleClass().add("menu-section");
 
         btnSalvarEmail = criarBotao("E-mails de Alerta", "/com/GuardouPagou/views/icons/campaing.png", "botao-listagem");
-        btnSalvarEmail.setPrefWidth(220); // ou o valor que iguale visualmente aos demais
+        btnSalvarEmail.setPrefWidth(220);
 
         VBox secaoOutros = new VBox(
                 criarTitulo("Outros"),
