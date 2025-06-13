@@ -122,32 +122,42 @@ public class MainView {
 
     private void criarUI() {
         root = new BorderPane();
-        root.setStyle("-fx-background-color: #BDBDBD;");
-        root.getStylesheets().add(
-                getClass().getResource("styles.css").toExternalForm()
-        );
+        root.getStyleClass().add("main-root");
+        root.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
 
-        VBox menuLateral = new VBox(20);
-        menuLateral.setPadding(new Insets(20));
+        VBox menuLateral = new VBox();
         menuLateral.getStyleClass().add("menu-lateral-root");
 
-        btnListarFaturas = criarBotao("Listar Faturas", "/com/GuardouPagou/views/icons/list.png");
-        btnListarMarcas = criarBotao("Listar Marcas", "/com/GuardouPagou/views/icons/list.png");
-        btnArquivadas = criarBotao("Arquivadas", "/com/GuardouPagou/views/icons/archive.png");
-        btnNovaFatura = criarBotao("Cadastrar Faturas", "/com/GuardouPagou/views/icons/plus.png");
-        btnNovaMarca = criarBotao("Cadastrar Marca", "/com/GuardouPagou/views/icons/plus.png");
+        btnListarFaturas = criarBotao("Listar Faturas", "/com/GuardouPagou/views/icons/list.png", "botao-listagem");
+        btnListarMarcas = criarBotao("Listar Marcas", "/com/GuardouPagou/views/icons/list.png", "botao-listagem");
+        btnArquivadas   = criarBotao("Arquivadas", "/com/GuardouPagou/views/icons/archive.png", "botao-listagem");
+        btnNovaFatura   = criarBotao("Cadastrar Faturas", "/com/GuardouPagou/views/icons/plus.png", "botao-cadastro");
+        btnNovaMarca    = criarBotao("Cadastrar Marca", "/com/GuardouPagou/views/icons/plus.png", "botao-cadastro");
 
-        // O labelText foi declarado no início da classe e agora é inicializado aqui
         labelText = new Label("Bem-vindo ao GuardouPagou");
         labelText.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         labelText.setTextFill(Color.web("#000000"));
 
+        VBox secaoListagens = new VBox(
+                criarTitulo("Principais Listagens"),
+                btnListarFaturas,
+                btnListarMarcas,
+                btnArquivadas
+        );
+        secaoListagens.getStyleClass().add("menu-section");
+
+        VBox secaoCadastros = new VBox(
+                criarTitulo("Novos Cadastros"),
+                btnNovaFatura,
+                btnNovaMarca
+        );
+        secaoCadastros.getStyleClass().add("menu-section");
+
         menuLateral.getChildren().addAll(
                 criarLogo(),
-                criarTitulo("Principais listagens"),
-                btnListarFaturas, btnListarMarcas, btnArquivadas,
-                criarTitulo("Novos Cadastros"),
-                btnNovaFatura, btnNovaMarca,
+                criarSeparadorLogo(),
+                secaoListagens,
+                secaoCadastros,
                 criarEspaçoFlexível(),
                 criarEmailPanel()
         );
@@ -156,20 +166,25 @@ public class MainView {
         root.setCenter(labelText);
     }
 
-    private Button criarBotao(String texto, String iconPath) {
+    private Button criarBotao(String texto, String iconPath, String cssClass) {
         Button btn = new Button(" " + texto);
         btn.setMaxWidth(Double.MAX_VALUE);
-        btn.getStyleClass().add("menu-button");
+        btn.getStyleClass().addAll("menu-button", cssClass);
 
         if (iconPath != null) {
-            ImageView icon = new ImageView(getClass().getResource(iconPath).toExternalForm());
-            icon.setFitHeight(16);
-            icon.setFitWidth(16);
-            btn.setGraphic(icon);
+            try {
+                ImageView icon = new ImageView(getClass().getResource(iconPath).toExternalForm());
+                icon.setFitHeight(20);
+                icon.setPreserveRatio(true);
+                btn.setGraphic(icon);
+            } catch (Exception e) {
+                System.err.println("Erro ao carregar ícone: " + iconPath);
+            }
         }
 
         return btn;
     }
+
 
     private VBox criarLogo() {
         VBox logoContainer = new VBox();
@@ -216,6 +231,14 @@ public class MainView {
         }
 
         return logoContainer;
+    }
+
+    private Region criarSeparadorLogo() {
+        Region linha = new Region();
+        linha.setPrefHeight(2);
+        linha.setMaxWidth(Double.MAX_VALUE);
+        linha.getStyleClass().add("logo-divider");
+        return linha;
     }
 
     private Label criarTitulo(String texto) {
