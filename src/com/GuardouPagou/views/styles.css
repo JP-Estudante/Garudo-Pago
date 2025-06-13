@@ -29,7 +29,10 @@
     -fx-alignment: CENTER_LEFT;
     -fx-graphic-text-gap: 10px;
     -fx-padding: 6 15 6 15;
+    -fx-padding: 12 20 12 20;
+    -fx-min-height: 45px;
 }
+
 .menu-button:hover {
     -fx-background-color: #8A8B8C;
 }
