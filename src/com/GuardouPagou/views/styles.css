@@ -23,34 +23,51 @@
 /* ——————————————————————————— */
 /* Base compartilhada para todos os botões do menu */
 .menu-button {
+    -fx-background-color: #4C4F53;
     -fx-background-radius: 22px;
+    -fx-text-fill: #F0A818;
     -fx-font-size: 16px;
-    -fx-font-family: "Arial";
-    -fx-font-weight: 600;
+    -fx-font-weight: normal;
     -fx-alignment: CENTER_LEFT;
     -fx-graphic-text-gap: 10px;
     -fx-padding: 12 20 12 20;
-    -fx-min-height: 45px;
-    -fx-cursor: hand;
     -fx-border-color: transparent;
     -fx-border-width: 0;
+    -fx-border-radius: 22px;
+    -fx-min-height: 45px;
+    -fx-max-height: 45px;
+    -fx-pref-height: 45px;
 }
 
-/* Hover */
 .menu-button:hover {
     -fx-background-color: #8A8B8C;
 }
 
-/* Foco apenas quando pressionado */
+/* Botão pressionado: borda laranja visível */
+.menu-button:pressed,
+.menu-button:armed {
+    -fx-background-color: #4C4F53;
+    -fx-border-color: #C88200;
+    -fx-border-width: 2px;
+    -fx-border-radius: 22px;
+    -fx-padding: 12 20 12 20;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+}
+
 .menu-button:focused {
     -fx-border-color: transparent;
     -fx-border-width: 0;
 }
-.menu-button:armed {
+
+.botao-listagem:pressed,
+.botao-cadastro:pressed,
+.botao-footer:pressed {
     -fx-border-color: #C88200;
-    -fx-border-width: 2;
-    -fx-border-radius: 22;
+    -fx-border-width: 2px;
+    -fx-border-radius: 22px;
 }
+
 
 /* ——————————————————————————— */
 /* Estilo específico por tipo */
@@ -73,6 +90,32 @@
     -fx-background-color: #646566;
 }
 
+.botao-footer {
+    -fx-background-color: #C88200;
+    -fx-text-fill: #000000;
+    -fx-background-radius: 22px;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 20 12 20;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-border-radius: 22px;
+    -fx-min-height: 45px;
+    -fx-pref-height: 45px;
+    -fx-max-height: 45px;
+    -fx-pref-width: 220px;  /* <— LARGURA SUGERIDA */
+}
+
+.botao-footer:pressed {
+    -fx-border-color: #C88200;
+    -fx-border-width: 2px;
+    -fx-border-radius: 22px;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+}
+
+
 /* Botões de rodapé (ex: salvar e-mail) */
 .botao-footer {
     -fx-background-color: #C88200;
@@ -89,7 +132,6 @@
     -fx-border-width: 1.5;
     -fx-border-radius: 10;
 }
-
 
 /* Barra cinza clara (#D9D9D9) abaixo da logo */
 .logo-divider {
