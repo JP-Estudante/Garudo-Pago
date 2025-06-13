@@ -182,6 +182,8 @@ public class MainView {
             }
         }
 
+        btn.setOnMouseClicked(e -> btn.getParent().requestFocus());
+
         return btn;
     }
 

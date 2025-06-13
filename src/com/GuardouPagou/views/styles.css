@@ -23,18 +23,26 @@
 /* ——————————————————————————— */
 /* Base compartilhada para todos os botões do menu */
 .menu-button {
+    -fx-background-color: #4C4F53;
     -fx-background-radius: 22px;
     -fx-font-size: 16px;
-    -fx-font-family: "Arial";
-    -fx-font-weight: bold;
+    -fx-font-weight: 600;
     -fx-alignment: CENTER_LEFT;
     -fx-graphic-text-gap: 10px;
     -fx-padding: 12 20 12 20;
     -fx-min-height: 45px;
-    -fx-cursor: hand;
-    -fx-border-color: transparent;
-    -fx-border-width: 0;
 }
+
+.botao-listagem {
+    -fx-text-fill: #F0A818;
+}
+.botao-cadastro {
+    -fx-text-fill: #F0A818;
+}
+.botao-footer {
+    -fx-text-fill: #000000;
+}
+
 
 /* Hover */
 .menu-button:hover {
@@ -50,6 +58,15 @@
     -fx-border-color: #C88200;
     -fx-border-width: 2;
     -fx-border-radius: 22;
+}
+
+.menu-button:pressed,
+.menu-button:focused,
+.menu-button:armed,
+.menu-button:selected {
+    -fx-background-color: #4C4F53 !important;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
 }
 
 /* ——————————————————————————— */
