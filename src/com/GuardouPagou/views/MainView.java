@@ -190,43 +190,21 @@ public class MainView {
 
     private VBox criarLogo() {
         VBox logoContainer = new VBox();
-        logoContainer.setPadding(new Insets(10, 0, 5, 10)); // margem interna
+        logoContainer.setPadding(new Insets(10, 0, 5, 10));
         logoContainer.setSpacing(0);
         logoContainer.setAlignment(Pos.TOP_LEFT);
 
         try {
-            // Logo principal
-            Image logoImage = new Image(getClass().getResource("/com/GuardouPagou/views/icons/G-Clock_bg.png").toExternalForm());
+            // Apenas a logo
+            Image logoImage = new Image(getClass().getResource("/com/GuardouPagou/views/icons/G-Clock_home.png").toExternalForm());
             ImageView logoView = new ImageView(logoImage);
-            logoView.setFitWidth(100);
             logoView.setPreserveRatio(true);
             logoView.setSmooth(true);
             logoView.setCache(true);
 
-            // Texto Guardou-Pagou
-            Label textoLogo = new Label("Guardou-Pagou");
-            textoLogo.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 24));
-            textoLogo.setTextFill(Color.web("#F0A818"));
-
-            DropShadow sombra = new DropShadow();
-            sombra.setOffsetX(0);
-            sombra.setOffsetY(4);
-            sombra.setRadius(4);
-            sombra.setColor(Color.rgb(0, 0, 0, 0.35));
-            textoLogo.setEffect(sombra);
-
-            // Alinha o texto à direita da largura da imagem
-            HBox textoBox = new HBox(textoLogo);
-            textoBox.setAlignment(Pos.BASELINE_RIGHT);
-            textoBox.setPadding(new Insets(1, 0, 0, 0)); // pequena margem acima do texto
-
-            // Largura total do logo + texto alinhado à direita
-            logoContainer.setPrefWidth(150);
-
-            logoContainer.getChildren().addAll(logoView, textoBox);
-
+            logoContainer.getChildren().add(logoView);
         } catch (Exception e) {
-            Label fallback = new Label("Guardou-Pagou");
+            Label fallback = new Label("LOGO");
             fallback.setFont(Font.font("Arial", FontWeight.BOLD, 24));
             fallback.setTextFill(Color.web("#F0A818"));
             logoContainer.getChildren().add(fallback);
