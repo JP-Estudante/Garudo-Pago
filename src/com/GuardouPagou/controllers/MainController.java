@@ -13,11 +13,14 @@ import com.GuardouPagou.controllers.NotaFaturaController;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class MainController {
 
@@ -34,7 +37,7 @@ public class MainController {
             try {
                 ObservableList<Fatura> faturas = new FaturaDAO().listarFaturas();
                 view.mostrarListaFaturas(faturas);
-                destacarBotao(view.getBtnListarFaturas());
+
             } catch (SQLException ex) {
                 view.getConteudoLabel().setText("Erro ao carregar faturas.");
                 ex.printStackTrace();
@@ -45,7 +48,6 @@ public class MainController {
             try {
                 ObservableList<Marca> marcas = new MarcaDAO().listarMarcas();
                 view.mostrarListaMarcas(marcas);
-                destacarBotao(view.getBtnListarMarcas());
             } catch (SQLException ex) {
                 view.getConteudoLabel().setText("Erro ao carregar marcas.");
                 ex.printStackTrace();
@@ -57,72 +59,68 @@ public class MainController {
             ArquivadasView arquivadasView = new ArquivadasView();
             new ArquivadasController(arquivadasView); // O controller carrega os dados
             view.getRoot().setCenter(arquivadasView.getRoot());
-            destacarBotao(view.getBtnArquivadas());
         });
 
         view.getBtnNovaFatura().setOnAction(e -> {
-            // CRIA NOVA JANELA MODAL
             Stage modal = new Stage();
             Window owner = view.getRoot().getScene().getWindow();
             modal.initOwner(owner);
             modal.initModality(Modality.WINDOW_MODAL);
             modal.setTitle("Cadastro de Nota Fiscal");
 
-            // Instancia view e controller do formulário
+            // Ícone da janela
+            modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/plus.png"))));
+
             NotaFaturaView notaView = new NotaFaturaView();
             new NotaFaturaController(notaView);
 
-            // Coloca no modal
-            Scene cena = new Scene(notaView.getRoot());
-            modal.setScene(cena);
-            modal.setResizable(false);
+            // Define largura x altura maiores
+            Scene cena = new Scene(notaView.getRoot(), 700, 500);
 
-            // Centraliza em relação à janela pai
-            modal.setOnShown(ev -> {
-                modal.setX(owner.getX() + (owner.getWidth() - modal.getWidth()) / 2);
-                modal.setY(owner.getY() + (owner.getHeight() - modal.getHeight()) / 2);
+            // Fecha com ESC
+            cena.setOnKeyPressed(ev -> {
+                if (ev.getCode() == KeyCode.ESCAPE) {
+                    modal.close();
+                }
             });
 
-            // Exibe e aguarda fechamento
+            modal.setScene(cena);
+            modal.setResizable(false);
+            modal.setOnShown(ev -> {
+                /* centraliza como antes */
+            });
             modal.showAndWait();
-
-            // Mantém destaque no botão
-            destacarBotao(view.getBtnNovaFatura());
         });
 
         view.getBtnNovaMarca().setOnAction(e -> {
-            // 1) Cria uma Stage modal
             Stage modal = new Stage();
             Window owner = view.getRoot().getScene().getWindow();
             modal.initOwner(owner);
             modal.initModality(Modality.WINDOW_MODAL);
             modal.setTitle("Cadastro de Marca");
 
-            // 2) Instancia view e controller
+            // Ícone da janela
+            modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/plus.png"))));
+
             MarcaView marcaView = new MarcaView();
             new MarcaController(marcaView);
 
-            // 3) Cria a Scene e CARREGA O CSS do pacote com.GuardouPagou.views
-            Scene scene = new Scene(marcaView.getRoot());
-            scene.getStylesheets().add(
-                    MarcaView.class
-                            .getResource("styles.css") // procura em com/GuardouPagou/views/styles.css
-                            .toExternalForm()
-            );
-            modal.setScene(scene);
-            modal.setResizable(false);
+            // Define largura x altura maiores
+            Scene scene = new Scene(marcaView.getRoot(), 650, 400);
 
-            // 4) Centraliza em relação à janela pai
-            modal.setOnShown(ev -> {
-                modal.setX(owner.getX() + (owner.getWidth() - modal.getWidth()) / 2);
-                modal.setY(owner.getY() + (owner.getHeight() - modal.getHeight()) / 2);
+            // Fecha com ESC
+            scene.setOnKeyPressed(ev -> {
+                if (ev.getCode() == KeyCode.ESCAPE) {
+                    modal.close();
+                }
             });
 
-            // 5) Exibe e aguarda
+            modal.setScene(scene);
+            modal.setResizable(false);
+            modal.setOnShown(ev -> {
+                /* centraliza como antes */
+            });
             modal.showAndWait();
-
-            // 6) Mantém destaque no botão
-            destacarBotao(view.getBtnNovaMarca());
         });
 
         view.getBtnSalvarEmail().setOnAction(e -> {
@@ -133,28 +131,6 @@ public class MainController {
                 atualizarConteudo("E-mail inválido!");
             }
         });
-    }
-
-    private void destacarBotao(Button botao) {
-        // Remove destaque do botão anterior
-        if (botaoSelecionado != null) {
-            String corOriginal = botaoSelecionado == view.getBtnNovaFatura()
-                    || botaoSelecionado == view.getBtnNovaMarca()
-                    ? "#f0a818" : "#C88200";
-            botaoSelecionado.setStyle("-fx-background-color: " + corOriginal + "; "
-                    + "-fx-text-fill: #000000; "
-                    + "-fx-font-weight: bold; "
-                    + "-fx-border-width: 0;");
-        }
-
-        // Aplica destaque ao novo botão
-        botao.setStyle("-fx-background-color: #f0a818; "
-                + "-fx-text-fill: #000000; "
-                + "-fx-font-weight: bold; "
-                + "-fx-border-color: #BDBDBD; "
-                + "-fx-border-width: 2px;");
-
-        botaoSelecionado = botao;
     }
 
     private void atualizarConteudo(String texto) {

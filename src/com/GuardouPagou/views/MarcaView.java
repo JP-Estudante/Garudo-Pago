@@ -18,7 +18,7 @@ public class MarcaView {
     private ColorPicker colorPicker;
     private TextArea taDescricao;
     private Label lblDescCounter;
-    private Button btnLimpar, btnGravar;      // Renomeado aqui
+    private Button btnLimpar, btnGravar;
     private Label lblId;
 
     public MarcaView() {
@@ -29,18 +29,18 @@ public class MarcaView {
         // Raiz e CSS
         root = new BorderPane();
         root.setStyle("-fx-background-color: #323437; -fx-padding: 20;");
-        URL cssUrl = MarcaView.class.getResource("styles.css");
+        URL cssUrl = MarcaView.class.getResource("/css/styles.css");
         if (cssUrl == null) {
-            throw new IllegalStateException("styles.css não encontrado em com/GuardouPagou/views");
+            throw new IllegalStateException("styles.css não encontrado em /css");
         }
         root.getStylesheets().add(cssUrl.toExternalForm());
 
         // ——— HEADER ———
         lblTitulo = new Label("Cadastro de Marcas");
-        lblTitulo.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        lblTitulo.setFont(Font.font("Poppins", FontWeight.BOLD, 24));
         lblTitulo.setTextFill(Color.web("#F0A818"));
         lblSubtitle = new Label("Dados da nova marca");
-        lblSubtitle.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
+        lblSubtitle.setFont(Font.font("Poppins", FontWeight.NORMAL, 14));
         lblSubtitle.setTextFill(Color.web("#7890A8"));
         Separator sep1 = new Separator();
         sep1.setStyle("-fx-background-color: #7890A8;");
@@ -84,6 +84,10 @@ public class MarcaView {
 
         // ——— DESCRIÇÃO ———
         taDescricao = new TextArea();
+            
+        taDescricao.setPrefWidth(600);
+        taDescricao.setPrefHeight(200);
+        
         taDescricao.setPromptText("Descrição (opcional, até 500 caracteres)");
         taDescricao.setWrapText(true);
         taDescricao.setPrefRowCount(5);
@@ -111,15 +115,19 @@ public class MarcaView {
 
         // ——— BOTÕES ———
         btnLimpar = new Button("Limpar");
-        btnLimpar.getStyleClass().add("modal-button");
-        btnLimpar.setPrefWidth(100);
+        btnLimpar.getStyleClass().addAll("modal-button", "icon-clean");
+        btnLimpar.setFont(Font.font("Poppins", FontWeight.BOLD, 16));
 
         btnGravar = new Button("Gravar");
-        btnGravar.getStyleClass().add("modal-button");
-        btnGravar.setPrefWidth(100);
+        btnGravar.getStyleClass().addAll("modal-button", "icon-save");
+        btnGravar.setFont(Font.font("Poppins", FontWeight.BOLD, 16));
 
+                btnLimpar.setPrefSize(120, 40);
+        btnGravar.setPrefSize(120, 40);
+        
         HBox buttonBox = new HBox(10, btnLimpar, btnGravar);
-        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.prefWidthProperty().bind(descBox.widthProperty());
         buttonBox.setPadding(new Insets(10, 0, 0, 0));
 
         // ——— MONTA CONTAINER PRINCIPAL ———

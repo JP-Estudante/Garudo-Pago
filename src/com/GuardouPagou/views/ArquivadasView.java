@@ -41,7 +41,7 @@ public class ArquivadasView {
         containerPrincipal.setAlignment(Pos.TOP_CENTER);
 
         Label titulo = new Label("NOTAS FISCAIS ARQUIVADAS");
-        titulo.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        titulo.setFont(Font.font("Poppins", FontWeight.BOLD, 24));
         titulo.setStyle("-fx-text-fill: #F0A818;");
 
         // --- Seção de Busca ---
@@ -81,7 +81,7 @@ public class ArquivadasView {
         tabelaNotasArquivadas = new TableView<>();
         tabelaNotasArquivadas.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tabelaNotasArquivadas.setStyle("-fx-border-color: #4A4A4A; -fx-border-width: 1; -fx-background-radius: 5; -fx-border-radius: 5;");
-        tabelaNotasArquivadas.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
+        tabelaNotasArquivadas.getStylesheets().add(getClass().getResource("/css/styles.css").toExternalForm());
 
         TableColumn<NotaFiscalArquivadaDAO, String> colNumeroNota = new TableColumn<>("Número Nota Fiscal");
         colNumeroNota.setCellValueFactory(new PropertyValueFactory<>("numeroNota"));

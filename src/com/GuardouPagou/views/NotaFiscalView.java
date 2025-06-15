@@ -42,12 +42,8 @@ public class NotaFiscalView {
 
         // Título
         Label titulo = new Label("CADASTRO DE NOTA FISCAL");
-        titulo.setStyle(
-                "-fx-font-family: Arial; "
-                + "-fx-font-weight: bold; "
-                + "-fx-font-size: 24px; "
-                + "-fx-text-fill: #F0A818;"
-        );
+        titulo.getStyleClass().add("h2");
+        titulo.setTextFill(Color.web("#F0A818"));
 
         // Campos principais
         VBox camposBox = new VBox(10);
@@ -56,7 +52,7 @@ public class NotaFiscalView {
         VBox numeroNotaBox = new VBox(5);
         Label numeroNotaLabel = new Label("Número da Nota*:");
         numeroNotaLabel.setStyle(
-                "-fx-font-family: Arial; "
+                "-fx-font-family: Poppins; "
                 + "-fx-font-size: 16px; "
                 + "-fx-text-fill: #BDBDBD;"
         );
@@ -103,7 +99,7 @@ public class NotaFiscalView {
         VBox dataEmissaoBox = new VBox(5);
         Label dataEmissaoLabel = new Label("Data de Emissão*:");
         dataEmissaoLabel.setStyle(
-                "-fx-font-family: Arial; "
+                "-fx-font-family: Poppins; "
                 + "-fx-font-size: 16px; "
                 + "-fx-text-fill: #BDBDBD;"
         );
@@ -146,7 +142,7 @@ public class NotaFiscalView {
         VBox marcaBox = new VBox(5);
         Label marcaLabel = new Label("Marca*:");
         marcaLabel.setStyle(
-                "-fx-font-family: Arial; "
+                "-fx-font-family: Poppins; "
                 + "-fx-font-size: 16px; "
                 + "-fx-text-fill: #BDBDBD;"
         );
@@ -190,7 +186,7 @@ public class NotaFiscalView {
         String buttonStyle
                 = "-fx-background-color: #F0A818 !important; "
                 + "-fx-text-fill: #000000 !important; "
-                + "-fx-font-family: Arial !important; "
+                + "-fx-font-family: Poppins !important; "
                 + "-fx-font-weight: bold !important; "
                 + "-fx-font-size: 14px !important; "
                 + "-fx-background-radius: 5 !important;";
@@ -216,7 +212,7 @@ public class NotaFiscalView {
         salvarButton.setStyle(
                 "-fx-background-color: #F0A818; "
                 + "-fx-text-fill: #000000; "
-                + "-fx-font-family: Arial; "
+                + "-fx-font-family: Poppins; "
                 + "-fx-font-weight: bold; "
                 + "-fx-font-size: 14px; "
                 + "-fx-background-radius: 5;"
@@ -224,7 +220,7 @@ public class NotaFiscalView {
         salvarButton.setOnMouseEntered(e -> salvarButton.setStyle(
                 "-fx-background-color: #FFC107; "
                 + "-fx-text-fill: #000000; "
-                + "-fx-font-family: Arial; "
+                + "-fx-font-family: Poppins; "
                 + "-fx-font-weight: bold; "
                 + "-fx-font-size: 14px; "
                 + "-fx-background-radius: 5;"
@@ -232,7 +228,7 @@ public class NotaFiscalView {
         salvarButton.setOnMouseExited(e -> salvarButton.setStyle(
                 "-fx-background-color: #F0A818; "
                 + "-fx-text-fill: #000000; "
-                + "-fx-font-family: Arial; "
+                + "-fx-font-family: Poppins; "
                 + "-fx-font-weight: bold; "
                 + "-fx-font-size: 14px; "
                 + "-fx-background-radius: 5;"
