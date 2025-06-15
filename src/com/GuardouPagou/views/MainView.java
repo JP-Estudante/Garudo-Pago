@@ -163,6 +163,14 @@ public class MainView {
                 criarEspaçoFlexível()
                 );
 
+        // Remove o deslocamento da barra lateral
+        btnListarFaturas.setFocusTraversable(false);
+        btnListarMarcas.setFocusTraversable(false);
+        btnArquivadas.setFocusTraversable(false);
+        btnNovaFatura.setFocusTraversable(false);
+        btnNovaMarca.setFocusTraversable(false);
+        btnSalvarEmail.setFocusTraversable(false);
+
         root.setLeft(menuLateral);
         root.setCenter(labelText);
     }

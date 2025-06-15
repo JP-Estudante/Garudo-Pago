@@ -8,10 +8,12 @@ import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
-        // 🅰️ Carrega a fonte Poppins antes de qualquer tela
+        // 🅰️ Carregando a fonte Poppins antes de qualquer tela
         Font poppinsRegular = Font.loadFont(
                 Main.class.getClassLoader().getResourceAsStream("fonts/Poppins-Regular.ttf"), 12
         );
@@ -25,7 +27,7 @@ public class Main extends Application {
                 12
         );
 
-        // Opcional: saída de confirmação
+        // Saída de confirmação
         System.out.println("Fonte Poppins Regular: " + (poppinsRegular != null ? "OK" : "Erro"));
         System.out.println("Fonte Poppins Bold: " + (poppinsMedium != null ? "OK" : "Erro"));
         System.out.println("Fonte Poppins Bold: " + (poppinsBold != null ? "OK" : "Erro"));
@@ -39,13 +41,14 @@ public class Main extends Application {
         // Ícone da janela
         primaryStage.getIcons().add(
                 new Image(
-                        getClass().getResourceAsStream(
+                        Objects.requireNonNull(getClass().getResourceAsStream(
                                 "/icons/G-Clock(100x100px).png"
-                        )
+                        ))
                 )
         );
 
         primaryStage.setTitle("GuardouPagou - Sistema de Notas e Faturas");
+        primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.show();
     }

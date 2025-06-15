@@ -13,11 +13,14 @@ import com.GuardouPagou.controllers.NotaFaturaController;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class MainController {
 
@@ -65,11 +68,21 @@ public class MainController {
             modal.initModality(Modality.WINDOW_MODAL);
             modal.setTitle("Cadastro de Nota Fiscal");
 
+            // Ícone da janela
+            modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/plus.png"))));
+
             NotaFaturaView notaView = new NotaFaturaView();
             new NotaFaturaController(notaView);
 
             // Define largura x altura maiores
             Scene cena = new Scene(notaView.getRoot(), 700, 500);
+
+            // Fecha com ESC
+            cena.setOnKeyPressed(ev -> {
+                if (ev.getCode() == KeyCode.ESCAPE) {
+                    modal.close();
+                }
+            });
 
             modal.setScene(cena);
             modal.setResizable(false);
@@ -86,11 +99,21 @@ public class MainController {
             modal.initModality(Modality.WINDOW_MODAL);
             modal.setTitle("Cadastro de Marca");
 
+            // Ícone da janela
+            modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/plus.png"))));
+
             MarcaView marcaView = new MarcaView();
             new MarcaController(marcaView);
 
             // Define largura x altura maiores
             Scene scene = new Scene(marcaView.getRoot(), 650, 400);
+
+            // Fecha com ESC
+            scene.setOnKeyPressed(ev -> {
+                if (ev.getCode() == KeyCode.ESCAPE) {
+                    modal.close();
+                }
+            });
 
             modal.setScene(scene);
             modal.setResizable(false);
