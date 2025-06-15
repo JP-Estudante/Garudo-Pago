@@ -48,10 +48,10 @@ public class NotaFaturaView {
 
         // ——— HEADER ———
         Label titulo = new Label("Cadastro de Faturas");
-        titulo.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        titulo.setFont(Font.font("Poppins", FontWeight.BOLD, 24));
         titulo.setTextFill(Color.web("#F0A818"));
         Label sub1 = new Label("Dados da Nota Fiscal Eletrônica");
-        sub1.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
+        sub1.setFont(Font.font("Poppins", FontWeight.NORMAL, 14));
         sub1.setTextFill(Color.web("#7890A8"));
         Separator sep1 = new Separator();
         sep1.setStyle("-fx-background-color: #7890A8;");
@@ -88,7 +88,7 @@ public class NotaFaturaView {
 
         // ——— SUBTÍTULO FATURAS ———
         Label sub2 = new Label("Dados da Fatura");
-        sub2.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
+        sub2.setFont(Font.font("Poppins", FontWeight.NORMAL, 14));
         sub2.setTextFill(Color.web("#7890A8"));
         Separator sep2 = new Separator();
         sep2.setStyle("-fx-background-color: #7890A8;");
@@ -103,9 +103,9 @@ public class NotaFaturaView {
 
         // Botões
         btnLimpar.getStyleClass().addAll("modal-button", "icon-clean");
-        btnLimpar.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        btnLimpar.setFont(Font.font("Poppins", FontWeight.BOLD, 16));
         btnGravar.getStyleClass().addAll("modal-button", "icon-save");
-        btnGravar.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        btnGravar.setFont(Font.font("Poppins", FontWeight.BOLD, 16));
         
         btnLimpar.setPrefSize(120, 40);
         btnGravar.setPrefSize(120, 40);

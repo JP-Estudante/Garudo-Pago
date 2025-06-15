@@ -37,10 +37,10 @@ public class MarcaView {
 
         // ——— HEADER ———
         lblTitulo = new Label("Cadastro de Marcas");
-        lblTitulo.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        lblTitulo.setFont(Font.font("Poppins", FontWeight.BOLD, 24));
         lblTitulo.setTextFill(Color.web("#F0A818"));
         lblSubtitle = new Label("Dados da nova marca");
-        lblSubtitle.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
+        lblSubtitle.setFont(Font.font("Poppins", FontWeight.NORMAL, 14));
         lblSubtitle.setTextFill(Color.web("#7890A8"));
         Separator sep1 = new Separator();
         sep1.setStyle("-fx-background-color: #7890A8;");
@@ -116,11 +116,11 @@ public class MarcaView {
         // ——— BOTÕES ———
         btnLimpar = new Button("Limpar");
         btnLimpar.getStyleClass().addAll("modal-button", "icon-clean");
-        btnLimpar.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        btnLimpar.setFont(Font.font("Poppins", FontWeight.BOLD, 16));
 
         btnGravar = new Button("Gravar");
         btnGravar.getStyleClass().addAll("modal-button", "icon-save");
-        btnGravar.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        btnGravar.setFont(Font.font("Poppins", FontWeight.BOLD, 16));
 
                 btnLimpar.setPrefSize(120, 40);
         btnGravar.setPrefSize(120, 40);
