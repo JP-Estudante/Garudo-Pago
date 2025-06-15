@@ -223,7 +223,7 @@ public class MainView {
 
     private Label criarTitulo(String texto) {
         Label label = new Label(texto);
-        label.getStyleClass().add("menu-subtitle");
+        label.getStyleClass().add("menu-subtitle-light");
         return label;
     }
 

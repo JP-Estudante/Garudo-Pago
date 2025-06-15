@@ -31,6 +31,13 @@
     -fx-font-weight: bold;
 }
 
+.menu-subtitle-light {
+    -fx-font-size: 14px;
+    -fx-font-family: "Poppins";
+    -fx-text-fill: #7890A8;
+    -fx-font-weight: normal;
+}
+
 /* ——————————————————————————— */
 /* Base compartilhada para todos os botões do menu */
 .menu-button {
@@ -97,11 +104,11 @@
 
 /* Botões de cadastro */
 .botao-cadastro {
-    -fx-background-color: #3E3F42;
+    -fx-background-color: #4C4F53;
     -fx-text-fill: #F0A818;
 }
 .botao-cadastro:hover {
-    -fx-background-color: #646566;
+    -fx-background-color: #6C6E70;
 }
 
 /* Botões de rodapé (ex: salvar e-mail) */

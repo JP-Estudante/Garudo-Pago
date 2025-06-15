@@ -42,12 +42,8 @@ public class NotaFiscalView {
 
         // Título
         Label titulo = new Label("CADASTRO DE NOTA FISCAL");
-        titulo.setStyle(
-                "-fx-font-family: Poppins; "
-                + "-fx-font-weight: bold; "
-                + "-fx-font-size: 24px; "
-                + "-fx-text-fill: #F0A818;"
-        );
+        titulo.getStyleClass().add("h2");
+        titulo.setTextFill(Color.web("#F0A818"));
 
         // Campos principais
         VBox camposBox = new VBox(10);
