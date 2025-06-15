@@ -21,3 +21,4 @@ dist/
 
 # Ignorar classe local de conexão com o banco
 src/com/GuardouPagou/models/DatabaseConnection.java
+*.ttf

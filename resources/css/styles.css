@@ -2,7 +2,18 @@
 /* Root da aplicação */
 .main-root {
     -fx-background-color: #BDBDBD;
+    -fx-font-family: "Poppins";
 }
+
+/* Hierarquia tipográfica */
+.h1 { -fx-font-size: 40px; -fx-font-weight: bold; }
+.h2 { -fx-font-size: 36px; -fx-font-weight: bold; }
+.h3 { -fx-font-size: 32px; -fx-font-weight: bold; }
+.h4 { -fx-font-size: 28px; -fx-font-weight: bold; }
+.h5 { -fx-font-size: 24px; -fx-font-weight: bold; }
+.h6 { -fx-font-size: 20px; -fx-font-weight: bold; }
+.p  { -fx-font-size: 16px; }
+.small { -fx-font-size: 12px; }
 
 /* ——————————————————————————— */
 /* Menu Lateral */
@@ -15,7 +26,7 @@
 /* Títulos de seção do menu */
 .menu-subtitle {
     -fx-font-size: 14px;
-    -fx-font-family: "Arial";
+    -fx-font-family: "Poppins";
     -fx-text-fill: #7890A8;
     -fx-font-weight: bold;
 }
@@ -184,7 +195,7 @@
     -fx-font-size: 14px;
 }
 .cadastro-header {
-    -fx-font-family: "Arial";
+    -fx-font-family: "Poppins";
     -fx-font-size: 30px;
     -fx-text-fill: #F04818;
     -fx-font-weight: bold;
@@ -259,7 +270,7 @@
 
 /* Subtítulos de campos */
 .field-subtitle {
-    -fx-font-family: "Arial";
+    -fx-font-family: "Poppins";
     -fx-font-size: 12px;
     -fx-text-fill: #3F5B92;
 }
@@ -270,7 +281,7 @@
     -fx-background-color: transparent;
     -fx-control-inner-background: transparent;
     -fx-border-width: 0;
-    -fx-font-family: "Arial";
+    -fx-font-family: "Poppins";
     -fx-font-size: 14px;
     -fx-text-fill: #181848;
     -fx-prompt-text-fill: #181848;
@@ -285,7 +296,7 @@
 }
 .pill-field .combo-box .text-field,
 .pill-field .combo-box .text-field:focused {
-    -fx-font-family: "Arial";
+    -fx-font-family: "Poppins";
     -fx-font-size: 14px;
     -fx-text-fill: #181848;
     -fx-prompt-text-fill: #181848;
@@ -293,7 +304,7 @@
 .pill-field .combo-box .button-cell,
 .pill-field .combo-box .cell {
     -fx-background-color: transparent;
-    -fx-font-family: "Arial";
+    -fx-font-family: "Poppins";
     -fx-font-size: 14px;
     -fx-text-fill: #181848;
     -fx-prompt-text-fill: #181848;
@@ -322,7 +333,7 @@
     -fx-background-color: transparent;
     -fx-control-inner-background: #BDBDBD;
     -fx-background-radius: 20px;
-    -fx-font-family: "Arial";
+    -fx-font-family: "Poppins";
     -fx-font-size: 14px;
     -fx-text-fill: #181848;
     -fx-prompt-text-fill: #181848;

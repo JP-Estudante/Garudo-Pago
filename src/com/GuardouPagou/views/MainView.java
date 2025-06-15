@@ -127,7 +127,7 @@ public class MainView {
         btnNovaMarca = criarBotao("Cadastrar Marca", "/icons/plus.png", "botao-cadastro");
 
         labelText = new Label("Bem-vindo ao GuardouPagou");
-        labelText.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        labelText.setFont(Font.font("Poppins", FontWeight.BOLD, 18));
         labelText.setTextFill(Color.web("#000000"));
 
         VBox secaoListagens = new VBox(
@@ -205,7 +205,7 @@ public class MainView {
             logoContainer.getChildren().add(logoView);
         } catch (Exception e) {
             Label fallback = new Label("LOGO");
-            fallback.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+            fallback.setFont(Font.font("Poppins", FontWeight.BOLD, 24));
             fallback.setTextFill(Color.web("#F0A818"));
             logoContainer.getChildren().add(fallback);
         }

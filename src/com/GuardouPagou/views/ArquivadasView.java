@@ -41,7 +41,7 @@ public class ArquivadasView {
         containerPrincipal.setAlignment(Pos.TOP_CENTER);
 
         Label titulo = new Label("NOTAS FISCAIS ARQUIVADAS");
-        titulo.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        titulo.setFont(Font.font("Poppins", FontWeight.BOLD, 24));
         titulo.setStyle("-fx-text-fill: #F0A818;");
 
         // --- Seção de Busca ---
