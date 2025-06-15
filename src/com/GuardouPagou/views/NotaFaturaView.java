@@ -43,7 +43,7 @@ public class NotaFaturaView {
     private void criarUI() {
         // Carrega o CSS de estilos e aplica classe de root
         root.getStyleClass().add("nota-fatura-root");
-        root.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
+        root.getStylesheets().add(getClass().getResource("/css/styles.css").toExternalForm());
         root.setStyle("-fx-background-color: #323437; -fx-padding: 20;");
 
         // ——— HEADER ———

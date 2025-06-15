@@ -115,16 +115,16 @@ public class MainView {
     private void criarUI() {
         root = new BorderPane();
         root.getStyleClass().add("main-root");
-        root.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
+        root.getStylesheets().add(getClass().getResource("/css/styles.css").toExternalForm());
 
         VBox menuLateral = new VBox();
         menuLateral.getStyleClass().add("menu-lateral-root");
 
-        btnListarFaturas = criarBotao("Listar Faturas", "/com/GuardouPagou/views/icons/list.png", "botao-listagem");
-        btnListarMarcas = criarBotao("Listar Marcas", "/com/GuardouPagou/views/icons/list.png", "botao-listagem");
-        btnArquivadas = criarBotao("Arquivadas", "/com/GuardouPagou/views/icons/archive.png", "botao-listagem");
-        btnNovaFatura = criarBotao("Cadastrar Faturas", "/com/GuardouPagou/views/icons/plus.png", "botao-cadastro");
-        btnNovaMarca = criarBotao("Cadastrar Marca", "/com/GuardouPagou/views/icons/plus.png", "botao-cadastro");
+        btnListarFaturas = criarBotao("Listar Faturas", "/icons/list.png", "botao-listagem");
+        btnListarMarcas = criarBotao("Listar Marcas", "/icons/list.png", "botao-listagem");
+        btnArquivadas = criarBotao("Arquivadas", "/icons/archive.png", "botao-listagem");
+        btnNovaFatura = criarBotao("Cadastrar Faturas", "/icons/plus.png", "botao-cadastro");
+        btnNovaMarca = criarBotao("Cadastrar Marca", "/icons/plus.png", "botao-cadastro");
 
         labelText = new Label("Bem-vindo ao GuardouPagou");
         labelText.setFont(Font.font("Arial", FontWeight.BOLD, 18));
@@ -145,7 +145,7 @@ public class MainView {
         );
         secaoCadastros.getStyleClass().add("menu-section");
 
-        btnSalvarEmail = criarBotao("E-mails de Alerta", "/com/GuardouPagou/views/icons/campaing.png", "botao-listagem");
+        btnSalvarEmail = criarBotao("E-mails de Alerta", "/icons/campaing.png", "botao-listagem");
         btnSalvarEmail.setPrefWidth(220);
 
         VBox secaoOutros = new VBox(
@@ -196,7 +196,7 @@ public class MainView {
 
         try {
             // Apenas a logo
-            Image logoImage = new Image(getClass().getResource("/com/GuardouPagou/views/icons/G-Clock_home.png").toExternalForm());
+            Image logoImage = new Image(getClass().getResource("/icons/G-Clock_home.png").toExternalForm());
             ImageView logoView = new ImageView(logoImage);
             logoView.setPreserveRatio(true);
             logoView.setSmooth(true);
@@ -239,7 +239,7 @@ public class MainView {
         TableView<Marca> tabela = new TableView<>();
         tabela.setStyle("-fx-border-color: #4A4A4A; -fx-border-width: 1; -fx-background-radius: 5; -fx-border-radius: 5;");
         tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tabela.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
+        tabela.getStylesheets().add(getClass().getResource("/css/styles.css").toExternalForm());
 
         TableColumn<Marca, Integer> colunaId = new TableColumn<>("ID");
         colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -378,7 +378,7 @@ public class MainView {
         TableView<Fatura> tabela = new TableView<>();
         tabela.setStyle("-fx-border-color: #4A4A4A; -fx-border-width: 1; -fx-background-radius: 5; -fx-border-radius: 5;");
         tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tabela.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
+        tabela.getStylesheets().add(getClass().getResource("/css/styles.css").toExternalForm());
 
         TableColumn<Fatura, Integer> colunaId = new TableColumn<>("ID");
         colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));

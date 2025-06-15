@@ -245,15 +245,15 @@
 
 /* Ícones */
 .icon-clean {
-    -fx-graphic: url("icons/clean.png");
+    -fx-graphic: url("../icons/clean.png");
     -fx-graphic-text-gap: 10px;
 }
 .icon-cancel {
-    -fx-graphic: url("icons/cancel.png");
+    -fx-graphic: url("../icons/cancel.png");
     -fx-graphic-text-gap: 10px;
 }
 .icon-save {
-    -fx-graphic: url("icons/save.png");
+    -fx-graphic: url("../icons/save.png");
     -fx-graphic-text-gap: 10px;
 }
 
