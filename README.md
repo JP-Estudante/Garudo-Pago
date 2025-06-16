@@ -96,6 +96,24 @@ ALTER COLUMN descricao TYPE VARCHAR(500);
 
 ```
 GuardouPagou/
+resources/
+├── css/
+│   └── styles.css
+├── fonts/
+│   ├── Poppins-Bold.ttf
+│   ├── Poppins-Medium.ttf
+│   └── Poppins-Regular.ttf
+└── icons/
+    ├── G-Clock(100x100px).png
+    ├── G-Clock_bg(100x100px).png
+    ├── G-Clock_home.png
+    ├── archive.png
+    ├── campaing.png
+    ├── cancel.png
+    ├── clean.png
+    ├── list.png
+    ├── plus.png
+    └── save.png
 src/
 └── com/
     └── GuardouPagou/
@@ -121,9 +139,8 @@ src/
             ├── MainView.java
             ├── MarcaView.java
             ├── NotaFaturaView.java
-            ├── NotaFiscalView.java
-            ├── button-style.css
-            └── table-style.css
+            └── NotaFiscalView.java
+CONTRIBUTING.md
 README.md
 build.xml
 manifest.mf
