@@ -319,21 +319,14 @@ public class MainView {
         });
         colunaDescricao.setPrefWidth(250);
 
-        // Coluna Ação (Editar/Excluir) - Reabilitada conforme sua necessidade em projetos anteriores
-        TableColumn<Marca, Void> colunaAcoes = new TableColumn<>("Ações");
+        /*Coluna Ação removida para ocultar o botão Excluir
+        
+        TableColumn<Marca, Void> colunaAcoes = new TableColumn<>("Ação");
         colunaAcoes.setCellFactory(column -> new TableCell<Marca, Void>() {
-            private final Button btnEditar = new Button("Editar");
             private final Button btnExcluir = new Button("Excluir");
 
             {
-                btnEditar.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5px;");
                 btnExcluir.setStyle("-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5px;");
-
-                btnEditar.setOnAction(e -> {
-                    Marca marca = getTableView().getItems().get(getIndex());
-                    editarMarca(marca);
-                });
-
                 btnExcluir.setOnAction(e -> {
                     Marca marca = getTableView().getItems().get(getIndex());
                     excluirMarca(marca);
@@ -353,8 +346,11 @@ public class MainView {
             }
         });
         colunaAcoes.setPrefWidth(150);
+*/
+        
+        
 
-        tabela.getColumns().addAll(colunaId, colunaNome, colunaDescricao, colunaAcoes); // Adicionando coluna Ações
+        tabela.getColumns().addAll(colunaId, colunaNome, colunaDescricao); //colunaAcoes); // Adicionando coluna Ações
         tabela.setItems(marcas);
 
         VBox container = new VBox(20);

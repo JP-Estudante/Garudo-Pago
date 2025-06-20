@@ -1,3 +1,4 @@
+
 # IntelliJ
 .idea/
 *.iml
@@ -21,3 +22,11 @@ dist/
 
 # Ignorar classe local de conexão com o banco
 src/com/GuardouPagou/models/DatabaseConnection.java
+=======
+/build/
+dist/
+nbbuild.xml
+nbproject/
+manifest.mf
+build.xml
+

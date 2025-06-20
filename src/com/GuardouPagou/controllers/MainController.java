@@ -8,7 +8,6 @@ import com.GuardouPagou.views.MarcaView;
 import com.GuardouPagou.views.NotaFaturaView;
 import com.GuardouPagou.dao.MarcaDAO;
 import com.GuardouPagou.dao.FaturaDAO;
-import com.GuardouPagou.controllers.MarcaController;
 import com.GuardouPagou.controllers.NotaFaturaController;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
