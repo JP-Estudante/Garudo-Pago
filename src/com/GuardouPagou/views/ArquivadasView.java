@@ -3,12 +3,7 @@ package com.GuardouPagou.views;
 import com.GuardouPagou.dao.NotaFiscalArquivadaDAO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -16,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class ArquivadasView {
 
@@ -94,6 +90,15 @@ public class ArquivadasView {
 
         TableColumn<NotaFiscalArquivadaDAO, LocalDate> colDataArquivamento = new TableColumn<>("Data de Arquivamento");
         colDataArquivamento.setCellValueFactory(new PropertyValueFactory<>("dataArquivamento"));
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        colDataArquivamento.setCellFactory(col -> new TableCell<NotaFiscalArquivadaDAO, LocalDate>() {
+            @Override
+            protected void updateItem(LocalDate data, boolean empty) {
+                super.updateItem(data, empty);
+                setText((empty || data == null) ? "" : data.format(fmt));
+            }
+        });
+
 
         tabelaNotasArquivadas.getColumns().addAll(colNumeroNota, colQtdFaturas, colMarca, colDataArquivamento);
         // Estilo da tabela pode ser adicionado aqui
