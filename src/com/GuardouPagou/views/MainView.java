@@ -664,12 +664,6 @@ public class MainView {
                         // NOTA: 'marcarComoArquivada' deve existir ou ser implementado em NotaFiscalDAO.java
                         boolean notaFiscalArquivada = new NotaFiscalDAO().marcarComoArquivada(fatura.getNotaFiscalId(), LocalDate.now());
                         if (notaFiscalArquivada) {
-                            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                            successAlert.setTitle("Sucesso");
-                            successAlert.setHeaderText(null);
-                            successAlert.setContentText("Todas as faturas da Nota Fiscal " + fatura.getNumeroNota() + " foram emitidas e a Nota Fiscal foi arquivada!");
-                            successAlert.showAndWait();
-
                             // Atualizar a lista e navegar para arquivadas
                             atualizarListaFaturas();
                             if (getBtnArquivadas() != null) {
