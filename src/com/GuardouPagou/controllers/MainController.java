@@ -34,7 +34,7 @@ public class MainController {
     private void configurarEventos() {
         view.getBtnListarFaturas().setOnAction(e -> {
             try {
-                ObservableList<Fatura> faturas = new FaturaDAO().listarFaturas();
+                ObservableList<Fatura> faturas = new FaturaDAO().listarFaturas(false);
                 view.mostrarListaFaturas(faturas);
 
             } catch (SQLException ex) {
