@@ -142,37 +142,44 @@ public class FaturaDAO {
 
     public ObservableList<Fatura> listarFaturas(boolean exibirSomenteArquivadas) throws SQLException {
         ObservableList<Fatura> faturas = FXCollections.observableArrayList();
-        StringBuilder sqlBuilder = new StringBuilder(
-                "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, f.vencimento, f.valor, f.status, "
-                + "m.nome AS marca, n.arquivada "
-                + "FROM faturas f "
-                + "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id "
-                + "LEFT JOIN marcas m ON n.marca_id = m.id "
-        );
+
+        StringBuilder sql = new StringBuilder()
+                .append("SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, ")
+                .append("f.vencimento, f.valor, f.status, ")
+                .append("m.nome      AS marca, ")
+                .append("m.cor       AS marca_cor, ")
+                .append("n.arquivada ")
+                .append("FROM faturas f ")
+                .append("JOIN notas_fiscais n ON f.nota_fiscal_id = n.id ")
+                .append("LEFT JOIN marcas m ON n.marca_id = m.id ");
 
         if (exibirSomenteArquivadas) {
-            sqlBuilder.append("WHERE n.arquivada = TRUE ");
+            sql.append("WHERE n.arquivada = TRUE ");
         } else {
-            sqlBuilder.append("WHERE n.arquivada = FALSE ");
+            sql.append("WHERE n.arquivada = FALSE ");
         }
 
-        sqlBuilder.append("ORDER BY n.numero_nota ASC, f.numero_fatura ASC");
+        sql.append("ORDER BY n.numero_nota ASC, f.numero_fatura ASC");
 
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sqlBuilder.toString()); ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql.toString());
+             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Fatura fatura = new Fatura();
-                fatura.setId(rs.getInt("id"));
-                fatura.setNotaFiscalId(rs.getInt("nota_fiscal_id"));
-                fatura.setNumeroNota(rs.getString("numero_nota"));
-                fatura.setNumeroFatura(rs.getInt("numero_fatura"));
-                fatura.setVencimento(rs.getDate("vencimento").toLocalDate());
-                fatura.setValor(rs.getDouble("valor"));
-                fatura.setStatus(rs.getString("status")); // Usa o status original da fatura
-                fatura.setMarca(rs.getString("marca"));
-                faturas.add(fatura);
+                Fatura f = new Fatura();
+                f.setId(rs.getInt("id"));
+                f.setNotaFiscalId(rs.getInt("nota_fiscal_id"));
+                f.setNumeroNota(rs.getString("numero_nota"));
+                f.setNumeroFatura(rs.getInt("numero_fatura"));
+                f.setVencimento(rs.getDate("vencimento").toLocalDate());
+                f.setValor(rs.getDouble("valor"));
+                f.setStatus(rs.getString("status"));
+                f.setMarca(rs.getString("marca"));
+                f.setMarcaColor(rs.getString("marca_cor"));
+                faturas.add(f);
             }
         }
+
         return faturas;
     }
 }

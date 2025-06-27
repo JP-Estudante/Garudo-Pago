@@ -58,16 +58,16 @@ public class NotaFiscalDAO {
             return -1; // Retorna -1 se a inserção falhar
         }
     }
-    
+
     // Método adicional recomendado
     public List<NotaFiscal> listarNotasFiscais() throws SQLException {
         List<NotaFiscal> notas = new ArrayList<>();
         String sql = "SELECT nf.*, m.nome AS marca FROM notas_fiscais nf LEFT JOIN marcas m ON nf.marca_id = m.id";
-        
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-            
+
             while (rs.next()) {
                 NotaFiscal nota = new NotaFiscal();
                 nota.setId(rs.getInt("id"));
@@ -79,7 +79,7 @@ public class NotaFiscalDAO {
         }
         return notas;
     }
-    
+
         public boolean marcarComoArquivada(int notaFiscalId, LocalDate dataArquivamento) throws SQLException {
         String sql = "UPDATE notas_fiscais SET arquivada = TRUE, data_arquivamento = ? WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -90,60 +90,69 @@ public class NotaFiscalDAO {
             return affectedRows > 0;
         }
     }
-        
-            public List<NotaFiscalArquivadaDAO> listarNotasFiscaisArquivadasComContagem(Map<String, Object> filtros) throws SQLException {
+
+    public List<NotaFiscalArquivadaDAO> listarNotasFiscaisArquivadasComContagem(Map<String, Object> filtros) throws SQLException {
         List<NotaFiscalArquivadaDAO> notasArquivadas = new ArrayList<>();
         List<Object> parametros = new ArrayList<>();
-        
+
         StringBuilder sqlBuilder = new StringBuilder(
-            "SELECT nf.id, nf.numero_nota, m.nome AS marca, nf.data_arquivamento, " +
-            "(SELECT COUNT(*) FROM faturas f WHERE f.nota_fiscal_id = nf.id) as quantidade_faturas " +
-            "FROM notas_fiscais nf " +
-            "LEFT JOIN marcas m ON nf.marca_id = m.id " +
-            "WHERE nf.arquivada = TRUE "
+                "SELECT nf.id, nf.numero_nota, m.nome AS marca, m.cor AS marca_cor, " +        // ← incluímos m.cor
+                        "       nf.data_arquivamento, " +
+                        "       (SELECT COUNT(*) FROM faturas f WHERE f.nota_fiscal_id = nf.id) AS quantidade_faturas " +
+                        "  FROM notas_fiscais nf " +
+                        "  LEFT JOIN marcas m ON nf.marca_id = m.id " +
+                        " WHERE nf.arquivada = TRUE "
         );
 
         if (filtros != null && !filtros.isEmpty()) {
             for (Map.Entry<String, Object> filtro : filtros.entrySet()) {
                 String coluna = filtro.getKey();
                 Object valor = filtro.getValue();
-
-                if (valor == null) continue; // Pular filtros com valor nulo
+                if (valor == null) continue;
 
                 sqlBuilder.append("AND ");
-                if (coluna.equals("numero_nota")) {
-                    sqlBuilder.append("LOWER(nf.numero_nota) LIKE LOWER(?) ");
-                    parametros.add("%" + valor.toString() + "%");
-                } else if (coluna.equals("marca")) {
-                    sqlBuilder.append("LOWER(m.nome) LIKE LOWER(?) ");
-                    parametros.add("%" + valor.toString() + "%");
-                } else if (coluna.equals("data_arquivamento")) {
-                    sqlBuilder.append("nf.").append(coluna).append(" = ? ");
-                    parametros.add(Date.valueOf((LocalDate) valor));
+                switch (coluna) {
+                    case "numero_nota":
+                        sqlBuilder.append("LOWER(nf.numero_nota) LIKE LOWER(?) ");
+                        parametros.add("%" + valor + "%");
+                        break;
+                    case "marca":
+                        sqlBuilder.append("LOWER(m.nome) LIKE LOWER(?) ");
+                        parametros.add("%" + valor + "%");
+                        break;
+                    case "data_arquivamento":
+                        sqlBuilder.append("nf.").append(coluna).append(" = ? ");
+                        parametros.add(Date.valueOf((LocalDate) valor));
+                        break;
                 }
-                // Adicionar mais condições de filtro se necessário
             }
         }
+
         sqlBuilder.append("ORDER BY nf.data_arquivamento DESC, nf.id DESC");
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sqlBuilder.toString())) {
-            
+
             for (int i = 0; i < parametros.size(); i++) {
                 stmt.setObject(i + 1, parametros.get(i));
             }
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    String numeroNota = rs.getString("numero_nota");
-                    String marca = rs.getString("marca");
-                    LocalDate dataArquivamento = rs.getDate("data_arquivamento") != null ? rs.getDate("data_arquivamento").toLocalDate() : null;
-                    int quantidadeFaturas = rs.getInt("quantidade_faturas");
-                    
-                    notasArquivadas.add(new NotaFiscalArquivadaDAO(numeroNota, quantidadeFaturas, marca, dataArquivamento));
+                    // cria o DTO
+                    NotaFiscalArquivadaDAO nota = new NotaFiscalArquivadaDAO(
+                            rs.getString("numero_nota"),
+                            rs.getInt   ("quantidade_faturas"),
+                            rs.getString("marca"),
+                            rs.getDate  ("data_arquivamento").toLocalDate()
+                    );
+                    // seta a cor que veio do SELECT m.cor AS marca_cor
+                    nota.setMarcaColor(rs.getString("marca_cor"));
+                    notasArquivadas.add(nota);
                 }
             }
         }
+
         return notasArquivadas;
     }
 }

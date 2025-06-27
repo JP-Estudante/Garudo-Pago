@@ -8,6 +8,7 @@ public class NotaFiscalArquivadaDAO {
     private int quantidadeFaturas;
     private String marca;
     private LocalDate dataArquivamento;
+    private String marcaColor;
 
     public NotaFiscalArquivadaDAO(String numeroNota, int quantidadeFaturas, String marca, LocalDate dataArquivamento) {
         this.numeroNota = numeroNota;
@@ -21,4 +22,13 @@ public class NotaFiscalArquivadaDAO {
     public int getQuantidadeFaturas() { return quantidadeFaturas; }
     public String getMarca() { return marca; }
     public LocalDate getDataArquivamento() { return dataArquivamento; }
+
+    public String getMarcaColor() {
+        return marcaColor;
+    }
+
+    // Setter
+    public void setMarcaColor(String marcaColor) {
+        this.marcaColor = marcaColor;
+    }
 }
