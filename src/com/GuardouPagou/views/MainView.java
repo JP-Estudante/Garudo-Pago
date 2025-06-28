@@ -268,8 +268,6 @@ public class MainView {
                     setStyle(
                             "-fx-background-color: transparent; " +
                                     "-fx-font-weight: bold; " +
-                                    "-fx-border-color: #ffffff; " +
-                                    "-fx-border-width: 0.5; " +
                                     "-fx-alignment: CENTER-LEFT;"
                     );
                 }
@@ -302,8 +300,6 @@ public class MainView {
                     setStyle(
                             "-fx-background-color: transparent; " +
                                     "-fx-font-weight: bold; " +
-                                    "-fx-border-color: #ffffff; " +
-                                    "-fx-border-width: 0.5; " +
                                     "-fx-alignment: CENTER-LEFT;"
                     );
                 }
@@ -385,8 +381,6 @@ public class MainView {
                     setStyle(
                             "-fx-background-color: transparent; " +
                                     "-fx-font-weight: bold; " +
-                                    "-fx-border-color: #ffffff; " +
-                                    "-fx-border-width: 0.5; " +
                                     "-fx-alignment: CENTER-LEFT;"
                     );
                 }
@@ -410,8 +404,6 @@ public class MainView {
                     setStyle(
                             "-fx-background-color: transparent; " +
                                     "-fx-font-weight: bold; " +
-                                    "-fx-border-color: #ffffff; " +
-                                    "-fx-border-width: 0.5; " +
                                     "-fx-alignment: CENTER-LEFT;"
                     );
                 }
@@ -434,8 +426,6 @@ public class MainView {
                     setStyle(
                             "-fx-background-color: transparent; " +
                                     "-fx-font-weight: bold; " +
-                                    "-fx-border-color: #ffffff; " +
-                                    "-fx-border-width: 0.5; " +
                                     "-fx-alignment: CENTER-LEFT;"
                     );
                 }
@@ -459,8 +449,6 @@ public class MainView {
                     setStyle(
                             "-fx-background-color: transparent; " +
                                     "-fx-font-weight: bold; " +
-                                    "-fx-border-color: #ffffff; " +
-                                    "-fx-border-width: 0.5; " +
                                     "-fx-alignment: CENTER-LEFT;"
                     );
                 }
@@ -489,8 +477,6 @@ public class MainView {
                     setStyle(
                             "-fx-background-color: transparent; " +
                                     "-fx-font-weight: bold; " +
-                                    "-fx-border-color: #ffffff; " +
-                                    "-fx-border-width: 0.5; " +
                                     "-fx-alignment: CENTER-LEFT;"
                     );
                 }
@@ -517,8 +503,6 @@ public class MainView {
                     setStyle(
                             "-fx-background-color: transparent; " +
                                     "-fx-font-weight: bold; " +
-                                    "-fx-border-color: #ffffff; " +
-                                    "-fx-border-width: 0.5; " +
                                     "-fx-alignment: CENTER-LEFT;"
                     );
                 }
