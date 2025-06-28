@@ -83,31 +83,35 @@ public class FaturaDAO {
         return faturas;
     }
 
-    public ObservableList<Fatura> listarFaturasPorPeriodo(LocalDate dataInicial) throws SQLException {
+    public ObservableList<Fatura> listarFaturasPorPeriodo(LocalDate dataInicial, LocalDate dataFinal) throws SQLException {
         ObservableList<Fatura> faturas = FXCollections.observableArrayList();
-        String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, f.vencimento, f.valor, f.status "
-                + "FROM faturas f "
-                + "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id "
-                + "WHERE f.vencimento >= ? "
-                + "ORDER BY f.vencimento";
+        String sql =
+                "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, f.vencimento, f.valor, f.status " +
+                        "FROM faturas f " +
+                        "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id " +
+                        "WHERE f.vencimento >= ? AND f.vencimento <= ? " +
+                        "ORDER BY f.vencimento";
 
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setDate(1, Date.valueOf(dataInicial));
-            ResultSet rs = stmt.executeQuery();
+            stmt.setDate(2, Date.valueOf(dataFinal));
 
-            while (rs.next()) {
-                Fatura fatura = new Fatura();
-                fatura.setId(rs.getInt("id"));
-                fatura.setNumeroNota(rs.getString("numero_nota"));
-                fatura.setNumeroFatura(rs.getInt("numero_fatura"));
-                fatura.setVencimento(rs.getDate("vencimento").toLocalDate());
-                fatura.setValor(rs.getDouble("valor"));
-                fatura.setStatus(rs.getString("status"));
-                faturas.add(fatura);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Fatura f = new Fatura();
+                    f.setId(rs.getInt("id"));
+                    f.setNotaFiscalId(rs.getInt("nota_fiscal_id"));
+                    f.setNumeroNota(rs.getString("numero_nota"));
+                    f.setNumeroFatura(rs.getInt("numero_fatura"));
+                    f.setVencimento(rs.getDate("vencimento").toLocalDate());
+                    f.setValor(rs.getDouble("valor"));
+                    f.setStatus(rs.getString("status"));
+                    faturas.add(f);
+                }
             }
         }
-
         return faturas;
     }
 

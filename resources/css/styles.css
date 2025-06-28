@@ -38,6 +38,70 @@
     -fx-font-weight: normal;
 }
 
+/* permite que o MenuButton realmente expanda no HBox */
+.menu-button {
+  -fx-max-width: Infinity; /* ou um valor fixo se preferir, ex: 200px */
+}
+
+/* remove padding extra do label interno, evitando clipping */
+.menu-button .label {
+  -fx-padding: 0;
+}
+
+/* -------- remover seta ▼ do MenuButton Filtrar --------- */
+.btn-filtrar > .arrow-button {
+  -fx-background-color: transparent;  /* sem fundo */
+  -fx-padding: 0;                     /* sem padding */
+  -fx-min-width: 0;                   /* largura mínima zero */
+  -fx-pref-width: 0;                  /* largura preferida zero */
+  -fx-max-width: 0;                   /* largura máxima zero */
+  -fx-opacity: 0;                     /* invisível */
+}
+
+/* ——————————————————————————— */
+/* Botões de Filtragem */
+/* Container do popup de itens */
+.menu-button .open > .menu {
+    -fx-background-color: #4C4F53;
+    -fx-background-radius: 8px;
+    -fx-padding: 5px 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 8,0,0,2);
+}
+
+/* Cada opção do menu */
+.menu-button .menu-item {
+    -fx-padding: 8 20 8 20;
+    -fx-text-fill: #F0A818;
+    -fx-font-family: "Poppins";
+    -fx-font-size: 14px;
+}
+
+.menu-button,
+.menu-button .label {
+  -fx-text-fill: #F0A818;      /* mesmo text-fill dos botões laterais */
+}
+
+/* Ajusta padding e gap para que o texto não fique cortado */
+.menu-button {
+  -fx-padding: 12px 20px;       /* topo/baixo 12, esquerda/direita 20 */
+  -fx-graphic-text-gap: 10px;   /* espaço ícone–texto */
+  -fx-alignment: CENTER_LEFT;
+  -fx-min-height: 49px;
+  -fx-pref-height: 49px;
+}
+
+/* Hover nos itens */
+.menu-button .menu-item:hover {
+    -fx-background-color: #6C6E70;
+    -fx-text-fill:       #FFFFFF;
+}
+
+/* Marca de seleção mais discreta */
+.menu-button .menu-item:checked > .label {
+    -fx-text-fill: #F0A818;
+}
+
+
 /* ——————————————————————————— */
 /* Base compartilhada para todos os botões do menu */
 .menu-button {
