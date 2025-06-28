@@ -1,6 +1,5 @@
 package com.GuardouPagou.views;
 
-import java.net.URL;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -29,11 +28,6 @@ public class MarcaView {
         // Raiz e CSS
         root = new BorderPane();
         root.setStyle("-fx-background-color: #323437; -fx-padding: 20;");
-        URL cssUrl = MarcaView.class.getResource("/css/styles.css");
-        if (cssUrl == null) {
-            throw new IllegalStateException("styles.css não encontrado em /css");
-        }
-        root.getStylesheets().add(cssUrl.toExternalForm());
 
         // ——— HEADER ———
         lblTitulo = new Label("Cadastro de Marcas");

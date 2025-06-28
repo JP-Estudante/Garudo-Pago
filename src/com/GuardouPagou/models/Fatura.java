@@ -11,6 +11,7 @@ public class Fatura {
     private double valor;
     private String status; // Este campo já existe e representa o status geral da fatura
     private String marca; // Adicionado para coluna MARCA
+    private String marcaColor;
 
     // NOVO CAMPO ADICIONADO AQUI
     private String statusFaturaIndividual; // Novo campo para o status individual da fatura
@@ -99,7 +100,14 @@ public class Fatura {
         this.marca = marca;
     }
 
-    // NOVOS GETTERS E SETTERS ADICIONADOS AQUI
+    public String getMarcaColor() {
+        return marcaColor;
+    }
+
+    public void setMarcaColor(String marcaColor) {
+        this.marcaColor = marcaColor;
+    }
+
     public String getStatusFaturaIndividual() {
         return statusFaturaIndividual;
     }
