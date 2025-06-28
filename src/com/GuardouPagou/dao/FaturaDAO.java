@@ -85,48 +85,49 @@ public class FaturaDAO {
 
     public ObservableList<Fatura> listarFaturasPorPeriodo(LocalDate dataInicial, LocalDate dataFinal) throws SQLException {
         ObservableList<Fatura> faturas = FXCollections.observableArrayList();
-        String sql =
-                "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, f.vencimento, f.valor, f.status " +
-                        "FROM faturas f " +
-                        "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id " +
-                        "WHERE f.vencimento >= ? AND f.vencimento <= ? " +
-                        "ORDER BY f.vencimento";
+        String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, f.vencimento, f.valor, f.status, m.nome AS marca, m.cor AS marca_cor "
+                + "FROM faturas f "
+                + "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id "
+                + "LEFT JOIN marcas m ON n.marca_id = m.id "
+                + "WHERE n.arquivada = FALSE AND f.vencimento BETWEEN ? AND ? "
+                + "ORDER BY f.vencimento";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setDate(1, Date.valueOf(dataInicial));
             stmt.setDate(2, Date.valueOf(dataFinal));
+            ResultSet rs = stmt.executeQuery();
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Fatura f = new Fatura();
-                    f.setId(rs.getInt("id"));
-                    f.setNotaFiscalId(rs.getInt("nota_fiscal_id"));
-                    f.setNumeroNota(rs.getString("numero_nota"));
-                    f.setNumeroFatura(rs.getInt("numero_fatura"));
-                    f.setVencimento(rs.getDate("vencimento").toLocalDate());
-                    f.setValor(rs.getDouble("valor"));
-                    f.setStatus(rs.getString("status"));
-                    faturas.add(f);
-                }
+            while (rs.next()) {
+                Fatura fatura = new Fatura();
+                fatura.setId(rs.getInt("id"));
+                fatura.setNumeroNota(rs.getString("numero_nota"));
+                fatura.setNumeroFatura(rs.getInt("numero_fatura"));
+                fatura.setVencimento(rs.getDate("vencimento").toLocalDate());
+                fatura.setValor(rs.getDouble("valor"));
+                fatura.setStatus(rs.getString("status"));
+                // Popula os dados da marca para exibição correta na tabela
+                fatura.setMarca(rs.getString("marca"));
+                fatura.setMarcaColor(rs.getString("marca_cor"));
+                faturas.add(fatura);
             }
         }
         return faturas;
     }
 
+    // MÉTODO CORRIGIDO
     public ObservableList<Fatura> listarFaturasPorMarca(String nomeMarca) throws SQLException {
         ObservableList<Fatura> faturas = FXCollections.observableArrayList();
-        String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, f.vencimento, f.valor, f.status "
+        String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, f.vencimento, f.valor, f.status, m.nome as marca, m.cor as marca_cor "
                 + "FROM faturas f "
                 + "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id "
                 + "JOIN marcas m ON n.marca_id = m.id "
-                + "WHERE m.nome ILIKE ?";
+                + "WHERE n.arquivada = FALSE AND m.nome ILIKE ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // Permitir busca parcial ignorando maiúsculas/minúsculas
             stmt.setString(1, "%" + nomeMarca + "%");
             ResultSet rs = stmt.executeQuery();
 
@@ -138,6 +139,9 @@ public class FaturaDAO {
                 fatura.setVencimento(rs.getDate("vencimento").toLocalDate());
                 fatura.setValor(rs.getDouble("valor"));
                 fatura.setStatus(rs.getString("status"));
+                // Popula os dados da marca para exibição correta na tabela
+                fatura.setMarca(rs.getString("marca"));
+                fatura.setMarcaColor(rs.getString("marca_cor"));
                 faturas.add(fatura);
             }
         }
