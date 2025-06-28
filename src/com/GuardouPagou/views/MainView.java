@@ -36,11 +36,12 @@ public class MainView {
     private TextField emailField;
     private RadioButton rbFiltraPeriodo = new RadioButton("Filtrar por Perí­odo");
     private RadioButton rbFiltraMarca = new RadioButton("Filtrar por Marca");
-    ;
     private ToggleGroup filtroToggleGroup;
     private DatePicker dpFiltroPeriodo;
     private ComboBox<Marca> cbFiltroMarca;
     private VBox filtroContainer;
+    private Button btnFiltrar;
+    private HBox subMenuFiltro;
 
     public BorderPane getRoot() {
         return this.root;
@@ -576,18 +577,51 @@ public class MainView {
             filtroContainer.setAlignment(Pos.CENTER_LEFT);
             filtroContainer.setPadding(new Insets(0, 0, 10, 0));
             filtroContainer.getChildren().addAll(dpFiltroPeriodo, cbFiltroMarca);
+            filtroContainer.setVisible(false);
+            filtroContainer.setManaged(false);
+        }
+
+        if (btnFiltrar == null) {
+            btnFiltrar = new Button("Filtrar");
+            btnFiltrar.setStyle("-fx-background-color: #C88200; -fx-text-fill: #000000; -fx-font-weight: bold;");
+        }
+
+        if (subMenuFiltro == null) {
+            subMenuFiltro = new HBox(10, rbFiltraPeriodo, rbFiltraMarca);
+            subMenuFiltro.setAlignment(Pos.CENTER_LEFT);
+            subMenuFiltro.setVisible(false);
+            subMenuFiltro.setManaged(false);
         }
 
         toolbar.getChildren().clear();
-        toolbar.getChildren().addAll(rbFiltraPeriodo, rbFiltraMarca, btnAtualizar);
+        toolbar.getChildren().addAll(btnFiltrar, btnAtualizar);
         toolbar.setSpacing(15);
-        // --- FIM DA ADIÇÃO DOS RADIOBUTTONS E TOGGLEGROUP ---
         toolbar.setAlignment(Pos.CENTER_RIGHT);
 
-        container.getChildren().addAll(titulo, toolbar, filtroContainer, tabela);
+        container.getChildren().addAll(titulo, toolbar, subMenuFiltro, filtroContainer, tabela);
         root.setCenter(container);
 
         btnAtualizar.setOnAction(e -> atualizarListaFaturas());
+
+        btnFiltrar.setOnAction(e -> {
+            boolean visible = subMenuFiltro.isVisible();
+            subMenuFiltro.setVisible(!visible);
+            subMenuFiltro.setManaged(!visible);
+            if (!visible) {
+                // ao abrir o submenu, apenas exibe; campos permanecem ocultos
+            } else {
+                // ao fechar o submenu limpa filtros e oculta campos
+                filtroToggleGroup.selectToggle(null);
+                filtroContainer.setVisible(false);
+                filtroContainer.setManaged(false);
+                dpFiltroPeriodo.setValue(null);
+                cbFiltroMarca.getSelectionModel().clearSelection();
+                dpFiltroPeriodo.setVisible(false);
+                dpFiltroPeriodo.setManaged(false);
+                cbFiltroMarca.setVisible(false);
+                cbFiltroMarca.setManaged(false);
+            }
+        });
 
         // Adiciona os listeners para os RadioButtons e o botão de atualização apenas uma vez
         if (rbFiltraPeriodo.getOnAction() == null) {
@@ -599,6 +633,8 @@ public class MainView {
                 dpFiltroPeriodo.setManaged(true);
                 cbFiltroMarca.setVisible(false);
                 cbFiltroMarca.setManaged(false);
+                filtroContainer.setVisible(true);
+                filtroContainer.setManaged(true);
 
                 dpFiltroPeriodo.setOnAction(event -> {
                     System.out.println("Data selecionada: " + dpFiltroPeriodo.getValue());
@@ -612,6 +648,8 @@ public class MainView {
                 cbFiltroMarca.setManaged(true);
                 dpFiltroPeriodo.setVisible(false);
                 dpFiltroPeriodo.setManaged(false);
+                filtroContainer.setVisible(true);
+                filtroContainer.setManaged(true);
 
                 cbFiltroMarca.setOnAction(event -> {
                     Marca selectedMarca = cbFiltroMarca.getSelectionModel().getSelectedItem();
