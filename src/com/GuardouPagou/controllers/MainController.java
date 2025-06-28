@@ -35,7 +35,7 @@ public class MainController {
         view.getBtnListarFaturas().setOnAction(e -> {
             try {
                 ObservableList<Fatura> faturas = new FaturaDAO().listarFaturas(false);
-                view.mostrarListaFaturas(faturas);
+                view.mostrarTelaListagemFaturas(faturas);
 
             } catch (SQLException ex) {
                 view.getConteudoLabel().setText("Erro ao carregar faturas.");
