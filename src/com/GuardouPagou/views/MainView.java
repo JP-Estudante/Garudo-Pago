@@ -525,126 +525,126 @@ public class MainView {
         titulo.getStyleClass().add("h5");
         titulo.setTextFill(Color.web("#F0A818"));
 
-        // 3. INICIALIZA OS COMPONENTES DE FILTRO (A PARTE QUE FALTAVA)
-        // ==========================================================
-
-        // ToggleGroup + RadioMenuItems (são campos da classe, mas precisam ser verificados)
+        // 3. INICIALIZA OS COMPONENTES DE FILTRO
         if (filtroToggleGroup == null) filtroToggleGroup = new ToggleGroup();
         miFiltrarPeriodo = new RadioMenuItem("Filtrar por Período");
         miFiltrarMarca = new RadioMenuItem("Filtrar por Marca");
         miFiltrarPeriodo.setToggleGroup(filtroToggleGroup);
         miFiltrarMarca.setToggleGroup(filtroToggleGroup);
 
-        // Ícone e MenuButton de filtro
-        ImageView filterIcon = new ImageView(getClass().getResource("/icons/ajust.png").toExternalForm());
-        filterIcon.setFitHeight(16);
+        ImageView filterIcon = new ImageView(getClass().getResource("/icons/filter_list.png").toExternalForm());
+        filterIcon.setFitHeight(22);
         filterIcon.setPreserveRatio(true);
-
         btnFiltrar = new MenuButton("Filtrar", filterIcon, miFiltrarPeriodo, miFiltrarMarca);
         btnFiltrar.getStyleClass().addAll("menu-button", "botao-listagem");
         btnFiltrar.setContentDisplay(ContentDisplay.LEFT);
         btnFiltrar.setGraphicTextGap(10);
-        // As linhas de Hgrow e MaxWidth foram removidas para corrigir o tamanho
 
-        // DatePickers
+        // Componentes do filtro de PERÍODO
         dpDataInicio = new DatePicker();
         dpDataInicio.setPromptText("Início do Período");
         dpDataInicio.setPrefWidth(150);
-
         dpDataFim = new DatePicker();
         dpDataFim.setPromptText("Fim do Período");
         dpDataFim.setPrefWidth(150);
-
-        // Botões Aplicar / Remover
         btnAplicarFiltro = new Button("Aplicar Filtro");
-        btnAplicarFiltro.getStyleClass().addAll("menu-button","botao-listagem");
+        btnAplicarFiltro.getStyleClass().addAll("menu-button", "botao-listagem");
         btnAplicarFiltro.setOnAction(e -> aplicarFiltroPeriodo());
         btnAplicarFiltro.setFocusTraversable(false);
-
         btnRemoverFiltro = new Button("Remover Filtro");
-        btnRemoverFiltro.getStyleClass().addAll("menu-button","botao-footer");
+        btnRemoverFiltro.getStyleClass().addAll("menu-button", "botao-footer");
         btnRemoverFiltro.setOnAction(e -> {
             dpDataInicio.setValue(null);
             dpDataFim.setValue(null);
             mostrarTodasFaturas();
-            if (filtroContainer != null) {
-                filtroContainer.setVisible(false);
-                filtroContainer.setManaged(false);
-            }
         });
 
-        // Container de período
-        filtroContainer = new VBox(6,
-                new HBox(6, new Label("De:"), dpDataInicio, new Label("Até:"), dpDataFim),
+        // Sub-container para o filtro de período
+        HBox linhaDataInicio = new HBox(6, new Label("De:   "), dpDataInicio);
+        linhaDataInicio.setAlignment(Pos.CENTER_LEFT);
+
+        HBox linhaDataFim = new HBox(6, new Label("Até: "), dpDataFim);
+        linhaDataFim.setAlignment(Pos.CENTER_LEFT);
+
+        VBox filtroDePeriodoContainer = new VBox(10, // Espaçamento vertical de 10px
+                linhaDataInicio,
+                linhaDataFim,
                 new HBox(10, btnAplicarFiltro, btnRemoverFiltro)
         );
-        filtroContainer.setPadding(new Insets(8));
-        filtroContainer.setVisible(false);
-        filtroContainer.setManaged(false);
+        filtroDePeriodoContainer.setPadding(new Insets(8));
+        filtroDePeriodoContainer.setVisible(false); // Começa invisível
+        filtroDePeriodoContainer.setManaged(false); // E sem ocupar espaço
 
-        // ComboBox de Marca
+        // Componente do filtro de MARCA
         cbFiltroMarca = new ComboBox<>();
         cbFiltroMarca.setPromptText("Selecione a Marca");
         cbFiltroMarca.setPrefWidth(200);
         cbFiltroMarca.setVisible(false);
         cbFiltroMarca.setManaged(false);
-
         try {
-            // Se o cache de marcas ainda não foi criado, busca no banco
+            ObservableList<Marca> cacheMarcas = null;
             if (cacheMarcas == null) {
-                System.out.println("Buscando marcas no banco pela primeira vez...");
                 cacheMarcas = new MarcaDAO().listarMarcas();
             }
-            // Usa a lista do cache
             cbFiltroMarca.setItems(cacheMarcas);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
-        // Listener para aplicar o filtro ao selecionar a marca
         cbFiltroMarca.setOnAction(e -> aplicarFiltroMarca());
 
-        // Listeners para mostrar/esconder cada filtro
+        // 4. AGRUPA TODOS OS FILTROS EM UM ÚNICO PAINEL ESTILIZÁVEL
+        VBox painelDeFiltros = new VBox(10);
+        painelDeFiltros.getStyleClass().add("painel-filtros");
+        painelDeFiltros.getChildren().addAll(filtroDePeriodoContainer, cbFiltroMarca);
+
+        painelDeFiltros.setFillWidth(false);
+
+        painelDeFiltros.setMaxWidth(Region.USE_PREF_SIZE);
+        painelDeFiltros.setMinWidth(Region.USE_PREF_SIZE);
+
+        painelDeFiltros.setVisible(false);
+        painelDeFiltros.setManaged(false);
+
+        // 5. CONFIGURA OS LISTENERS PARA MOSTRAR/ESCONDER OS FILTROS
         miFiltrarPeriodo.setOnAction(e -> {
-            filtroContainer.setVisible(true);
-            filtroContainer.setManaged(true);
+            painelDeFiltros.setVisible(true);
+            painelDeFiltros.setManaged(true);
+            filtroDePeriodoContainer.setVisible(true);
+            filtroDePeriodoContainer.setManaged(true);
             cbFiltroMarca.setVisible(false);
             cbFiltroMarca.setManaged(false);
         });
         miFiltrarMarca.setOnAction(e -> {
-            filtroContainer.setVisible(false);
-            filtroContainer.setManaged(false);
+            painelDeFiltros.setVisible(true);
+            painelDeFiltros.setManaged(true);
+            filtroDePeriodoContainer.setVisible(false);
+            filtroDePeriodoContainer.setManaged(false);
             cbFiltroMarca.setVisible(true);
             cbFiltroMarca.setManaged(true);
         });
 
-        // ==========================================================
-
-        // 4. MONTA A BARRA DE FERRAMENTAS
+        // 6. MONTA A BARRA DE FERRAMENTAS (TOOLBAR)
         Button btnAtualizar = new Button("Atualizar");
         btnAtualizar.getStyleClass().addAll("menu-button", "botao-listagem");
         btnAtualizar.setOnAction(e -> atualizarListaFaturas());
-
-        // HBox para alinhar botões à direita
         HBox espacador = new HBox();
-        HBox.setHgrow(espacador, Priority.ALWAYS); // Ocupa todo o espaço
+        HBox.setHgrow(espacador, Priority.ALWAYS);
         HBox toolbar = new HBox(12, btnFiltrar, espacador, btnAtualizar);
         toolbar.setAlignment(Pos.CENTER_LEFT);
 
-        // 5. CRIA A TABELA DE FATURAS
+        // 7. CRIA A TABELA DE FATURAS
         TableView<Fatura> tabelaFaturas = criarTabelaFaturas(faturas);
         VBox.setVgrow(tabelaFaturas, Priority.ALWAYS);
 
-        // 6. MONTA A TELA FINAL NO NOVO CONTAINER
+        // 8. MONTA A TELA FINAL NO CONTAINER PRINCIPAL
         container.getChildren().addAll(
                 titulo,
                 toolbar,
-                filtroContainer,
-                cbFiltroMarca,
+                painelDeFiltros,
                 tabelaFaturas
         );
 
-        // 7. RETORNA A TELA COMPLETA E PRONTA
+        // 9. RETORNA A TELA COMPLETA E PRONTA
         return container;
     }
 

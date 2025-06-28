@@ -101,6 +101,46 @@
     -fx-text-fill: #F0A818;
 }
 
+/* ——————————————————————————— */
+/* Painel de filtros: cor de fundo e sem borda */
+.painel-filtros {
+    -fx-background-color: #7890A8; /* antes era #4C4F53 */
+    -fx-padding: 15px;
+    -fx-spacing: 10px;
+    -fx-background-radius: 10px;
+    /* remove completamente qualquer borda */
+    -fx-border-width: 0;
+}
+
+/* ——————————————————————————— */
+/* DatePickers dentro do painel devem herdar o estilo .date-picker existente */
+/* (copiando o que já está em .pill-field .date-picker) */
+.painel-filtros .date-picker {
+    -fx-background-color: #BDBDBD;
+    -fx-background-radius: 20px;
+    -fx-padding: 5px 10px;
+}
+
+/* 2) Remove qualquer fundo ou borda do editor (TextField interno) */
+.painel-filtros .date-picker .text-field {
+    -fx-background-color: transparent;            /* transparentes para deixar ver o contêiner */
+    -fx-control-inner-background: transparent;    /* idem */
+    -fx-border-width: 0;                          /* sem borda */
+    -fx-padding: 0;                               /* sem padding extra */
+
+    /* se quiser ajustar fonte e cor do texto: */
+    -fx-text-fill: #181848;
+    -fx-prompt-text-fill: #181848;
+    -fx-font-family: "Poppins";
+    -fx-font-size: 14px;
+}
+
+/* 3) Arrow-button também sem fundo/borda */
+.painel-filtros .date-picker .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-border-width: 0;
+}
 
 /* ——————————————————————————— */
 /* Base compartilhada para todos os botões do menu */
