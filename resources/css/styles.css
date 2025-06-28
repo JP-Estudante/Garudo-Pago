@@ -180,60 +180,61 @@
 /* ———————————————— */
 /* Table Styles */
 .table-padrao {
-  -fx-background-color: #3f5b92;         /* fundo geral */
-  -fx-border-color: #181848;             /* borda externa */
+  -fx-background-color: #3F5B92;    /* fundo das células */
+  -fx-border-color: #181848;        /* borda externa */
   -fx-border-width: 1px;
   -fx-background-radius: 5px;
   -fx-border-radius: 5px;
-
-  /* unifica as linhas “listradas” para todas iguais */
-  -fx-stripe-even-row-fill: #3f5b92;
-  -fx-stripe-odd-row-fill:  #3f5b92;
+  -fx-stripe-even-row-fill: #3F5B92;
+  -fx-stripe-odd-row-fill:  #3F5B92;
 }
 
-/* 2) Cabeçalho */
+/* 1) Zera borda das linhas (TableRow) para não interferir */
+.table-padrao {
+  -fx-background-color: #3F5B92;
+  -fx-border-color: #181848;
+  -fx-border-width: 1px;
+  -fx-background-radius: 5px;
+  -fx-border-radius: 5px;
+  -fx-stripe-even-row-fill: #3F5B92;
+  -fx-stripe-odd-row-fill:  #3F5B92;
+}
+
+/* cabeçalho: fundo + borda inferior */
 .table-padrao .column-header-background {
-  -fx-background-color: #7890A8;         /* fundo do header */
+  -fx-background-color: #7890A8;
+  -fx-border-style: none none solid none;
+  -fx-border-width: 0 0 1px 0;
+  -fx-border-color: transparent transparent #181848 transparent;
 }
 
-.table-padrao .column-header-background .column-header {
-  /* linhas verticais e horizontais no header */
-  -fx-border-color: transparent #181848 #181848 transparent;
+/* 1) Zera borda das linhas (TableRow) para não interferir */
+.table-padrao .table-row-cell {
+  -fx-border-width: 0;
+}
+
+/* 2) Grid completa: linhas horizontais + verticais em cada célula */
+.table-padrao .cell {
+  -fx-background-color: transparent;
+  -fx-border-style: none solid solid none;      /* direita + abaixo */
   -fx-border-width: 0 1px 1px 0;
+  -fx-border-color: transparent #181848 #181848 transparent;
+  -fx-border-alignment: inside;
+  -fx-border-insets: 0;
+  -fx-background-insets: 0;
 }
 
-.table-padrao .column-header .label {
-  -fx-text-fill: #181848;                /* texto do header */
-  -fx-font-weight: bold;
-  -fx-font-size: 14px;
-}
-
-/* 3) Área interna de dados */
+/* 3) Área de rolagem */
 .table-padrao .virtual-flow .viewport,
 .table-padrao .scroll-pane .viewport {
-  -fx-background-color: #3f5b92;         /* fundo da viewport */
+  -fx-background-color: #3F5B92;
 }
 
-/* 4) Linhas da tabela */
-.table-padrao .table-row-cell {
-  -fx-background-color: transparent;     /* herda o stripe-fill */
-}
-
-/* 5) Células: bordas e texto */
+/* 6) Fallback de fonte */
+.table-padrao .column-header .label,
 .table-padrao .cell {
-  /* border: top right bottom left */
-  -fx-border-color: transparent #181848 #181848 transparent;
-  -fx-border-width: 0 1px 1px 0px;
-  -fx-text-fill: #FFFFFF;                /* texto branco */
-  -fx-font-size: 14px;
-  -fx-background-color: transparent;
-}
-
-/* 6) Fonte e fallback genérico */
-.table-view .column-header .label,
-.table-view .cell {
   -fx-font-family: "Poppins", sans-serif;
-  -fx-font-size: 14px;
+  -fx-font-size: 18px;
 }
 
 /* ———————————————— */
