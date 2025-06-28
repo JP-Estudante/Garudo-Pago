@@ -75,6 +75,10 @@ public class MainController {
 
             // Define largura x altura maiores
             Scene cena = new Scene(notaView.getRoot(), 700, 500);
+            // Herda a folha de estilos da cena principal
+            cena.getStylesheets().addAll(
+                    view.getRoot().getScene().getStylesheets()
+            );
 
             // Fecha com ESC
             cena.setOnKeyPressed(ev -> {
@@ -106,6 +110,10 @@ public class MainController {
 
             // Define largura x altura maiores
             Scene scene = new Scene(marcaView.getRoot(), 650, 400);
+            // Herda a folha de estilos da cena principal
+            scene.getStylesheets().addAll(
+                    view.getRoot().getScene().getStylesheets()
+            );
 
             // Fecha com ESC
             scene.setOnKeyPressed(ev -> {
