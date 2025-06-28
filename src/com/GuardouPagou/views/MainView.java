@@ -116,7 +116,6 @@ public class MainView {
     private void criarUI() {
         root = new BorderPane();
         root.getStyleClass().add("main-root");
-        root.getStylesheets().add(getClass().getResource("/css/styles.css").toExternalForm());
 
         VBox menuLateral = new VBox();
         menuLateral.getStyleClass().add("menu-lateral-root");

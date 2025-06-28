@@ -90,10 +90,8 @@ public class ArquivadasView {
         // Tabela de notas arquivadas
         tabelaNotasArquivadas = new TableView<>();
         tabelaNotasArquivadas.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tabelaNotasArquivadas.getStylesheets().add(
-                getClass().getResource("/css/styles.css").toExternalForm()
-        );
 
+        ViewUtils.aplicarEstiloPadrao(tabelaNotasArquivadas);
         // Coluna Número da Nota
         TableColumn<NotaFiscalArquivadaDAO, String> colNumeroNota =
                 new TableColumn<>("Número Nota Fiscal");
