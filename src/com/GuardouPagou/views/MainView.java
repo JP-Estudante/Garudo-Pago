@@ -26,6 +26,15 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javafx.stage.Popup;
+import javafx.scene.layout.HBox;
+import javafx.geometry.Insets;
 
 public class MainView {
 
@@ -44,6 +53,11 @@ public class MainView {
     private ComboBox<Marca> cbFiltroMarca;
     private ObservableList<Marca> cacheMarcas;
     private final Popup filtroPopup = new Popup();
+    private LocalDate periodoFilterStart;
+    private LocalDate periodoFilterEnd;
+    private final Set<Marca> marcaFilters = new HashSet<>();
+    private HBox filterTokens;
+    private TableView<Fatura> tabelaFaturas;
 
     public MainView() {
         criarUI();
@@ -190,7 +204,8 @@ public class MainView {
 
     private void mostrarTelaListagemFaturas(ObservableList<Fatura> faturas) {
         // 1) monta a tabela
-        TableView<Fatura> tabela = criarTabelaFaturas(faturas);
+        this.tabelaFaturas = criarTabelaFaturas(faturas);
+        VBox.setVgrow(this.tabelaFaturas, Priority.ALWAYS);
 
         // 2) monta os filtros / toolbar (se quiser manter)
         HBox toolbar = new HBox(12, btnFiltrar, new Button("Atualizar"));
@@ -205,7 +220,7 @@ public class MainView {
         titulo.setTextFill(Color.web("#F0A818"));
 
         // 4) container inteiro (substitui inteiramente o centro)
-        VBox tela = new VBox(18, titulo, toolbar, tabela);
+        VBox tela = new VBox(18, titulo, toolbar, tabelaFaturas);
         tela.setPadding(new Insets(20));
         tela.setStyle("-fx-background-color: #BDBDBD;");
 
@@ -531,7 +546,7 @@ public class MainView {
         Button btnAplicarFiltro = new Button("Aplicar Filtro");
         btnAplicarFiltro.getStyleClass().addAll("menu-button", "botao-listagem");
 
-       // 2) Cria e configura o ícone
+        // 2) Cria e configura o ícone
         ImageView checkIcon = new ImageView(
                 new Image(getClass().getResourceAsStream("/icons/check.png"))
         );
@@ -588,11 +603,14 @@ public class MainView {
         marcaContent.getStyleClass().add("painel-filtros");
         marcaContent.setPadding(new Insets(15));
 
-        // 6. Configura Popup (uma vez só)
         filtroPopup.setAutoHide(true);
         filtroPopup.setHideOnEscape(true);
 
-        // 7. Event handlers do MenuButton
+        filterTokens = new HBox(8);
+        filterTokens.setAlignment(Pos.CENTER_LEFT);
+        filterTokens.setPadding(new Insets(0, 0, 0, 10));
+
+        // Event handlers do MenuButton
         miFiltrarPeriodo.setOnAction(e -> {
             filtroPopup.getContent().setAll(periodContent);
             Bounds b = btnFiltrar.localToScreen(btnFiltrar.getBoundsInLocal());
@@ -604,21 +622,27 @@ public class MainView {
             filtroPopup.show(btnFiltrar.getScene().getWindow(), b.getMinX(), b.getMaxY());
         });
 
-        // 8. Toolbar e tabela
+        // Toolbar e tabela
         Button btnAtualizar = new Button("Atualizar");
         btnAtualizar.getStyleClass().addAll("menu-button", "botao-listagem");
         btnAtualizar.setOnAction(e -> atualizarListaFaturas());
-        HBox esp = new HBox();
-        HBox.setHgrow(esp, Priority.ALWAYS);
-        HBox toolbar = new HBox(12, btnFiltrar, esp, btnAtualizar);
+        HBox espacador = new HBox();
+        HBox.setHgrow(espacador, Priority.ALWAYS);
+        HBox toolbar = new HBox(12, btnFiltrar, filterTokens, espacador, btnAtualizar);
         toolbar.setAlignment(Pos.CENTER_LEFT);
 
-        TableView<Fatura> tabela = criarTabelaFaturas(faturas);
-        VBox.setVgrow(tabela, Priority.ALWAYS);
+        this.tabelaFaturas = criarTabelaFaturas(faturas);
+        VBox.setVgrow(this.tabelaFaturas, Priority.ALWAYS);
 
-        // 9. Monta a cena
-        container.getChildren().addAll(titulo, toolbar, tabela);
+        // Monta a cena usando o campo
+        container.getChildren().addAll(titulo, toolbar, this.tabelaFaturas);
         return container;
+    }
+
+    private void mostrarListaFaturas(ObservableList<Fatura> faturas) {
+        if (this.tabelaFaturas != null) {
+            this.tabelaFaturas.setItems(faturas);
+        }
     }
 
     // MÉTODO marcarFaturaComoEmitida - ADICIONADO
@@ -752,65 +776,129 @@ public class MainView {
     }
 
     private void aplicarFiltroPeriodo() {
-        try {
-            LocalDate dataInicio = dpDataInicio.getValue();
-            LocalDate dataFim = dpDataFim.getValue(); // <-- OBTENDO A DATA DE FIM
+        LocalDate inicio = dpDataInicio.getValue();
+        LocalDate fim    = dpDataFim.getValue();
+        if (inicio != null && fim != null) {
+            // 1) guarda estado
+            periodoFilterStart = inicio;
+            periodoFilterEnd   = fim;
 
-            // Validação para garantir que ambas as datas foram selecionadas
-            if (dataInicio == null || dataFim == null) {
-                Alert alert = new Alert(Alert.AlertType.WARNING, "Por favor, selecione a data de INÍCIO e FIM para filtrar por período.");
-                alert.showAndWait();
+            // 2) executa a query dentro de try/catch
+            ObservableList<Fatura> f;
+            try {
+                f = new FaturaDAO().listarFaturasPorPeriodo(inicio, fim);
+                mostrarListaFaturas(f);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                // mostra alerta de erro
+                showAlert(Alert.AlertType.ERROR,
+                        "Erro ao filtrar por período",
+                        ex.getMessage());
+                // limpa estado para não ficar inconsistente
+                periodoFilterStart = periodoFilterEnd = null;
                 return;
             }
 
-            // Validação para garantir que a data de início não é posterior à de fim
-            if (dataInicio.isAfter(dataFim)) {
-                Alert alert = new Alert(Alert.AlertType.WARNING, "A data de início não pode ser posterior à data de fim.");
-                alert.showAndWait();
-                return;
-            }
+            // 3) remove token anterior de período (caso exista)
+            filterTokens.getChildren().removeIf(n -> "periodo".equals(n.getUserData()));
 
-            // 1. Busca os dados com o filtro de período (agora com os dois argumentos)
-            ObservableList<Fatura> faturas = new FaturaDAO().listarFaturasPorPeriodo(dataInicio, dataFim);
+            // 4) formata texto do token
+            String txt = inicio.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    + " – "
+                    + fim.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-            // 2. Cria a view com os dados filtrados
-            Node viewFaturas = criarViewFaturas(faturas);
+            // 5) cria o botão-token
+            Button periodoBtn = new Button(txt);
+            periodoBtn.setUserData("periodo");
+            periodoBtn.getStyleClass().add("filter-token");
 
-            // 3. Define como conteúdo principal
-            setConteudoPrincipal(viewFaturas);
+            ImageView cancelIcon = new ImageView(
+                    new Image(getClass().getResourceAsStream("/icons/cancel.png"))
+            );
+            cancelIcon.setFitHeight(12);
+            cancelIcon.setPreserveRatio(true);
+            periodoBtn.setGraphic(cancelIcon);
+            periodoBtn.setContentDisplay(ContentDisplay.RIGHT);
 
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao filtrar faturas por período: " + ex.getMessage());
-            alert.showAndWait();
+            // 6) ao clicar, limpa filtro e remove o token
+            periodoBtn.setOnAction(ev -> {
+                periodoFilterStart = periodoFilterEnd = null;
+                mostrarTodasFaturas();
+                filterTokens.getChildren().remove(periodoBtn);
+            });
+
+            // 7) adiciona o token à barra
+            filterTokens.getChildren().add(periodoBtn);
         }
+        // fecha o popup
+        filtroPopup.hide();
     }
 
     private void aplicarFiltroMarca() {
-        try {
-            Marca marcaSelecionadaObj = cbFiltroMarca.getValue();
-            if (marcaSelecionadaObj == null || marcaSelecionadaObj.getNome().isEmpty()) {
-                Alert alert = new Alert(Alert.AlertType.WARNING, "Por favor, selecione uma marca para filtrar.");
-                alert.showAndWait();
-                mostrarTodasFaturas(); // Opcional: volta para a lista completa se a marca for nula
+        Marca sel = cbFiltroMarca.getValue();
+        if (sel != null && marcaFilters.add(sel)) {
+            // 1) extrai apenas os nomes das marcas atuais
+            List<String> nomes = marcaFilters.stream()
+                    .map(Marca::getNome)
+                    .collect(Collectors.toList());
+
+            try {
+                // 2) chama o novo método do DAO dentro do try
+                ObservableList<Fatura> f = new FaturaDAO()
+                        .listarFaturasPorMarcas(nomes);
+                mostrarListaFaturas(f);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                // informa o usuário em um alerta
+                showAlert(Alert.AlertType.ERROR,
+                        "Erro ao filtrar por marca",
+                        ex.getMessage());
+                // remove a marca adicionada no set para não ficar em estado inconsistente
+                marcaFilters.remove(sel);
                 return;
             }
 
-            // 1. Busca os dados com o filtro de marca
-            String nomeMarca = marcaSelecionadaObj.getNome();
-            ObservableList<Fatura> faturas = new FaturaDAO().listarFaturasPorMarca(nomeMarca);
+            // 3) cria o botão-token
+            Button marcaBtn = new Button(sel.getNome());
+            marcaBtn.setUserData(sel);
+            marcaBtn.getStyleClass().add("filter-token");
+            ImageView cancelIcon = new ImageView(
+                    new Image(getClass().getResourceAsStream("/icons/cancel.png"))
+            );
+            cancelIcon.setFitHeight(12);
+            cancelIcon.setPreserveRatio(true);
+            marcaBtn.setGraphic(cancelIcon);
+            marcaBtn.setContentDisplay(ContentDisplay.RIGHT);
 
-            // 2. Cria a view com os dados filtrados
-            Node viewFaturas = criarViewFaturas(faturas);
+            // 4) ao clicar, remove apenas aquela marca e refaz o filtro
+            marcaBtn.setOnAction(ev -> {
+                marcaFilters.remove(sel);
 
-            // 3. Define como conteúdo principal
-            setConteudoPrincipal(viewFaturas);
+                if (marcaFilters.isEmpty()) {
+                    mostrarTodasFaturas();
+                } else {
+                    // repete o mesmo tratamento em try/catch
+                    List<String> restantes = marcaFilters.stream()
+                            .map(Marca::getNome)
+                            .collect(Collectors.toList());
+                    try {
+                        ObservableList<Fatura> nf = new FaturaDAO()
+                                .listarFaturasPorMarcas(restantes);
+                        mostrarListaFaturas(nf);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        showAlert(Alert.AlertType.ERROR,
+                                "Erro ao filtrar por marca",
+                                e.getMessage());
+                    }
+                }
+                filterTokens.getChildren().remove(marcaBtn);
+            });
 
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao filtrar faturas por marca: " + ex.getMessage());
-            alert.showAndWait();
+            // 5) adiciona o token à barra
+            filterTokens.getChildren().add(marcaBtn);
         }
+        filtroPopup.hide();
     }
 
     private void mostrarTodasFaturas() {

@@ -469,6 +469,17 @@
     -fx-padding: 0;
 }
 
+.filter-token {
+    -fx-background-color: #C88200;
+    -fx-background-radius: 12px;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 4 8 4 8;
+}
+.filter-token .label {
+    -fx-text-fill: white;
+}
+
 /* ScrollPane */
 .scroll-pane {
     -fx-background-color: #7890A8;
