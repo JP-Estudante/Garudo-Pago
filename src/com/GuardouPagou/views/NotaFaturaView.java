@@ -133,64 +133,6 @@ public class NotaFaturaView {
         root.setCenter(container);
     }
 
-    private VBox wrapField(TextField field, String labelText, String prompt) {
-        Label lbl = new Label(labelText);
-        lbl.setTextFill(Color.web("#323437"));
-        field.setPromptText(prompt);
-        field.setPrefWidth(250);
-        field.setStyle(
-                "-fx-background-color: transparent; "
-                + "-fx-text-fill: #323437; "
-                + "-fx-prompt-text-fill: #323437; "
-                + "-fx-border-width: 0;"
-        );
-        VBox box = new VBox(6, lbl, field);
-        box.setStyle(
-                "-fx-background-color: #BDBDBD; "
-                + "-fx-background-radius: 10; "
-                + "-fx-padding: 12;"
-        );
-        return box;
-    }
-
-    private VBox wrapDatePicker(DatePicker dp, String labelText, String prompt) {
-        Label lbl = new Label(labelText);
-        lbl.setTextFill(Color.web("#323437"));
-        dp.setPromptText(prompt);
-        dp.setPrefWidth(250);
-        dp.setStyle(
-                "-fx-background-color: transparent; "
-                + "-fx-text-fill: #323437; "
-                + "-fx-border-width: 0;"
-        );
-        VBox box = new VBox(6, lbl, dp);
-        box.setStyle(
-                "-fx-background-color: #BDBDBD; "
-                + "-fx-background-radius: 10; "
-                + "-fx-padding: 12;"
-        );
-        return box;
-    }
-
-    private VBox wrapComboBox(ComboBox<String> cb, String labelText, String prompt) {
-        Label lbl = new Label(labelText);
-        lbl.setTextFill(Color.web("#323437"));
-        cb.setPromptText(prompt);
-        cb.setPrefWidth(250);
-        cb.setStyle(
-                "-fx-background-color: transparent; "
-                + "-fx-text-fill: #323437; "
-                + "-fx-border-width: 0;"
-        );
-        VBox box = new VBox(6, lbl, cb);
-        box.setStyle(
-                "-fx-background-color: #BDBDBD; "
-                + "-fx-background-radius: 10; "
-                + "-fx-padding: 12;"
-        );
-        return box;
-    }
-
     // === GETTERS para o controller ===
     public BorderPane getRoot() {
         return root;

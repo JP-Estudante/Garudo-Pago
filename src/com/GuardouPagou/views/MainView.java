@@ -1,6 +1,5 @@
 package com.GuardouPagou.views;
 
-import com.GuardouPagou.controllers.MarcaController;
 import com.GuardouPagou.dao.FaturaDAO;
 import com.GuardouPagou.dao.MarcaDAO;
 import com.GuardouPagou.dao.NotaFiscalDAO;
@@ -24,24 +23,18 @@ import javafx.stage.Popup;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import javafx.stage.Popup;
 import javafx.scene.layout.HBox;
-import javafx.geometry.Insets;
 
 public class MainView {
+    private static final Logger LOGGER = Logger.getLogger(MainView.class.getName());
 
     private MenuButton btnFiltrar;
     private RadioMenuItem miFiltrarPeriodo;
     private RadioMenuItem miFiltrarMarca;
-    private ToggleGroup filtroToggleGroup;
     private BorderPane root;
     private Button btnListarFaturas, btnListarMarcas, btnArquivadas;
     private Button btnNovaFatura, btnNovaMarca, btnSalvarEmail;
@@ -102,6 +95,7 @@ public class MainView {
         root.setCenter(painelCentral);
     }
 
+    @SuppressWarnings("unused")
     private Button criarBotao(String texto, String iconPath, String cssClass) {
         Button btn = new Button(" " + texto);
         btn.setMaxWidth(Double.MAX_VALUE);
@@ -109,7 +103,7 @@ public class MainView {
 
         if (iconPath != null) {
             try {
-                ImageView icon = new ImageView(getClass().getResource(iconPath).toExternalForm());
+                ImageView icon = new ImageView(Objects.requireNonNull(getClass().getResource(iconPath)).toExternalForm());
                 icon.setPreserveRatio(true);
                 btn.setGraphic(icon);
             } catch (Exception e) {
@@ -122,7 +116,6 @@ public class MainView {
         return btn;
     }
 
-
     private VBox criarLogo() {
         VBox logoContainer = new VBox();
         logoContainer.setPadding(new Insets(10, 0, 5, 10));
@@ -131,7 +124,7 @@ public class MainView {
 
         try {
             // Apenas a logo
-            Image logoImage = new Image(getClass().getResource("/icons/G-Clock_home.png").toExternalForm());
+            Image logoImage = new Image(Objects.requireNonNull(getClass().getResource("/icons/G-Clock_home.png")).toExternalForm());
             ImageView logoView = new ImageView(logoImage);
             logoView.setPreserveRatio(true);
             logoView.setSmooth(true);
@@ -202,43 +195,36 @@ public class MainView {
         return menuLateral;
     }
 
-    private void mostrarTelaListagemFaturas(ObservableList<Fatura> faturas) {
-        // 1) monta a tabela
-        this.tabelaFaturas = criarTabelaFaturas(faturas);
-        VBox.setVgrow(this.tabelaFaturas, Priority.ALWAYS);
-
-        // 2) monta os filtros / toolbar (se quiser manter)
-        HBox toolbar = new HBox(12, btnFiltrar, new Button("Atualizar"));
-        toolbar.setAlignment(Pos.CENTER_RIGHT);
-        ((Button) toolbar.getChildren().get(1)).setOnAction(e -> atualizarListaFaturas());
-        HBox.setHgrow(btnFiltrar, Priority.ALWAYS);
-        btnFiltrar.setMaxWidth(Double.MAX_VALUE);
-
-        // 3) título
-        Label titulo = new Label("LISTAGEM DE FATURAS");
-        titulo.getStyleClass().add("h5");
-        titulo.setTextFill(Color.web("#F0A818"));
-
-        // 4) container inteiro (substitui inteiramente o centro)
-        VBox tela = new VBox(18, titulo, toolbar, tabelaFaturas);
-        tela.setPadding(new Insets(20));
-        tela.setStyle("-fx-background-color: #BDBDBD;");
-
-        // 5) faz a troca “de verdade”
-        root.setCenter(tela);
-    }
-
+    @SuppressWarnings("unused")
     private TableView<Fatura> criarTabelaFaturas(ObservableList<Fatura> faturas) {
         TableView<Fatura> tabela = new TableView<>();
         ViewUtils.aplicarEstiloPadrao(tabela);
-        tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-        // --- Definição das Colunas ---
+        // Chama os métodos auxiliares para criar cada coluna
+        TableColumn<Fatura, Integer> colunaId = criarColunaIdFatura();
+        TableColumn<Fatura, String> colunaNumeroNota = criarColunaNumeroNotaFatura();
+        TableColumn<Fatura, Integer> colunaOrdem = criarColunaOrdemFatura();
+        TableColumn<Fatura, LocalDate> colunaVencimento = criarColunaVencimentoFatura();
+        TableColumn<Fatura, String> colunaMarca = criarColunaMarcaFatura();
+        TableColumn<Fatura, String> colunaStatus = criarColunaStatusFatura();
+        TableColumn<Fatura, Void> colunaAcoes = criarColunaAcoesFatura();
 
-        // Coluna ID
-        TableColumn<Fatura, Integer> colunaId = new TableColumn<>("ID");
-        colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colunaId.setCellFactory(col -> new TableCell<>() {
+        // Adiciona as colunas e os itens à tabela
+        tabela.getColumns().setAll(List.of(colunaId, colunaNumeroNota, colunaOrdem, colunaVencimento, colunaMarca, colunaStatus, colunaAcoes));
+        tabela.setItems(faturas);
+
+        return tabela;
+    }
+
+// --- NOVOS MÉTODOS PRIVADOS AUXILIARES PARA CADA COLUNA ---
+
+    @SuppressWarnings("unused")
+    private TableColumn<Fatura, Integer> criarColunaIdFatura() {
+        TableColumn<Fatura, Integer> coluna = new TableColumn<>("ID");
+        coluna.setCellValueFactory(new PropertyValueFactory<>("id"));
+        coluna.setPrefWidth(80);
+        coluna.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(Integer id, boolean empty) {
                 super.updateItem(id, empty);
@@ -252,12 +238,15 @@ public class MainView {
                 }
             }
         });
-        colunaId.setPrefWidth(80);
+        return coluna;
+    }
 
-        // Coluna NÚMERO DA NOTA
-        TableColumn<Fatura, String> colunaNumeroNota = new TableColumn<>("NÚMERO DA NOTA");
-        colunaNumeroNota.setCellValueFactory(new PropertyValueFactory<>("numeroNota"));
-        colunaNumeroNota.setCellFactory(col -> new TableCell<>() {
+    @SuppressWarnings("unused")
+    private TableColumn<Fatura, String> criarColunaNumeroNotaFatura() {
+        TableColumn<Fatura, String> coluna = new TableColumn<>("NÚMERO DA NOTA");
+        coluna.setCellValueFactory(new PropertyValueFactory<>("numeroNota"));
+        coluna.setPrefWidth(150);
+        coluna.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(String numeroNota, boolean empty) {
                 super.updateItem(numeroNota, empty);
@@ -271,12 +260,15 @@ public class MainView {
                 }
             }
         });
-        colunaNumeroNota.setPrefWidth(150);
+        return coluna;
+    }
 
-        // Coluna ORDEM DA FATURA
-        TableColumn<Fatura, Integer> colunaOrdem = new TableColumn<>("ORDEM DA FATURA");
-        colunaOrdem.setCellValueFactory(new PropertyValueFactory<>("numeroFatura"));
-        colunaOrdem.setCellFactory(col -> new TableCell<>() {
+    @SuppressWarnings("unused")
+    private TableColumn<Fatura, Integer> criarColunaOrdemFatura() {
+        TableColumn<Fatura, Integer> coluna = new TableColumn<>("ORDEM DA FATURA");
+        coluna.setCellValueFactory(new PropertyValueFactory<>("numeroFatura"));
+        coluna.setPrefWidth(120);
+        coluna.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(Integer ordem, boolean empty) {
                 super.updateItem(ordem, empty);
@@ -290,33 +282,33 @@ public class MainView {
                 }
             }
         });
-        colunaOrdem.setPrefWidth(120);
+        return coluna;
+    }
 
-        // Coluna VENCIMENTO
-        TableColumn<Fatura, LocalDate> colunaVencimento = new TableColumn<>("VENCIMENTO");
-        colunaVencimento.setCellValueFactory(new PropertyValueFactory<>("vencimento"));
-        colunaVencimento.setCellFactory(col -> new TableCell<>() {
+    @SuppressWarnings("unused")
+    private TableColumn<Fatura, LocalDate> criarColunaVencimentoFatura() {
+        TableColumn<Fatura, LocalDate> coluna = new TableColumn<>("VENCIMENTO");
+        coluna.setCellValueFactory(new PropertyValueFactory<>("vencimento"));
+        coluna.setPrefWidth(120);
+        coluna.setCellFactory(col -> new TableCell<>() {
             private final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
             @Override
             protected void updateItem(LocalDate venc, boolean empty) {
                 super.updateItem(venc, empty);
-                if (empty || venc == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(venc.format(fmt));
-                    setTextFill(Color.WHITE);
-                    setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
-                }
+                setText((empty || venc == null) ? null : venc.format(fmt));
+                setTextFill(Color.WHITE);
+                setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
             }
         });
-        colunaVencimento.setPrefWidth(120);
+        return coluna;
+    }
 
-        // Coluna MARCA
-        TableColumn<Fatura, String> colunaMarca = new TableColumn<>("MARCA");
-        colunaMarca.setCellValueFactory(new PropertyValueFactory<>("marca"));
-        colunaMarca.setCellFactory(col -> new TableCell<>() {
+    @SuppressWarnings("unused")
+    private TableColumn<Fatura, String> criarColunaMarcaFatura() {
+        TableColumn<Fatura, String> coluna = new TableColumn<>("MARCA");
+        coluna.setCellValueFactory(new PropertyValueFactory<>("marca"));
+        coluna.setPrefWidth(150);
+        coluna.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(String marca, boolean empty) {
                 super.updateItem(marca, empty);
@@ -331,36 +323,36 @@ public class MainView {
                 }
             }
         });
-        colunaMarca.setPrefWidth(150);
+        return coluna;
+    }
 
-        // Coluna STATUS
-        TableColumn<Fatura, String> colunaStatus = new TableColumn<>("STATUS");
-        colunaStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-        colunaStatus.setCellFactory(col -> new TableCell<>() {
+    @SuppressWarnings("unused")
+    private TableColumn<Fatura, String> criarColunaStatusFatura() {
+        TableColumn<Fatura, String> coluna = new TableColumn<>("STATUS");
+        coluna.setCellValueFactory(new PropertyValueFactory<>("status"));
+        coluna.setPrefWidth(120);
+        coluna.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(String status, boolean empty) {
                 super.updateItem(status, empty);
                 if (empty || status == null) {
-                    setText(null);
-                    setStyle("");
+                    setText(null); setStyle("");
                 } else {
                     setText(status);
-                    if ("Vencida".equalsIgnoreCase(status)) {
-                        setTextFill(Color.web("#f0a818"));
-                    } else {
-                        setTextFill(Color.WHITE);
-                    }
+                    setTextFill("Vencida".equalsIgnoreCase(status) ? Color.web("#f0a818") : Color.WHITE);
                     setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
                 }
             }
         });
-        colunaStatus.setPrefWidth(120);
+        return coluna;
+    }
 
-        // Coluna AÇÕES
-        TableColumn<Fatura, Void> colunaAcoes = new TableColumn<>("Ações");
-        colunaAcoes.setCellFactory(col -> new TableCell<>() {
+    @SuppressWarnings("unused")
+    private TableColumn<Fatura, Void> criarColunaAcoesFatura() {
+        TableColumn<Fatura, Void> coluna = new TableColumn<>("Ações");
+        coluna.setPrefWidth(100);
+        coluna.setCellFactory(col -> new TableCell<>() {
             private final Button btnEmitida = new Button("Emitida");
-
             {
                 btnEmitida.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5px;");
                 btnEmitida.setOnAction(evt -> {
@@ -386,94 +378,27 @@ public class MainView {
                 }
             }
         });
-        colunaAcoes.setPrefWidth(100);
-
-        // Adiciona as colunas e os itens à tabela
-        tabela.getColumns().setAll(colunaId, colunaNumeroNota, colunaOrdem, colunaVencimento, colunaMarca, colunaStatus, colunaAcoes);
-        tabela.setItems(faturas);
-
-        return tabela;
+        return coluna;
     }
 
     // MÉTODO criarViewMarcas - CORRIGIDO E ORIGINAL
+    @SuppressWarnings("unused")
     public Node criarViewMarcas(ObservableList<Marca> marcas) {
-        // 1) Cria e estiliza a TableView
+        // 1. Cria a tabela
         TableView<Marca> tabela = new TableView<>();
         ViewUtils.aplicarEstiloPadrao(tabela);
         tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-        // 2) Coluna ID
-        TableColumn<Marca, Integer> colunaId = new TableColumn<>("ID");
-        colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colunaId.setPrefWidth(80);
-        colunaId.setCellFactory(col -> new TableCell<Marca, Integer>() {
-            @Override
-            protected void updateItem(Integer id, boolean empty) {
-                super.updateItem(id, empty);
-                if (empty || id == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(id.toString());
-                    setTextFill(Color.WHITE);
-                    setStyle("-fx-background-color: transparent; " + "-fx-font-weight: bold; " + "-fx-alignment: CENTER-LEFT;");
-                }
-            }
-        });
+        // 2. Cria as colunas chamando os novos métodos auxiliares
+        TableColumn<Marca, Integer> colunaId = criarColunaIdMarca();
+        TableColumn<Marca, String> colunaNome = criarColunaNomeMarca();
+        TableColumn<Marca, String> colunaDescricao = criarColunaDescricaoMarca();
 
-        // 3) Coluna Nome (dinâmica conforme a cor cadastrada)
-        TableColumn<Marca, String> colunaNome = new TableColumn<>("Nome");
-        colunaNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
-        colunaNome.setPrefWidth(200);
-        colunaNome.setCellFactory(col -> new TableCell<Marca, String>() {
-            @Override
-            protected void updateItem(String nome, boolean empty) {
-                super.updateItem(nome, empty);
-                if (empty || nome == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(nome);
-                    // pega a cor cadastrada na Marca
-                    String cor = getTableView().getItems().get(getIndex()).getCor(); // ex: "#FF0000"
-                    if (cor != null && cor.matches("#[0-9A-Fa-f]{6}")) {
-                        setTextFill(Color.web(cor));
-                    } else {
-                        setTextFill(Color.WHITE);
-                    }
-                    setStyle("-fx-background-color: transparent; " + "-fx-font-weight: bold; " + "-fx-alignment: CENTER-LEFT;");
-                }
-            }
-        });
-
-        // 4) Coluna Descrição
-        TableColumn<Marca, String> colunaDescricao = new TableColumn<>("Descrição");
-        colunaDescricao.setCellValueFactory(new PropertyValueFactory<>("descricao"));
-        colunaDescricao.setPrefWidth(250);
-        colunaDescricao.setCellFactory(col -> new TableCell<Marca, String>() {
-            @Override
-            protected void updateItem(String desc, boolean empty) {
-                super.updateItem(desc, empty);
-                if (empty) {
-                    setText(null);
-                    setStyle("");
-                } else if (desc == null || desc.isBlank()) {
-                    setText("Nenhuma descrição adicionada");
-                    setTextFill(Color.WHITE);
-                    setStyle("-fx-background-color: transparent; " + "-fx-alignment: CENTER-LEFT;");
-                } else {
-                    setText(desc);
-                    setTextFill(Color.WHITE);
-                    setStyle("-fx-background-color: transparent; " + "-fx-alignment: CENTER-LEFT;");
-                }
-            }
-        });
-
-        // 5) Monta e popula a tabela
-        tabela.getColumns().setAll(colunaId, colunaNome, colunaDescricao);
+        // 3. Monta a tabela
+        tabela.getColumns().setAll(List.of(colunaId, colunaNome, colunaDescricao));
         tabela.setItems(marcas);
 
-        // 6) Coloca no layout
+        // 4. Monta o layout da tela
         VBox container = new VBox(20);
         container.setPadding(new Insets(20));
         container.setStyle("-fx-background-color: #BDBDBD;");
@@ -493,7 +418,83 @@ public class MainView {
         return container;
     }
 
+    @SuppressWarnings("unused")
+    private TableColumn<Marca, Integer> criarColunaIdMarca() {
+        TableColumn<Marca, Integer> colunaId = new TableColumn<>("ID");
+        colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colunaId.setPrefWidth(80);
+        colunaId.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer id, boolean empty) {
+                super.updateItem(id, empty);
+                if (empty || id == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(id.toString());
+                    setTextFill(Color.WHITE);
+                    setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
+                }
+            }
+        });
+        return colunaId;
+    }
+
+    @SuppressWarnings("unused")
+    private TableColumn<Marca, String> criarColunaNomeMarca() {
+        TableColumn<Marca, String> colunaNome = new TableColumn<>("Nome");
+        colunaNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colunaNome.setPrefWidth(200);
+        colunaNome.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String nome, boolean empty) {
+                super.updateItem(nome, empty);
+                if (empty || nome == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(nome);
+                    String cor = getTableView().getItems().get(getIndex()).getCor();
+                    if (cor != null && cor.matches("#[0-9A-Fa-f]{6}")) {
+                        setTextFill(Color.web(cor));
+                    } else {
+                        setTextFill(Color.WHITE);
+                    }
+                    setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
+                }
+            }
+        });
+        return colunaNome;
+    }
+
+    @SuppressWarnings("unused")
+    private TableColumn<Marca, String> criarColunaDescricaoMarca() {
+        TableColumn<Marca, String> colunaDescricao = new TableColumn<>("Descrição");
+        colunaDescricao.setCellValueFactory(new PropertyValueFactory<>("descricao"));
+        colunaDescricao.setPrefWidth(250);
+        colunaDescricao.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String desc, boolean empty) {
+                super.updateItem(desc, empty);
+                if (empty) {
+                    setText(null);
+                    setStyle("");
+                } else if (desc == null || desc.isBlank()) {
+                    setText("Nenhuma descrição adicionada");
+                    setTextFill(Color.WHITE);
+                    setStyle("-fx-background-color: transparent; -fx-alignment: CENTER-LEFT;");
+                } else {
+                    setText(desc);
+                    setTextFill(Color.WHITE);
+                    setStyle("-fx-background-color: transparent; -fx-alignment: CENTER-LEFT;");
+                }
+            }
+        });
+        return colunaDescricao;
+    }
+
     // MÉTODO criarViewFaturas - ADICIONADO E CORRIGIDO
+    @SuppressWarnings("unused")
     public Node criarViewFaturas(ObservableList<Fatura> faturas) {
         // 1. Container principal
         VBox container = new VBox(18);
@@ -506,14 +507,14 @@ public class MainView {
         titulo.setTextFill(Color.web("#F0A818"));
 
         // 3. MenuButton Filtrar
-        filtroToggleGroup = new ToggleGroup();
+        ToggleGroup filtroToggleGroup = new ToggleGroup();
         miFiltrarPeriodo = new RadioMenuItem("Filtrar por Período");
         miFiltrarMarca   = new RadioMenuItem("Filtrar por Marca");
         miFiltrarPeriodo.setToggleGroup(filtroToggleGroup);
         miFiltrarMarca.setToggleGroup(filtroToggleGroup);
 
         ImageView filterIcon = new ImageView(
-                new Image(getClass().getResourceAsStream("/icons/filter_list.png"))
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/filter_list.png")))
         );
         filterIcon.setFitHeight(22);
         filterIcon.setPreserveRatio(true);
@@ -547,7 +548,7 @@ public class MainView {
         Button btnAplicarFiltro = new Button();
         btnAplicarFiltro.getStyleClass().addAll("modal-button", "btn-aplicar");
         ImageView checkIcon = new ImageView(
-                new Image(getClass().getResourceAsStream("/icons/check.png"))
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/check.png")))
         );
         checkIcon.setPreserveRatio(true);
         btnAplicarFiltro.setGraphic(checkIcon);
@@ -561,7 +562,7 @@ public class MainView {
         Button btnCancelarFiltro = new Button();
         btnCancelarFiltro.getStyleClass().addAll("modal-button", "btn-cancelar");
         ImageView cancelIcon = new ImageView(
-                new Image(getClass().getResourceAsStream("/icons/cancel.png"))
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cancel.png")))
         );
         cancelIcon.setPreserveRatio(true);
         btnCancelarFiltro.setGraphic(cancelIcon);
@@ -590,7 +591,8 @@ public class MainView {
         try {
             cbFiltroMarca.setItems(new MarcaDAO().listarMarcas());
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            // Substitui printStackTrace pela chamada ao Logger
+            LOGGER.log(Level.SEVERE, "Falha ao carregar a lista de marcas para o ComboBox de filtro.", ex);
         }
         cbFiltroMarca.setOnAction(e -> {
             aplicarFiltroMarca();
@@ -710,7 +712,9 @@ public class MainView {
                     errorAlert.showAndWait();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                // Substitui printStackTrace pela chamada ao Logger
+                LOGGER.log(Level.SEVERE, "Erro ao processar emissão da fatura.", e);
+
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                 errorAlert.setTitle("Erro");
                 errorAlert.setHeaderText(null);
@@ -720,8 +724,8 @@ public class MainView {
         }
     }
 
-    private void showAlert(Alert.AlertType tipo, String titulo, String msg) {
-        Alert a = new Alert(tipo);
+    private void showAlert(String titulo, String msg) {
+        Alert a = new Alert(Alert.AlertType.ERROR);
         a.setTitle(titulo);
         a.setHeaderText(null);
         a.setContentText(msg);
@@ -733,7 +737,10 @@ public class MainView {
             ObservableList<Marca> marcas = new MarcaDAO().listarMarcas();
             criarViewMarcas(marcas);
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            // Substitui printStackTrace pela chamada ao Logger
+            LOGGER.log(Level.SEVERE, "Falha ao carregar a lista de marcas do banco de dados.", ex);
+
+            // O restante do código permanece o mesmo
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Erro");
             alert.setHeaderText(null);
@@ -742,51 +749,7 @@ public class MainView {
         }
     }
 
-    private void mostrarFormularioMarca() {
-        MarcaView marcaView = new MarcaView();
-        new MarcaController(marcaView);
-        root.setCenter(marcaView.getRoot());
-    }
-
-    private void editarMarca(Marca marca) {
-        MarcaView marcaView = new MarcaView();
-        new MarcaController(marcaView);
-
-        marcaView.getNomeField().setText(marca.getNome());
-        marcaView.getDescricaoArea().setText(marca.getDescricao());
-        try {
-            String cor = marca.getCor() != null && marca.getCor().matches("#[0-9A-Fa-f]{6}") ? marca.getCor() : "#000000";
-            marcaView.getCorPicker().setValue(Color.web(cor));
-        } catch (IllegalArgumentException e) {
-            System.out.println("Cor inválida: " + marca.getCor());
-            marcaView.getCorPicker().setValue(Color.BLACK);
-        }
-
-        root.setCenter(marcaView.getRoot());
-    }
-
-    private void excluirMarca(Marca marca) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmação");
-        alert.setHeaderText("Excluir Marca");
-        alert.setContentText("Tem certeza que deseja excluir a marca " + marca.getNome() + "?");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                new MarcaDAO().excluirMarca(marca.getId());
-                atualizarListaMarcas();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                errorAlert.setTitle("Erro");
-                errorAlert.setHeaderText(null);
-                errorAlert.setContentText("Erro ao excluir marca: " + e.getMessage());
-                errorAlert.showAndWait();
-            }
-        }
-    }
-
+    @SuppressWarnings("unused")
     private void aplicarFiltroPeriodo() {
         LocalDate inicio = dpDataInicio.getValue();
         LocalDate fim    = dpDataFim.getValue();
@@ -801,9 +764,11 @@ public class MainView {
                 f = new FaturaDAO().listarFaturasPorPeriodo(inicio, fim);
                 mostrarListaFaturas(f);
             } catch (SQLException ex) {
-                ex.printStackTrace();
+                // Substitui printStackTrace pela chamada ao Logger
+                LOGGER.log(Level.SEVERE, "Erro ao tentar filtrar faturas por período.", ex);
+
                 // mostra alerta de erro
-                showAlert(Alert.AlertType.ERROR,
+                showAlert(
                         "Erro ao filtrar por período",
                         ex.getMessage());
                 // limpa estado para não ficar inconsistente
@@ -825,7 +790,7 @@ public class MainView {
             periodoBtn.getStyleClass().add("filter-token");
 
             ImageView cancelIcon = new ImageView(
-                    new Image(getClass().getResourceAsStream("/icons/cancel.png"))
+                    new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cancel.png")))
             );
             cancelIcon.setFitHeight(20);
             cancelIcon.setPreserveRatio(true);
@@ -846,6 +811,7 @@ public class MainView {
         filtroPopup.hide();
     }
 
+    @SuppressWarnings("unused")
     private void aplicarFiltroMarca() {
         Marca sel = cbFiltroMarca.getValue();
         if (sel != null && marcaFilters.add(sel)) {
@@ -860,9 +826,11 @@ public class MainView {
                         .listarFaturasPorMarcas(nomes);
                 mostrarListaFaturas(f);
             } catch (SQLException ex) {
-                ex.printStackTrace();
+                // Substitui printStackTrace pela chamada ao Logger
+                LOGGER.log(Level.SEVERE, "Erro ao tentar filtrar faturas por marca.", ex);
+
                 // informa o usuário em um alerta
-                showAlert(Alert.AlertType.ERROR,
+                showAlert(
                         "Erro ao filtrar por marca",
                         ex.getMessage());
                 // remove a marca adicionada no set para não ficar em estado inconsistente
@@ -875,7 +843,7 @@ public class MainView {
             marcaBtn.setUserData(sel);
             marcaBtn.getStyleClass().add("filter-token");
             ImageView cancelIcon = new ImageView(
-                    new Image(getClass().getResourceAsStream("/icons/cancel.png"))
+                    new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cancel.png")))
             );
             cancelIcon.setFitHeight(20);
             cancelIcon.setPreserveRatio(true);
@@ -898,8 +866,8 @@ public class MainView {
                                 .listarFaturasPorMarcas(restantes);
                         mostrarListaFaturas(nf);
                     } catch (SQLException e) {
-                        e.printStackTrace();
-                        showAlert(Alert.AlertType.ERROR,
+                        LOGGER.log(Level.SEVERE, "Erro ao filtrar por marca.", e);
+                        showAlert(
                                 "Erro ao filtrar por marca",
                                 e.getMessage());
                     }
@@ -925,7 +893,7 @@ public class MainView {
             setConteudoPrincipal(viewFaturas);
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Erro ao carregar todas as faturas.", ex);
             // Lógica para tratar o erro
             Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao carregar todas as faturas: " + ex.getMessage());
             alert.showAndWait();

@@ -3,11 +3,12 @@ package com.GuardouPagou.dao; // Ou com.GuardouPagou.models.dto
 
 import java.time.LocalDate;
 
+@SuppressWarnings("unused")
 public class NotaFiscalArquivadaDAO {
-    private String numeroNota;
-    private int quantidadeFaturas;
-    private String marca;
-    private LocalDate dataArquivamento;
+    private final String numeroNota;
+    private final int quantidadeFaturas;
+    private final String marca;
+    private final LocalDate dataArquivamento;
     private String marcaColor;
 
     public NotaFiscalArquivadaDAO(String numeroNota, int quantidadeFaturas, String marca, LocalDate dataArquivamento) {

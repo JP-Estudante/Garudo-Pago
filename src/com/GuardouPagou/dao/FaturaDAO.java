@@ -8,9 +8,8 @@ import java.sql.SQLException;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -59,33 +58,6 @@ public class FaturaDAO {
         return false;
     }
 
-    public ObservableList<Fatura> listarFaturas() throws SQLException {
-        ObservableList<Fatura> faturas = FXCollections.observableArrayList();
-        String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, f.vencimento, f.valor, f.status, "
-                + "m.nome AS marca "
-                + "FROM faturas f "
-                + "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id "
-                + "LEFT JOIN marcas m ON n.marca_id = m.id "
-                + "ORDER BY n.numero_nota ASC, f.numero_fatura ASC";
-
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                Fatura fatura = new Fatura();
-                fatura.setId(rs.getInt("id"));
-                fatura.setNotaFiscalId(rs.getInt("nota_fiscal_id"));
-                fatura.setNumeroNota(rs.getString("numero_nota"));
-                fatura.setNumeroFatura(rs.getInt("numero_fatura"));
-                fatura.setVencimento(rs.getDate("vencimento").toLocalDate());
-                fatura.setValor(rs.getDouble("valor"));
-                fatura.setStatus(rs.getString("status"));
-                fatura.setMarca(rs.getString("marca"));
-                faturas.add(fatura);
-            }
-        }
-        return faturas;
-    }
-
     public ObservableList<Fatura> listarFaturasPorPeriodo(LocalDate dataInicial, LocalDate dataFinal) throws SQLException {
         ObservableList<Fatura> faturas = FXCollections.observableArrayList();
         String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, f.vencimento, f.valor, f.status, m.nome AS marca, m.cor AS marca_cor "
@@ -126,10 +98,11 @@ public class FaturaDAO {
             return faturas;  // vazio
         }
 
-        // 1) Monta "?, ?, ?" de acordo com o tamanho da lista
-        String placeholders = IntStream.range(0, nomesMarcas.size())
-                .mapToObj(i -> "?")
-                .collect(Collectors.joining(","));
+        // 1) Monta "?, ?, ?" conforme o tamanho da lista
+        String placeholders = String.join(
+                ",",
+                Collections.nCopies(nomesMarcas.size(), "?")
+        );
 
         // 2) SQL com IN-list dinâmica
         String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, "

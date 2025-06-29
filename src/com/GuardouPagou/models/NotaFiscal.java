@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class NotaFiscal {
-    private int id;
     private String numeroNota;
     private LocalDate dataEmissao;
     private String marca;
@@ -20,15 +19,6 @@ public class NotaFiscal {
         this.dataEmissao = dataEmissao;
         this.marca = marca;
         this.faturas = faturas;
-    }
-
-    // Getters e Setters
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getNumeroNota() {

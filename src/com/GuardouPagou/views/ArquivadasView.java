@@ -14,12 +14,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 
 public class ArquivadasView {
+
+    private static final Logger LOGGER = Logger.getLogger(ArquivadasView.class.getName());
 
     private BorderPane root;
     private TableView<NotaFiscalArquivadaDAO> tabelaNotasArquivadas;
@@ -89,7 +94,7 @@ public class ArquivadasView {
 
         // Tabela de notas arquivadas
         tabelaNotasArquivadas = new TableView<>();
-        tabelaNotasArquivadas.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tabelaNotasArquivadas.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         ViewUtils.aplicarEstiloPadrao(tabelaNotasArquivadas);
         // Coluna Número da Nota
@@ -105,32 +110,7 @@ public class ArquivadasView {
         colQtdFaturas.setPrefWidth(100);
 
         // Coluna Marca com cor dinâmica
-        TableColumn<NotaFiscalArquivadaDAO, String> colMarca =
-                new TableColumn<>("Marca");
-        colMarca.setCellValueFactory(new PropertyValueFactory<>("marca"));
-        colMarca.setPrefWidth(150);
-        colMarca.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(String marca, boolean empty) {
-                super.updateItem(marca, empty);
-                if (empty || marca == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(marca);
-                    String cor = getTableView()
-                            .getItems()
-                            .get(getIndex())
-                            .getMarcaColor();
-                    setTextFill(Color.web(cor));
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-font-weight: bold; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
-                }
-            }
-        });
+        TableColumn<NotaFiscalArquivadaDAO, String> colMarca = criarColunaMarca();
 
         // Coluna Data de Arquivamento
         TableColumn<NotaFiscalArquivadaDAO, LocalDate> colDataArquivamento =
@@ -138,7 +118,7 @@ public class ArquivadasView {
         colDataArquivamento.setCellValueFactory(new PropertyValueFactory<>("dataArquivamento"));
         colDataArquivamento.setPrefWidth(140);
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        colDataArquivamento.setCellFactory(col -> new TableCell<>() {
+        colDataArquivamento.setCellFactory(ignored -> new TableCell<>() {
             @Override
             protected void updateItem(LocalDate data, boolean empty) {
                 super.updateItem(data, empty);
@@ -146,21 +126,19 @@ public class ArquivadasView {
             }
         });
 
+
         // Adiciona colunas e popula a tabela
         tabelaNotasArquivadas.getColumns().setAll(
-                colNumeroNota,
-                colQtdFaturas,
-                colMarca,
-                colDataArquivamento
+                List.of(colNumeroNota,
+                        colQtdFaturas,
+                        colMarca,
+                        colDataArquivamento)
         );
         try {
-            tabelaNotasArquivadas.setItems(
-                    FXCollections.observableArrayList(
-                            new NotaFiscalDAO().listarNotasFiscaisArquivadasComContagem((Map<String,Object>) null)
-                    )
-            );
+            var notas = new NotaFiscalDAO().listarNotasFiscaisArquivadasComContagem(null);
+            tabelaNotasArquivadas.setItems(FXCollections.observableArrayList(notas));
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Erro ao carregar notas arquivadas", e);
         }
 
         // Monta o layout
@@ -193,5 +171,34 @@ public class ArquivadasView {
     }
     public Button getBtnLimparBusca() {
         return btnLimparBusca;
+    }
+
+    private TableColumn<NotaFiscalArquivadaDAO,String> criarColunaMarca() {
+        TableColumn<NotaFiscalArquivadaDAO,String> colMarca = new TableColumn<>("Marca");
+        colMarca.setCellValueFactory(new PropertyValueFactory<>("marca"));
+        colMarca.setPrefWidth(150);
+        colMarca.setCellFactory(ignored -> new TableCell<>() {
+            @Override
+            protected void updateItem(String marca, boolean empty) {
+                super.updateItem(marca, empty);
+                if (empty || marca == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(marca);
+                    String cor = getTableView()
+                            .getItems()
+                            .get(getIndex())
+                            .getMarcaColor();
+                    setTextFill(Color.web(cor));
+                    setStyle(
+                            "-fx-background-color: transparent; " +
+                                    "-fx-font-weight: bold; " +
+                                    "-fx-alignment: CENTER-LEFT;"
+                    );
+                }
+            }
+        });
+        return colMarca;
     }
 }

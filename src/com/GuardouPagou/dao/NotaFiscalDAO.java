@@ -2,7 +2,6 @@ package com.GuardouPagou.dao;
 
 import com.GuardouPagou.models.DatabaseConnection;
 import com.GuardouPagou.models.NotaFiscal;
-import com.GuardouPagou.dao.MarcaDAO;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -10,23 +9,6 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class NotaFiscalDAO {
-    
-    public boolean existeNotaFiscal(String numeroNota) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM notas_fiscais WHERE numero_nota = ?";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, numeroNota);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        }
-        return false;
-    }
 
     public int inserirNotaFiscal(NotaFiscal nota) throws SQLException {
         String sql = "INSERT INTO notas_fiscais (numero_nota, data_emissao, marca_id) VALUES (?, ?, ?)";
@@ -55,32 +37,11 @@ public class NotaFiscalDAO {
                     }
                 }
             }
-            return -1; // Retorna -1 se a inserção falhar
+            return -1; // Retorna −1 se a inserção falhar
         }
     }
 
-    // Método adicional recomendado
-    public List<NotaFiscal> listarNotasFiscais() throws SQLException {
-        List<NotaFiscal> notas = new ArrayList<>();
-        String sql = "SELECT nf.*, m.nome AS marca FROM notas_fiscais nf LEFT JOIN marcas m ON nf.marca_id = m.id";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                NotaFiscal nota = new NotaFiscal();
-                nota.setId(rs.getInt("id"));
-                nota.setNumeroNota(rs.getString("numero_nota"));
-                nota.setDataEmissao(rs.getDate("data_emissao").toLocalDate());
-                nota.setMarca(rs.getString("marca"));
-                notas.add(nota);
-            }
-        }
-        return notas;
-    }
-
-        public boolean marcarComoArquivada(int notaFiscalId, LocalDate dataArquivamento) throws SQLException {
+    public boolean marcarComoArquivada(int notaFiscalId, LocalDate dataArquivamento) throws SQLException {
         String sql = "UPDATE notas_fiscais SET arquivada = TRUE, data_arquivamento = ? WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

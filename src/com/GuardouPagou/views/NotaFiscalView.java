@@ -9,8 +9,11 @@ import javafx.scene.paint.Color;
 import javafx.util.StringConverter;
 
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class NotaFiscalView {
+    private static final Logger LOGGER = Logger.getLogger(NotaFiscalView.class.getName());
 
     private final BorderPane root;
     private final TextField numeroNotaField;
@@ -21,14 +24,18 @@ public class NotaFiscalView {
     private final Button salvarButton;
 
     public NotaFiscalView() {
+
         numeroNotaField = new TextField();
         dataEmissaoPicker = new DatePicker();
-        marcaComboBox = new ComboBox<Marca>();
-        marcaComboBox.setConverter(new StringConverter<Marca>() {
-            @Override public String toString(Marca m) {
+        marcaComboBox = new ComboBox<>();
+        marcaComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Marca m) {
                 return m == null ? "" : m.getNome();
             }
-            @Override public Marca fromString(String s) {
+
+            @Override
+            public Marca fromString(String s) {
                 return null; // não usado
             }
         });
@@ -39,6 +46,7 @@ public class NotaFiscalView {
         criarUI();
     }
 
+    @SuppressWarnings("unused")
     private void criarUI() {
         root.setStyle("-fx-background-color: #BDBDBD; -fx-padding: 20;");
 
@@ -160,9 +168,22 @@ public class NotaFiscalView {
         marcaComboBox.setPrefWidth(200);
         // carrega os itens normalmente...
         try {
+            // Tenta carregar as marcas do banco de dados
             marcaComboBox.setItems(new MarcaDAO().listarMarcas());
-        } catch(SQLException ex){
-            ex.printStackTrace();
+        } catch (SQLException ex) {
+            // 1. Registra o erro detalhado no log para o desenvolvedor
+            LOGGER.log(Level.SEVERE, "Falha ao carregar a lista de marcas para o ComboBox de cadastro.", ex);
+
+            // 2. Mostra uma mensagem clara e útil para o usuário
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erro de Conexão");
+            alert.setHeaderText("Não foi possível carregar as marcas.");
+            alert.setContentText("Ocorreu um erro ao buscar os dados das marcas no banco. Verifique sua conexão e tente novamente.");
+            alert.showAndWait();
+
+            // 3. (Opcional, mas recomendado) Desabilita o ComboBox para evitar erros futuros
+            marcaComboBox.setDisable(true);
+            marcaComboBox.setPromptText("Erro ao carregar");
         }
 
         // embrulha num “pill-field”
@@ -227,11 +248,6 @@ public class NotaFiscalView {
         formPanel.getChildren().addAll(titulo, camposBox, faturasContainer, salvarBox);
 
         root.setCenter(formPanel);
-    }
-
-    // Getters
-    public BorderPane getRoot() {
-        return root;
     }
 
     public TextField getNumeroNotaField() {

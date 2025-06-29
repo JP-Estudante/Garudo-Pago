@@ -10,33 +10,23 @@ import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
 
 public class MarcaDAO {
-    public boolean existeMarca(String nome) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM marcas WHERE nome = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, nome);
-            ResultSet rs = stmt.executeQuery();
-            return rs.next() && rs.getInt(1) > 0;
-        }
-    }
-
-    public int inserirMarca(String nome, String descricao, String cor) throws SQLException {
+    public void inserirMarca(String nome, String descricao, String cor) throws SQLException {
         String sql = "INSERT INTO marcas (nome, descricao, cor) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nome);
             stmt.setString(2, descricao.isEmpty() ? null : descricao); // Salva null se descrição vazia
             stmt.setString(3, cor);
-            return stmt.executeUpdate();
+            stmt.executeUpdate();
         }
     }
     
-    public int excluirMarca(int id) throws SQLException {
+    public void excluirMarca(int id) throws SQLException {
         String sql = "DELETE FROM marcas WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
-            return stmt.executeUpdate();
+            stmt.executeUpdate();
         }
     }
 

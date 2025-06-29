@@ -39,7 +39,7 @@ public class Main extends Application {
         Scene scene = new Scene(mainView.getRoot(), 950, 700);
 
         scene.getStylesheets().add(
-                getClass().getResource("/css/styles.css").toExternalForm()
+                Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm()
         );
 
         // Ícone da janela
