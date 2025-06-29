@@ -7,109 +7,78 @@ import com.GuardouPagou.dao.NotaFiscalDAO;
 import com.GuardouPagou.models.Fatura;
 import com.GuardouPagou.models.Marca;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Popup;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javafx.stage.Popup;
+import javafx.scene.layout.HBox;
+import javafx.geometry.Insets;
 
 public class MainView {
 
-    private RadioButton rbFiltraPeriodo = new RadioButton("Filtrar por Período");
-    private RadioButton rbFiltraMarca = new RadioButton("Filtrar por Marca");
+    private MenuButton btnFiltrar;
+    private RadioMenuItem miFiltrarPeriodo;
+    private RadioMenuItem miFiltrarMarca;
     private ToggleGroup filtroToggleGroup;
     private BorderPane root;
     private Button btnListarFaturas, btnListarMarcas, btnArquivadas;
     private Button btnNovaFatura, btnNovaMarca, btnSalvarEmail;
     private Label labelText; // Alterado de conteudoLabel para labelText para corresponder ao uso em criarUI
     private TextField emailField;
-    private DatePicker dpFiltroPeriodo;
-    private ComboBox<Marca> cbFiltroMarca;
+    private DatePicker dpDataInicio, dpDataFim;
+    private Button btnAplicarFiltro, btnRemoverFiltro;
     private VBox filtroContainer;
+    private ComboBox<Marca> cbFiltroMarca;
+    private ObservableList<Marca> cacheMarcas;
+    private final Popup filtroPopup = new Popup();
+    private LocalDate periodoFilterStart;
+    private LocalDate periodoFilterEnd;
+    private final Set<Marca> marcaFilters = new HashSet<>();
+    private HBox filterTokens;
+    private TableView<Fatura> tabelaFaturas;
 
     public MainView() {
         criarUI();
-        filtroToggleGroup = new ToggleGroup();
-        try {
-            // Mudar de new FaturaDAO().listarFaturas() para:
-            ObservableList<Fatura> faturas = new FaturaDAO().listarFaturas(false); // Listar apenas não arquivadas
-            mostrarListaFaturas(faturas);
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erro");
-            alert.setHeaderText(null);
-            alert.setContentText("Erro ao carregar faturas na inicialização: " + ex.getMessage());
-            alert.showAndWait();
-            root.setCenter(labelText); // Mantém a mensagem padrão em caso de erro
-        }
     }
 
     public BorderPane getRoot() {
         return this.root;
     }
 
-    // Este é o método atualizarListaFaturas() que será usado para recarregar a lista
+    // NOVO MÉTODO: Responsável apenas por trocar o conteúdo central
+    public void setConteudoPrincipal(Node novoConteudo) {
+        root.setCenter(novoConteudo);
+    }
+
     private void atualizarListaFaturas() {
-        try {
-            // Mudar de new FaturaDAO().listarFaturas() para:
-            ObservableList<Fatura> faturas;
-            if (rbFiltraPeriodo.isSelected()) {
-                LocalDate dataSelecionada = dpFiltroPeriodo.getValue();
-                if (dataSelecionada != null) {
-                    System.out.println("Atualizando lista por período: " + dataSelecionada);
-                    // por Periodo
-                    faturas = new FaturaDAO().listarFaturasPorPeriodo(dataSelecionada);
-
-                } else {
-                    faturas = new FaturaDAO().listarFaturas(false);
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Atencao");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Selecione uma data para filtrar por periodo.");
-                    alert.showAndWait();
-                }
-
-            } else if (rbFiltraMarca.isSelected()) {
-                Marca selectedMarcaObject = cbFiltroMarca.getValue();
-                String marcaSelecionada = (selectedMarcaObject != null) ? selectedMarcaObject.getNome() : null;
-
-                if (marcaSelecionada != null && !marcaSelecionada.isEmpty()) {
-                    System.out.println("Atualizando lista por marca: " + marcaSelecionada);
-                    // Por Marca
-                    faturas = new FaturaDAO().listarFaturasPorMarca(marcaSelecionada);
-                } else {
-                    faturas = new FaturaDAO().listarFaturas(false);
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Atenção");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Selecione uma marca para filtrar.");
-                    alert.showAndWait();
-                }
-            } else {
-                faturas = new FaturaDAO().listarFaturas(false);
-                //faturas = new FaturaDAO().listarFaturas();
-            }
-            mostrarListaFaturas(faturas);
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erro");
-            alert.setHeaderText(null);
-            alert.setContentText("Erro ao carregar faturas: " + ex.getMessage());
-            alert.showAndWait();
+        if (miFiltrarPeriodo.isSelected()) {
+            aplicarFiltroPeriodo();
+        } else if (miFiltrarMarca.isSelected()) {
+            aplicarFiltroMarca();
+        } else {
+            mostrarTodasFaturas();
         }
     }
 
@@ -117,62 +86,20 @@ public class MainView {
         root = new BorderPane();
         root.getStyleClass().add("main-root");
 
-        VBox menuLateral = new VBox();
-        menuLateral.getStyleClass().add("menu-lateral-root");
+        // 1. Cria e posiciona o menu lateral.
+        root.setLeft(criarMenuLateral());
 
-        btnListarFaturas = criarBotao("Listar Faturas", "/icons/list.png", "botao-listagem");
-        btnListarMarcas = criarBotao("Listar Marcas", "/icons/list.png", "botao-listagem");
-        btnArquivadas = criarBotao("Arquivadas", "/icons/archive.png", "botao-listagem");
-        btnNovaFatura = criarBotao("Cadastrar Faturas", "/icons/plus.png", "botao-cadastro");
-        btnNovaMarca = criarBotao("Cadastrar Marca", "/icons/plus.png", "botao-cadastro");
+        // 2. Cria uma label com a mensagem de boas-vindas.
+        labelText = new Label("Bem-vindo ao Guardou-Pagou");
+        labelText.getStyleClass().add("h5"); // Estilo de fonte definido no seu CSS.
+        labelText.setTextFill(Color.web("#323437")); // Uma cor escura para o texto.
 
-        labelText = new Label("Bem-vindo ao GuardouPagou");
-        labelText.setFont(Font.font("Poppins", FontWeight.BOLD, 18));
-        labelText.setTextFill(Color.web("#000000"));
+        // 3. Coloca a mensagem em um painel centralizador.
+        StackPane painelCentral = new StackPane(labelText);
+        painelCentral.setStyle("-fx-background-color: #BDBDBD;"); // Fundo cinza padrão.
 
-        VBox secaoListagens = new VBox(
-                criarTitulo("Principais Listagens"),
-                btnListarFaturas,
-                btnListarMarcas,
-                btnArquivadas
-        );
-        secaoListagens.getStyleClass().add("menu-section");
-
-        VBox secaoCadastros = new VBox(
-                criarTitulo("Novos Cadastros"),
-                btnNovaFatura,
-                btnNovaMarca
-        );
-        secaoCadastros.getStyleClass().add("menu-section");
-
-        btnSalvarEmail = criarBotao("E-mails de Alerta", "/icons/campaing.png", "botao-listagem");
-        btnSalvarEmail.setPrefWidth(220);
-
-        VBox secaoOutros = new VBox(
-                criarTitulo("Outros"),
-                btnSalvarEmail
-        );
-        secaoOutros.getStyleClass().add("menu-section");
-
-        menuLateral.getChildren().addAll(
-                criarLogo(),
-                criarSeparadorLogo(),
-                secaoListagens,
-                secaoCadastros,
-                secaoOutros,
-                criarEspaçoFlexível()
-                );
-
-        // Remove o deslocamento da barra lateral
-        btnListarFaturas.setFocusTraversable(false);
-        btnListarMarcas.setFocusTraversable(false);
-        btnArquivadas.setFocusTraversable(false);
-        btnNovaFatura.setFocusTraversable(false);
-        btnNovaMarca.setFocusTraversable(false);
-        btnSalvarEmail.setFocusTraversable(false);
-
-        root.setLeft(menuLateral);
-        root.setCenter(labelText);
+        // 4. Define o painel de boas-vindas como o conteúdo inicial.
+        root.setCenter(painelCentral);
     }
 
     private Button criarBotao(String texto, String iconPath, String cssClass) {
@@ -235,21 +162,245 @@ public class MainView {
         return label;
     }
 
-    private VBox criarEspaçoFlexível() {
-        VBox espaço = new VBox();
-        VBox.setVgrow(espaço, Priority.ALWAYS);
-        return espaço;
+    private VBox criarEspacoFlexivel() {
+        VBox espaco = new VBox();
+        VBox.setVgrow(espaco, Priority.ALWAYS);
+        return espaco;
     }
 
+    private VBox criarMenuLateral() {
+        VBox menuLateral = new VBox();
+        menuLateral.getStyleClass().add("menu-lateral-root");
 
-    // MÉTODO mostrarListaMarcas - CORRIGIDO E ORIGINAL
-    public void mostrarListaMarcas(ObservableList<Marca> marcas) {
+        // Botões principais
+        btnListarFaturas = criarBotao("Listar Faturas", "/icons/list.png", "botao-listagem");
+        btnListarMarcas = criarBotao("Listar Marcas", "/icons/list.png", "botao-listagem");
+        btnArquivadas = criarBotao("Arquivadas", "/icons/archive.png", "botao-listagem");
+        btnNovaFatura = criarBotao("Cadastrar Faturas", "/icons/plus.png", "botao-cadastro");
+        btnNovaMarca = criarBotao("Cadastrar Marca", "/icons/plus.png", "botao-cadastro");
+
+        // Seções
+        VBox secaoListagens = new VBox(criarTitulo("Principais Listagens"), btnListarFaturas, btnListarMarcas, btnArquivadas);
+        secaoListagens.getStyleClass().add("menu-section");
+
+        VBox secaoCadastros = new VBox(criarTitulo("Novos Cadastros"), btnNovaFatura, btnNovaMarca);
+        secaoCadastros.getStyleClass().add("menu-section");
+
+        btnSalvarEmail = criarBotao("E-mails de Alerta", "/icons/campaing.png", "botao-listagem");
+        btnSalvarEmail.setPrefWidth(220);
+        VBox secaoOutros = new VBox(criarTitulo("Outros"), btnSalvarEmail);
+        secaoOutros.getStyleClass().add("menu-section");
+
+        // Monta tudo
+        menuLateral.getChildren().addAll(criarLogo(), criarSeparadorLogo(), secaoListagens, secaoCadastros, secaoOutros, criarEspacoFlexivel());
+
+        // desabilita focus traversal
+        for (Button b : List.of(btnListarFaturas, btnListarMarcas, btnArquivadas, btnNovaFatura, btnNovaMarca, btnSalvarEmail)) {
+            b.setFocusTraversable(false);
+        }
+
+        return menuLateral;
+    }
+
+    private void mostrarTelaListagemFaturas(ObservableList<Fatura> faturas) {
+        // 1) monta a tabela
+        this.tabelaFaturas = criarTabelaFaturas(faturas);
+        VBox.setVgrow(this.tabelaFaturas, Priority.ALWAYS);
+
+        // 2) monta os filtros / toolbar (se quiser manter)
+        HBox toolbar = new HBox(12, btnFiltrar, new Button("Atualizar"));
+        toolbar.setAlignment(Pos.CENTER_RIGHT);
+        ((Button) toolbar.getChildren().get(1)).setOnAction(e -> atualizarListaFaturas());
+        HBox.setHgrow(btnFiltrar, Priority.ALWAYS);
+        btnFiltrar.setMaxWidth(Double.MAX_VALUE);
+
+        // 3) título
+        Label titulo = new Label("LISTAGEM DE FATURAS");
+        titulo.getStyleClass().add("h5");
+        titulo.setTextFill(Color.web("#F0A818"));
+
+        // 4) container inteiro (substitui inteiramente o centro)
+        VBox tela = new VBox(18, titulo, toolbar, tabelaFaturas);
+        tela.setPadding(new Insets(20));
+        tela.setStyle("-fx-background-color: #BDBDBD;");
+
+        // 5) faz a troca “de verdade”
+        root.setCenter(tela);
+    }
+
+    private TableView<Fatura> criarTabelaFaturas(ObservableList<Fatura> faturas) {
+        TableView<Fatura> tabela = new TableView<>();
+        ViewUtils.aplicarEstiloPadrao(tabela);
+        tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        // --- Definição das Colunas ---
+
+        // Coluna ID
+        TableColumn<Fatura, Integer> colunaId = new TableColumn<>("ID");
+        colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colunaId.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer id, boolean empty) {
+                super.updateItem(id, empty);
+                if (empty || id == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(id.toString());
+                    setTextFill(Color.WHITE);
+                    setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
+                }
+            }
+        });
+        colunaId.setPrefWidth(80);
+
+        // Coluna NÚMERO DA NOTA
+        TableColumn<Fatura, String> colunaNumeroNota = new TableColumn<>("NÚMERO DA NOTA");
+        colunaNumeroNota.setCellValueFactory(new PropertyValueFactory<>("numeroNota"));
+        colunaNumeroNota.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String numeroNota, boolean empty) {
+                super.updateItem(numeroNota, empty);
+                if (empty || numeroNota == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(numeroNota);
+                    setTextFill(Color.WHITE);
+                    setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
+                }
+            }
+        });
+        colunaNumeroNota.setPrefWidth(150);
+
+        // Coluna ORDEM DA FATURA
+        TableColumn<Fatura, Integer> colunaOrdem = new TableColumn<>("ORDEM DA FATURA");
+        colunaOrdem.setCellValueFactory(new PropertyValueFactory<>("numeroFatura"));
+        colunaOrdem.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer ordem, boolean empty) {
+                super.updateItem(ordem, empty);
+                if (empty || ordem == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(ordem.toString());
+                    setTextFill(Color.WHITE);
+                    setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
+                }
+            }
+        });
+        colunaOrdem.setPrefWidth(120);
+
+        // Coluna VENCIMENTO
+        TableColumn<Fatura, LocalDate> colunaVencimento = new TableColumn<>("VENCIMENTO");
+        colunaVencimento.setCellValueFactory(new PropertyValueFactory<>("vencimento"));
+        colunaVencimento.setCellFactory(col -> new TableCell<>() {
+            private final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+            @Override
+            protected void updateItem(LocalDate venc, boolean empty) {
+                super.updateItem(venc, empty);
+                if (empty || venc == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(venc.format(fmt));
+                    setTextFill(Color.WHITE);
+                    setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
+                }
+            }
+        });
+        colunaVencimento.setPrefWidth(120);
+
+        // Coluna MARCA
+        TableColumn<Fatura, String> colunaMarca = new TableColumn<>("MARCA");
+        colunaMarca.setCellValueFactory(new PropertyValueFactory<>("marca"));
+        colunaMarca.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String marca, boolean empty) {
+                super.updateItem(marca, empty);
+                if (empty || marca == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(marca);
+                    String cor = getTableView().getItems().get(getIndex()).getMarcaColor();
+                    setTextFill(Color.web(cor));
+                    setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
+                }
+            }
+        });
+        colunaMarca.setPrefWidth(150);
+
+        // Coluna STATUS
+        TableColumn<Fatura, String> colunaStatus = new TableColumn<>("STATUS");
+        colunaStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colunaStatus.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+                if (empty || status == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(status);
+                    if ("Vencida".equalsIgnoreCase(status)) {
+                        setTextFill(Color.web("#f0a818"));
+                    } else {
+                        setTextFill(Color.WHITE);
+                    }
+                    setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
+                }
+            }
+        });
+        colunaStatus.setPrefWidth(120);
+
+        // Coluna AÇÕES
+        TableColumn<Fatura, Void> colunaAcoes = new TableColumn<>("Ações");
+        colunaAcoes.setCellFactory(col -> new TableCell<>() {
+            private final Button btnEmitida = new Button("Emitida");
+
+            {
+                btnEmitida.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5px;");
+                btnEmitida.setOnAction(evt -> {
+                    Fatura f = getTableView().getItems().get(getIndex());
+                    marcarFaturaComoEmitida(f);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    Fatura f = getTableView().getItems().get(getIndex());
+                    if ("Emitida".equalsIgnoreCase(f.getStatus()) || "Vencida".equalsIgnoreCase(f.getStatus())) {
+                        setGraphic(null);
+                    } else {
+                        HBox box = new HBox(btnEmitida);
+                        box.setAlignment(Pos.CENTER);
+                        setGraphic(box);
+                    }
+                }
+            }
+        });
+        colunaAcoes.setPrefWidth(100);
+
+        // Adiciona as colunas e os itens à tabela
+        tabela.getColumns().setAll(colunaId, colunaNumeroNota, colunaOrdem, colunaVencimento, colunaMarca, colunaStatus, colunaAcoes);
+        tabela.setItems(faturas);
+
+        return tabela;
+    }
+
+    // MÉTODO criarViewMarcas - CORRIGIDO E ORIGINAL
+    public Node criarViewMarcas(ObservableList<Marca> marcas) {
         // 1) Cria e estiliza a TableView
         TableView<Marca> tabela = new TableView<>();
         ViewUtils.aplicarEstiloPadrao(tabela);
-        tabela.setColumnResizePolicy(
-                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
-        );
+        tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         // 2) Coluna ID
         TableColumn<Marca, Integer> colunaId = new TableColumn<>("ID");
@@ -265,11 +416,7 @@ public class MainView {
                 } else {
                     setText(id.toString());
                     setTextFill(Color.WHITE);
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-font-weight: bold; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
+                    setStyle("-fx-background-color: transparent; " + "-fx-font-weight: bold; " + "-fx-alignment: CENTER-LEFT;");
                 }
             }
         });
@@ -288,20 +435,13 @@ public class MainView {
                 } else {
                     setText(nome);
                     // pega a cor cadastrada na Marca
-                    String cor = getTableView()
-                            .getItems()
-                            .get(getIndex())
-                            .getCor(); // ex: "#FF0000"
+                    String cor = getTableView().getItems().get(getIndex()).getCor(); // ex: "#FF0000"
                     if (cor != null && cor.matches("#[0-9A-Fa-f]{6}")) {
                         setTextFill(Color.web(cor));
                     } else {
                         setTextFill(Color.WHITE);
                     }
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-font-weight: bold; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
+                    setStyle("-fx-background-color: transparent; " + "-fx-font-weight: bold; " + "-fx-alignment: CENTER-LEFT;");
                 }
             }
         });
@@ -320,17 +460,11 @@ public class MainView {
                 } else if (desc == null || desc.isBlank()) {
                     setText("Nenhuma descrição adicionada");
                     setTextFill(Color.WHITE);
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
+                    setStyle("-fx-background-color: transparent; " + "-fx-alignment: CENTER-LEFT;");
                 } else {
                     setText(desc);
                     setTextFill(Color.WHITE);
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
+                    setStyle("-fx-background-color: transparent; " + "-fx-alignment: CENTER-LEFT;");
                 }
             }
         });
@@ -356,276 +490,171 @@ public class MainView {
         toolbar.setAlignment(Pos.CENTER_RIGHT);
 
         container.getChildren().addAll(titulo, toolbar, tabela);
-        root.setCenter(container);
+        return container;
     }
 
-    // MÉTODO mostrarListaFaturas - ADICIONADO E CORRIGIDO
-    public void mostrarListaFaturas(ObservableList<Fatura> faturas) {
-        TableView<Fatura> tabelaFaturas = new TableView<>();
-        ViewUtils.aplicarEstiloPadrao(tabelaFaturas);
-        tabelaFaturas.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        // Coluna ID
-        TableColumn<Fatura, Integer> colunaId = new TableColumn<>("ID");
-        colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colunaId.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(Integer id, boolean empty) {
-                super.updateItem(id, empty);
-                if (empty || id == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(id.toString());
-                    setTextFill(Color.WHITE);
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-font-weight: bold; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
-                }
-            }
-        });
-        colunaId.setPrefWidth(80);
-
-        // Coluna NÚMERO DA NOTA
-        TableColumn<Fatura, String> colunaNumeroNota = new TableColumn<>("NÚMERO DA NOTA");
-        colunaNumeroNota.setCellValueFactory(new PropertyValueFactory<>("numeroNota"));
-        colunaNumeroNota.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(String numeroNota, boolean empty) {
-                super.updateItem(numeroNota, empty);
-                if (empty || numeroNota == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(numeroNota);
-                    setTextFill(Color.WHITE);  // texto branco
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-font-weight: bold; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
-                }
-            }
-        });
-        colunaNumeroNota.setPrefWidth(150);
-
-        // Coluna ORDEM DA FATURA
-        TableColumn<Fatura, Integer> colunaOrdem = new TableColumn<>("ORDEM DA FATURA");
-        colunaOrdem.setCellValueFactory(new PropertyValueFactory<>("numeroFatura"));
-        colunaOrdem.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(Integer ordem, boolean empty) {
-                super.updateItem(ordem, empty);
-                if (empty || ordem == null) {
-                    setText(null); setStyle("");
-                } else {
-                    setText(ordem.toString());
-                    setTextFill(Color.WHITE);
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-font-weight: bold; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
-                }
-            }
-        });
-        colunaOrdem.setPrefWidth(120);
-
-        // Coluna VENCIMENTO
-        TableColumn<Fatura, LocalDate> colunaVencimento = new TableColumn<>("VENCIMENTO");
-        colunaVencimento.setCellValueFactory(new PropertyValueFactory<>("vencimento"));
-        colunaVencimento.setCellFactory(col -> new TableCell<>() {
-            private final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            @Override
-            protected void updateItem(LocalDate venc, boolean empty) {
-                super.updateItem(venc, empty);
-                if (empty || venc == null) {
-                    setText(null); setStyle("");
-                } else {
-                    setText(venc.format(fmt));
-                    setTextFill(Color.WHITE);
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-font-weight: bold; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
-                }
-            }
-        });
-        colunaVencimento.setPrefWidth(120);
-
-        // Coluna MARCA (com cor dinâmica)
-        TableColumn<Fatura, String> colunaMarca = new TableColumn<>("MARCA");
-        colunaMarca.setCellValueFactory(new PropertyValueFactory<>("marca"));
-        colunaMarca.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(String marca, boolean empty) {
-                super.updateItem(marca, empty);
-                if (empty || marca == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(marca);
-                    // cor definida no cadastro da marca
-                    String cor = getTableView()
-                            .getItems()
-                            .get(getIndex())
-                            .getMarcaColor(); // ex: "#FF0000"
-                    setTextFill(Color.web(cor));
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-font-weight: bold; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
-                }
-            }
-        });
-        colunaMarca.setPrefWidth(150);
-
-        // Coluna STATUS
-        TableColumn<Fatura, String> colunaStatus = new TableColumn<>("STATUS");
-        colunaStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-        colunaStatus.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(String status, boolean empty) {
-                super.updateItem(status, empty);
-                if (empty || status == null) {
-                    setText(null); setStyle("");
-                } else {
-                    setText(status);
-                    if ("Vencida".equalsIgnoreCase(status)) {
-                        setTextFill(Color.web("#f0a818"));
-                    } else {
-                        setTextFill(Color.WHITE);
-                    }
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-font-weight: bold; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
-                }
-            }
-        });
-        colunaStatus.setPrefWidth(120);
-
-        // Coluna AÇÕES (botão Emitida)
-        TableColumn<Fatura, Void> colunaAcoes = new TableColumn<>("Ações");
-        colunaAcoes.setCellFactory(col -> new TableCell<>() {
-            private final Button btnEmitida = new Button("Emitida");
-            {
-                btnEmitida.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5px;");
-                btnEmitida.setOnAction(evt -> {
-                    Fatura f = getTableView().getItems().get(getIndex());
-                    marcarFaturaComoEmitida(f);
-                });
-            }
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    Fatura f = getTableView().getItems().get(getIndex());
-                    if ("Emitida".equalsIgnoreCase(f.getStatus()) || "Vencida".equalsIgnoreCase(f.getStatus())) {
-                        setGraphic(null);
-                    } else {
-                        HBox box = new HBox(btnEmitida);
-                        box.setAlignment(Pos.CENTER);
-                        setGraphic(box);
-                    }
-                }
-            }
-        });
-        colunaAcoes.setPrefWidth(100);
-
-        // Adiciona todas as colunas na tabela
-        tabelaFaturas.getColumns()
-                .setAll(List.of(
-                        colunaId,
-                        colunaNumeroNota,
-                        colunaOrdem,
-                        colunaVencimento,
-                        colunaMarca,
-                        colunaStatus,
-                        colunaAcoes
-                ));
-        tabelaFaturas.setItems(faturas);
-
-        // --- Configuração dos filtros ---
-        // ToggleGroup e RadioButtons
-        if (filtroToggleGroup == null) {
-            filtroToggleGroup = new ToggleGroup();
-            rbFiltraPeriodo = new RadioButton("Período");
-            rbFiltraMarca   = new RadioButton("Marca");
-            rbFiltraPeriodo.setToggleGroup(filtroToggleGroup);
-            rbFiltraMarca.setToggleGroup(filtroToggleGroup);
-        }
-
-        // DatePicker
-        if (dpFiltroPeriodo == null) {
-            dpFiltroPeriodo = new DatePicker();
-            dpFiltroPeriodo.setPromptText("Selecione a data");
-            dpFiltroPeriodo.setPrefWidth(200);
-            dpFiltroPeriodo.setVisible(false);
-            dpFiltroPeriodo.setManaged(false);
-        }
-
-        // ComboBox de marcas
-        if (cbFiltroMarca == null) {
-            cbFiltroMarca = new ComboBox<>();
-            cbFiltroMarca.setPromptText("Selecione a Marca");
-            cbFiltroMarca.setPrefWidth(200);
-            cbFiltroMarca.setVisible(false);
-            cbFiltroMarca.setManaged(false);
-            try {
-                cbFiltroMarca.setItems(new MarcaDAO().listarMarcas());
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        // Container de filtros
-        if (filtroContainer == null) {
-            filtroContainer = new VBox(10, dpFiltroPeriodo, cbFiltroMarca);
-            filtroContainer.setAlignment(Pos.CENTER_LEFT);
-            filtroContainer.setPadding(new Insets(0, 0, 10, 0));
-        }
-
-        // Botão Atualizar
-        Button btnAtualizar = new Button("Atualizar");
-        btnAtualizar.setStyle("-fx-background-color: #C88200; -fx-text-fill: #000000; -fx-font-weight: bold;");
-        btnAtualizar.setOnAction(e -> atualizarListaFaturas());
-
-        // Toolbar de filtros
-        HBox toolbar = new HBox(15, rbFiltraPeriodo, rbFiltraMarca, btnAtualizar);
-        toolbar.setAlignment(Pos.CENTER_RIGHT);
-
-        // Listeners dos RadioButtons
-        rbFiltraPeriodo.setOnAction(e -> {
-            dpFiltroPeriodo.setVisible(true);
-            dpFiltroPeriodo.setManaged(true);
-            cbFiltroMarca.setVisible(false);
-            cbFiltroMarca.setManaged(false);
-        });
-        rbFiltraMarca.setOnAction(e -> {
-            cbFiltroMarca.setVisible(true);
-            cbFiltroMarca.setManaged(true);
-            dpFiltroPeriodo.setVisible(false);
-            dpFiltroPeriodo.setManaged(false);
-        });
-
-        // Layout final
-        VBox container = new VBox(20);
+    // MÉTODO criarViewFaturas - ADICIONADO E CORRIGIDO
+    public Node criarViewFaturas(ObservableList<Fatura> faturas) {
+        // 1. Container principal
+        VBox container = new VBox(18);
         container.setPadding(new Insets(20));
         container.setStyle("-fx-background-color: #BDBDBD;");
 
+        // 2. Título
         Label titulo = new Label("LISTAGEM DE FATURAS");
-        titulo.setStyle("-fx-text-fill: #F0A818; -fx-font-size: 18px; -fx-font-weight: bold;");
+        titulo.getStyleClass().add("h5");
+        titulo.setTextFill(Color.web("#F0A818"));
 
-        container.getChildren().addAll(titulo, toolbar, filtroContainer, tabelaFaturas);
-        root.setCenter(container);
+        // 3. MenuButton Filtrar
+        filtroToggleGroup = new ToggleGroup();
+        miFiltrarPeriodo = new RadioMenuItem("Filtrar por Período");
+        miFiltrarMarca   = new RadioMenuItem("Filtrar por Marca");
+        miFiltrarPeriodo.setToggleGroup(filtroToggleGroup);
+        miFiltrarMarca.setToggleGroup(filtroToggleGroup);
+
+        ImageView filterIcon = new ImageView(
+                new Image(getClass().getResourceAsStream("/icons/filter_list.png"))
+        );
+        filterIcon.setFitHeight(22);
+        filterIcon.setPreserveRatio(true);
+        btnFiltrar = new MenuButton("Filtrar", filterIcon, miFiltrarPeriodo, miFiltrarMarca);
+        btnFiltrar.getStyleClass().addAll("menu-button", "botao-listagem", "btn-filtrar");
+        btnFiltrar.setContentDisplay(ContentDisplay.LEFT);
+        btnFiltrar.setGraphicTextGap(10);
+
+        // ─── Conteúdo PERÍODO para o Popup ───
+        dpDataInicio = new DatePicker();
+        dpDataInicio.setPromptText("Início do Período");
+        dpDataInicio.setPrefWidth(150);
+        Label lblDataInicio = new Label("Data Inicial");
+        lblDataInicio.getStyleClass().add("field-subtitle");
+        VBox dataInicioBox = new VBox(6, lblDataInicio, dpDataInicio);
+        dataInicioBox.getStyleClass().add("pill-field");
+
+        dpDataFim = new DatePicker();
+        dpDataFim.setPromptText("Fim do Período");
+        dpDataFim.setPrefWidth(150);
+        dpDataFim.setOnAction(e -> {
+            aplicarFiltroPeriodo();
+            filtroPopup.hide();
+        });
+        Label lblDataFim = new Label("Data Final");
+        lblDataFim.getStyleClass().add("field-subtitle");
+        VBox dataFimBox = new VBox(6, lblDataFim, dpDataFim);
+        dataFimBox.getStyleClass().add("pill-field");
+
+        // Botões “Aplicar” e “Cancelar” (só ícone)
+        Button btnAplicarFiltro = new Button();
+        btnAplicarFiltro.getStyleClass().addAll("modal-button", "btn-aplicar");
+        ImageView checkIcon = new ImageView(
+                new Image(getClass().getResourceAsStream("/icons/check.png"))
+        );
+        checkIcon.setPreserveRatio(true);
+        btnAplicarFiltro.setGraphic(checkIcon);
+        btnAplicarFiltro.setFocusTraversable(false);
+        btnAplicarFiltro.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        btnAplicarFiltro.setOnAction(e -> {
+            aplicarFiltroPeriodo();
+            filtroPopup.hide();
+        });
+
+        Button btnCancelarFiltro = new Button();
+        btnCancelarFiltro.getStyleClass().addAll("modal-button", "btn-cancelar");
+        ImageView cancelIcon = new ImageView(
+                new Image(getClass().getResourceAsStream("/icons/cancel.png"))
+        );
+        cancelIcon.setPreserveRatio(true);
+        btnCancelarFiltro.setGraphic(cancelIcon);
+        btnCancelarFiltro.setFocusTraversable(false);
+        btnCancelarFiltro.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        btnCancelarFiltro.setOnAction(e -> filtroPopup.hide());
+
+        // Layout do período: datas empilhadas + botões empilhados, tudo centralizado
+        VBox dateVBox   = new VBox(10, dataInicioBox, dataFimBox);
+        dateVBox.setAlignment(Pos.CENTER_LEFT);
+        VBox buttonVBox = new VBox(10, btnAplicarFiltro, btnCancelarFiltro);
+        buttonVBox.setAlignment(Pos.CENTER_LEFT);
+        HBox contentHBox = new HBox(20, dateVBox, buttonVBox);
+        contentHBox.setAlignment(Pos.CENTER);
+
+        VBox periodContent = new VBox(contentHBox);
+        periodContent.getStyleClass().addAll("painel-filtros","painel-filtros-canto-quadrado");
+        periodContent.setPadding(new Insets(15));
+
+        // ─── Conteúdo MARCA para o Popup ───
+        Label lblFiltrarMarca = new Label("Filtrar por Marca:");
+        lblFiltrarMarca.getStyleClass().add("field-subtitle");
+        cbFiltroMarca = new ComboBox<>();
+        cbFiltroMarca.setPromptText("Selecione uma marca");
+        cbFiltroMarca.setPrefWidth(200);
+        try {
+            cbFiltroMarca.setItems(new MarcaDAO().listarMarcas());
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        cbFiltroMarca.setOnAction(e -> {
+            aplicarFiltroMarca();
+            filtroPopup.hide();
+        });
+
+        // aplica mesmo estilo “pill” dos DatePickers
+        VBox marcaBox = new VBox(6, lblFiltrarMarca, cbFiltroMarca);
+        marcaBox.getStyleClass().add("pill-field");
+
+        VBox marcaContent = new VBox(marcaBox);
+        marcaContent.getStyleClass().addAll("painel-filtros","painel-filtros-canto-quadrado");
+        marcaContent.setPadding(new Insets(15));
+
+        // ─── Configura o Popup ───
+        filtroPopup.setAutoHide(true);
+        filtroPopup.setHideOnEscape(true);
+        filtroPopup.setOnShowing(evt ->
+                btnFiltrar.getStyleClass().add("filter-open")
+        );
+        filtroPopup.setOnHiding(evt ->
+                btnFiltrar.getStyleClass().remove("filter-open")
+        );
+
+        // Container de tokens (filtros ativos)
+        filterTokens = new HBox(8);
+        filterTokens.setAlignment(Pos.CENTER_LEFT);
+        filterTokens.setPadding(new Insets(0,0,0,10));
+
+        // Handlers do MenuButton
+        miFiltrarPeriodo.setOnAction(e -> {
+            filtroPopup.getContent().setAll(periodContent);
+            Bounds b = btnFiltrar.localToScreen(btnFiltrar.getBoundsInLocal());
+            filtroPopup.show(btnFiltrar.getScene().getWindow(), b.getMinX(), b.getMaxY());
+        });
+        miFiltrarMarca.setOnAction(e -> {
+            filtroPopup.getContent().setAll(marcaContent);
+            Bounds b = btnFiltrar.localToScreen(btnFiltrar.getBoundsInLocal());
+            filtroPopup.show(btnFiltrar.getScene().getWindow(), b.getMinX(), b.getMaxY());
+        });
+
+        // ─── Monta toolbar e tabela ───
+        Button btnAtualizar = new Button("Atualizar");
+        btnAtualizar.getStyleClass().addAll("menu-button","botao-listagem");
+        btnAtualizar.setOnAction(e -> atualizarListaFaturas());
+
+        HBox espacador = new HBox();
+        HBox.setHgrow(espacador, Priority.ALWAYS);
+
+        HBox toolbar = new HBox(12, btnFiltrar, filterTokens, espacador, btnAtualizar);
+        toolbar.setAlignment(Pos.CENTER_LEFT);
+
+        this.tabelaFaturas = criarTabelaFaturas(faturas);
+        VBox.setVgrow(this.tabelaFaturas, Priority.ALWAYS);
+
+        // 6. Adiciona tudo ao container principal
+        container.getChildren().addAll(titulo, toolbar, this.tabelaFaturas);
+        return container;
+    }
+
+    private void mostrarListaFaturas(ObservableList<Fatura> faturas) {
+        if (this.tabelaFaturas != null) {
+            this.tabelaFaturas.setItems(faturas);
+        }
     }
 
     // MÉTODO marcarFaturaComoEmitida - ADICIONADO
@@ -691,10 +720,18 @@ public class MainView {
         }
     }
 
+    private void showAlert(Alert.AlertType tipo, String titulo, String msg) {
+        Alert a = new Alert(tipo);
+        a.setTitle(titulo);
+        a.setHeaderText(null);
+        a.setContentText(msg);
+        a.showAndWait();
+    }
+
     private void atualizarListaMarcas() {
         try {
             ObservableList<Marca> marcas = new MarcaDAO().listarMarcas();
-            mostrarListaMarcas(marcas);
+            criarViewMarcas(marcas);
         } catch (SQLException ex) {
             ex.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -747,6 +784,151 @@ public class MainView {
                 errorAlert.setContentText("Erro ao excluir marca: " + e.getMessage());
                 errorAlert.showAndWait();
             }
+        }
+    }
+
+    private void aplicarFiltroPeriodo() {
+        LocalDate inicio = dpDataInicio.getValue();
+        LocalDate fim    = dpDataFim.getValue();
+        if (inicio != null && fim != null) {
+            // 1) guarda estado
+            periodoFilterStart = inicio;
+            periodoFilterEnd   = fim;
+
+            // 2) executa a query dentro de try/catch
+            ObservableList<Fatura> f;
+            try {
+                f = new FaturaDAO().listarFaturasPorPeriodo(inicio, fim);
+                mostrarListaFaturas(f);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                // mostra alerta de erro
+                showAlert(Alert.AlertType.ERROR,
+                        "Erro ao filtrar por período",
+                        ex.getMessage());
+                // limpa estado para não ficar inconsistente
+                periodoFilterStart = periodoFilterEnd = null;
+                return;
+            }
+
+            // 3) remove token anterior de período (caso exista)
+            filterTokens.getChildren().removeIf(n -> "periodo".equals(n.getUserData()));
+
+            // 4) formata texto do token
+            String txt = inicio.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    + " – "
+                    + fim.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+            // 5) cria o botão-token
+            Button periodoBtn = new Button(txt);
+            periodoBtn.setUserData("periodo");
+            periodoBtn.getStyleClass().add("filter-token");
+
+            ImageView cancelIcon = new ImageView(
+                    new Image(getClass().getResourceAsStream("/icons/cancel.png"))
+            );
+            cancelIcon.setFitHeight(20);
+            cancelIcon.setPreserveRatio(true);
+            periodoBtn.setGraphic(cancelIcon);
+            periodoBtn.setContentDisplay(ContentDisplay.RIGHT);
+
+            // 6) ao clicar, limpa filtro e remove o token
+            periodoBtn.setOnAction(ev -> {
+                periodoFilterStart = periodoFilterEnd = null;
+                mostrarTodasFaturas();
+                filterTokens.getChildren().remove(periodoBtn);
+            });
+
+            // 7) adiciona o token à barra
+            filterTokens.getChildren().add(periodoBtn);
+        }
+        // fecha o popup
+        filtroPopup.hide();
+    }
+
+    private void aplicarFiltroMarca() {
+        Marca sel = cbFiltroMarca.getValue();
+        if (sel != null && marcaFilters.add(sel)) {
+            // 1) extrai apenas os nomes das marcas atuais
+            List<String> nomes = marcaFilters.stream()
+                    .map(Marca::getNome)
+                    .collect(Collectors.toList());
+
+            try {
+                // 2) chama o novo método do DAO dentro do try
+                ObservableList<Fatura> f = new FaturaDAO()
+                        .listarFaturasPorMarcas(nomes);
+                mostrarListaFaturas(f);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                // informa o usuário em um alerta
+                showAlert(Alert.AlertType.ERROR,
+                        "Erro ao filtrar por marca",
+                        ex.getMessage());
+                // remove a marca adicionada no set para não ficar em estado inconsistente
+                marcaFilters.remove(sel);
+                return;
+            }
+
+            // 3) cria o botão-token
+            Button marcaBtn = new Button(sel.getNome());
+            marcaBtn.setUserData(sel);
+            marcaBtn.getStyleClass().add("filter-token");
+            ImageView cancelIcon = new ImageView(
+                    new Image(getClass().getResourceAsStream("/icons/cancel.png"))
+            );
+            cancelIcon.setFitHeight(20);
+            cancelIcon.setPreserveRatio(true);
+            marcaBtn.setGraphic(cancelIcon);
+            marcaBtn.setContentDisplay(ContentDisplay.RIGHT);
+
+            // 4) ao clicar, remove apenas aquela marca e refaz o filtro
+            marcaBtn.setOnAction(ev -> {
+                marcaFilters.remove(sel);
+
+                if (marcaFilters.isEmpty()) {
+                    mostrarTodasFaturas();
+                } else {
+                    // repete o mesmo tratamento em try/catch
+                    List<String> restantes = marcaFilters.stream()
+                            .map(Marca::getNome)
+                            .collect(Collectors.toList());
+                    try {
+                        ObservableList<Fatura> nf = new FaturaDAO()
+                                .listarFaturasPorMarcas(restantes);
+                        mostrarListaFaturas(nf);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        showAlert(Alert.AlertType.ERROR,
+                                "Erro ao filtrar por marca",
+                                e.getMessage());
+                    }
+                }
+                filterTokens.getChildren().remove(marcaBtn);
+            });
+
+            // 5) adiciona o token à barra
+            filterTokens.getChildren().add(marcaBtn);
+        }
+        filtroPopup.hide();
+    }
+
+    private void mostrarTodasFaturas() {
+        try {
+            // 1. Busca os dados
+            ObservableList<Fatura> faturas = new FaturaDAO().listarFaturas(false);
+
+            // 2. Cria a view com base nos dados
+            Node viewFaturas = criarViewFaturas(faturas);
+
+            // 3. Define a view como o conteúdo principal, substituindo o antigo
+            setConteudoPrincipal(viewFaturas);
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            // Lógica para tratar o erro
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao carregar todas as faturas: " + ex.getMessage());
+            alert.showAndWait();
         }
     }
 

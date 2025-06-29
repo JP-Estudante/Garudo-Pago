@@ -47,4 +47,9 @@ public class Marca {
     public void setCor(String cor) {
         this.cor = cor;
     }
+
+    @Override
+    public String toString() {
+        return nome;
+    }
 }

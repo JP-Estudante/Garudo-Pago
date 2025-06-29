@@ -1,16 +1,21 @@
 package com.GuardouPagou.views;
 
+import com.GuardouPagou.dao.MarcaDAO;
+import com.GuardouPagou.models.Marca;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.geometry.*;
 import javafx.scene.paint.Color;
+import javafx.util.StringConverter;
+
+import java.sql.SQLException;
 
 public class NotaFiscalView {
 
     private final BorderPane root;
     private final TextField numeroNotaField;
     private final DatePicker dataEmissaoPicker;
-    private final ComboBox<String> marcaComboBox;
+    private final ComboBox<Marca> marcaComboBox;
     private final Button adicionarFaturaButton;
     private final VBox faturasContainer;
     private final Button salvarButton;
@@ -18,7 +23,15 @@ public class NotaFiscalView {
     public NotaFiscalView() {
         numeroNotaField = new TextField();
         dataEmissaoPicker = new DatePicker();
-        marcaComboBox = new ComboBox<>();
+        marcaComboBox = new ComboBox<Marca>();
+        marcaComboBox.setConverter(new StringConverter<Marca>() {
+            @Override public String toString(Marca m) {
+                return m == null ? "" : m.getNome();
+            }
+            @Override public Marca fromString(String s) {
+                return null; // não usado
+            }
+        });
         adicionarFaturaButton = new Button("Adicionar Nova Fatura");
         faturasContainer = new VBox(10);
         salvarButton = new Button("Salvar");
@@ -139,48 +152,24 @@ public class NotaFiscalView {
         dataEmissaoBox.getChildren().addAll(dataEmissaoLabel, dataEmissaoPicker);
 
         // Marca
-        VBox marcaBox = new VBox(5);
         Label marcaLabel = new Label("Marca*:");
-        marcaLabel.setStyle(
-                "-fx-font-family: Poppins; "
-                + "-fx-font-size: 16px; "
-                + "-fx-text-fill: #BDBDBD;"
-        );
+        marcaLabel.getStyleClass().add("field-subtitle");
+
+        // ComboBox já declarado lá em cima
         marcaComboBox.setPromptText("Selecione uma marca");
-        marcaComboBox.setStyle(
-                "-fx-background-color: #2A2A2A; "
-                + "-fx-text-fill: #FFFFFF; "
-                + "-fx-font-size: 14px; "
-                + "-fx-border-color: #4A4A4A; "
-                + "-fx-border-width: 1; "
-                + "-fx-background-radius: 5; "
-                + "-fx-border-radius: 5;"               
-        );
-        marcaComboBox.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal) {
-                marcaComboBox.setStyle(
-                        "-fx-background-color: #2A2A2A; "
-                        + "-fx-text-fill: #FFFFFF; "
-                        + "-fx-font-size: 14px; "
-                        + "-fx-border-color: #F0A818; "
-                        + "-fx-border-width: 1; "
-                        + "-fx-background-radius: 5; "
-                        + "-fx-border-radius: 5;"
-                );
-            } else {
-                marcaComboBox.setStyle(
-                        "-fx-background-color: #2A2A2A; "
-                        + "-fx-text-fill: #FFFFFF; "
-                        + "-fx-font-size: 14px; "
-                        + "-fx-border-color: #4A4A4A; "
-                        + "-fx-border-width: 1; "
-                        + "-fx-background-radius: 5; "
-                        + "-fx-border-radius: 5;"
-                );
-            }
-        });
         marcaComboBox.setPrefWidth(200);
-        marcaBox.getChildren().addAll(marcaLabel, marcaComboBox);
+        // carrega os itens normalmente...
+        try {
+            marcaComboBox.setItems(new MarcaDAO().listarMarcas());
+        } catch(SQLException ex){
+            ex.printStackTrace();
+        }
+
+        // embrulha num “pill-field”
+        VBox marcaField = new VBox(6, marcaLabel, marcaComboBox);
+        marcaField.getStyleClass().add("pill-field");
+
+        camposBox.getChildren().add(marcaField);
 
         // Botão Adicionar Nova Fatura
         String buttonStyle
@@ -195,7 +184,7 @@ public class NotaFiscalView {
         adicionarFaturaButton.setOnMouseExited(e -> adicionarFaturaButton.setStyle(buttonStyle));
         adicionarFaturaButton.setPrefWidth(200);
 
-        camposBox.getChildren().addAll(numeroNotaBox, dataEmissaoBox, marcaBox, adicionarFaturaButton);
+        camposBox.getChildren().addAll(numeroNotaBox, dataEmissaoBox, marcaField, adicionarFaturaButton);
 
         // Container de faturas
         faturasContainer.setStyle(
@@ -253,7 +242,7 @@ public class NotaFiscalView {
         return dataEmissaoPicker;
     }
 
-    public ComboBox<String> getMarcaComboBox() {
+    public ComboBox<Marca> getMarcaComboBox() {
         return marcaComboBox;
     }
 

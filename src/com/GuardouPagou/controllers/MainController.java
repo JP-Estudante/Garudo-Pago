@@ -12,14 +12,19 @@ import com.GuardouPagou.controllers.NotaFaturaController;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-
-import java.sql.SQLException;
+import javafx.scene.Node;
 import java.util.Objects;
+import java.sql.SQLException;
+import javafx.concurrent.Task;
+import javafx.scene.control.ProgressIndicator;
+import javafx.geometry.Pos;
 
 public class MainController {
 
@@ -32,33 +37,70 @@ public class MainController {
     }
 
     private void configurarEventos() {
+        // Ação para o botão Listar Faturas
         view.getBtnListarFaturas().setOnAction(e -> {
-            try {
-                ObservableList<Fatura> faturas = new FaturaDAO().listarFaturas(false);
-                view.mostrarListaFaturas(faturas);
+            // 1. Mostra um indicador de "carregando" imediatamente
+            ProgressIndicator pi = new ProgressIndicator();
+            VBox boxCarregando = new VBox(new Label("Carregando faturas..."), pi);
+            boxCarregando.setAlignment(Pos.CENTER);
+            boxCarregando.setSpacing(10);
+            view.setConteudoPrincipal(boxCarregando);
 
-            } catch (SQLException ex) {
+            // 2. Cria uma Tarefa para rodar a busca no banco em segundo plano
+            Task<ObservableList<Fatura>> carregarFaturasTask = new Task<>() {
+                @Override
+                protected ObservableList<Fatura> call() throws Exception {
+                    // Esta é a operação demorada que vai para a outra thread
+                    return new FaturaDAO().listarFaturas(false);
+                }
+            };
+
+            // 3. Define o que fazer QUANDO a tarefa for bem-sucedida
+            carregarFaturasTask.setOnSucceeded(event -> {
+                ObservableList<Fatura> faturas = carregarFaturasTask.getValue();
+                Node viewFaturas = view.criarViewFaturas(faturas);
+                view.setConteudoPrincipal(viewFaturas); // Atualiza a tela com o resultado
+            });
+
+            // 4. Define o que fazer se a tarefa falhar
+            carregarFaturasTask.setOnFailed(event -> {
                 view.getConteudoLabel().setText("Erro ao carregar faturas.");
-                ex.printStackTrace();
-            }
-        });
+                carregarFaturasTask.getException().printStackTrace();
+            });
 
+            // 5. Inicia a tarefa em uma nova thread
+            new Thread(carregarFaturasTask).start();
+        });
+        // Ação para o botão Listar Marcas
         view.getBtnListarMarcas().setOnAction(e -> {
             try {
+                // 1. Busca os dados
                 ObservableList<Marca> marcas = new MarcaDAO().listarMarcas();
-                view.mostrarListaMarcas(marcas);
+
+                // 2. Solicita à View que crie o Node (a tela) com os dados
+                Node viewMarcas = view.criarViewMarcas(marcas);
+
+                // 3. Define a tela criada como o conteúdo principal
+                view.setConteudoPrincipal(viewMarcas);
+
             } catch (SQLException ex) {
                 view.getConteudoLabel().setText("Erro ao carregar marcas.");
                 ex.printStackTrace();
             }
         });
 
+        // Ação para o botão Arquivadas
         view.getBtnArquivadas().setOnAction(e -> {
-            // Em vez de: atualizarConteudo("Documentos Arquivados");
+            // 1. Cria a view e o controller da tela de arquivadas
             ArquivadasView arquivadasView = new ArquivadasView();
-            new ArquivadasController(arquivadasView); // O controller carrega os dados
-            view.getRoot().setCenter(arquivadasView.getRoot());
+            new ArquivadasController(arquivadasView);
+
+            // 2. Define a nova tela como conteúdo principal
+            view.setConteudoPrincipal(arquivadasView.getRoot());
         });
+
+        // --- O restante do código (modais e outros) permanece o mesmo ---
+        // A lógica para abrir janelas modais não precisa mudar.
 
         view.getBtnNovaFatura().setOnAction(e -> {
             Stage modal = new Stage();
@@ -67,20 +109,16 @@ public class MainController {
             modal.initModality(Modality.WINDOW_MODAL);
             modal.setTitle("Cadastro de Nota Fiscal");
 
-            // Ícone da janela
             modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/plus.png"))));
 
             NotaFaturaView notaView = new NotaFaturaView();
             new NotaFaturaController(notaView);
 
-            // Define largura x altura maiores
             Scene cena = new Scene(notaView.getRoot(), 700, 500);
-            // Herda a folha de estilos da cena principal
             cena.getStylesheets().addAll(
                     view.getRoot().getScene().getStylesheets()
             );
 
-            // Fecha com ESC
             cena.setOnKeyPressed(ev -> {
                 if (ev.getCode() == KeyCode.ESCAPE) {
                     modal.close();
@@ -89,9 +127,6 @@ public class MainController {
 
             modal.setScene(cena);
             modal.setResizable(false);
-            modal.setOnShown(ev -> {
-                /* centraliza como antes */
-            });
             modal.showAndWait();
         });
 
@@ -102,20 +137,16 @@ public class MainController {
             modal.initModality(Modality.WINDOW_MODAL);
             modal.setTitle("Cadastro de Marca");
 
-            // Ícone da janela
             modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/plus.png"))));
 
             MarcaView marcaView = new MarcaView();
             new MarcaController(marcaView);
 
-            // Define largura x altura maiores
             Scene scene = new Scene(marcaView.getRoot(), 650, 400);
-            // Herda a folha de estilos da cena principal
             scene.getStylesheets().addAll(
                     view.getRoot().getScene().getStylesheets()
             );
 
-            // Fecha com ESC
             scene.setOnKeyPressed(ev -> {
                 if (ev.getCode() == KeyCode.ESCAPE) {
                     modal.close();
@@ -124,9 +155,6 @@ public class MainController {
 
             modal.setScene(scene);
             modal.setResizable(false);
-            modal.setOnShown(ev -> {
-                /* centraliza como antes */
-            });
             modal.showAndWait();
         });
 

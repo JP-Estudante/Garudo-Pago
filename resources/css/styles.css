@@ -38,6 +38,128 @@
     -fx-font-weight: normal;
 }
 
+/* permite que o MenuButton realmente expanda no HBox */
+.menu-button {
+  -fx-max-width: Infinity; /* ou um valor fixo se preferir, ex: 200px */
+}
+
+/* remove padding extra do label interno, evitando clipping */
+.menu-button .label {
+  -fx-padding: 0;
+}
+
+/* -------- remover seta ▼ do MenuButton Filtrar --------- */
+.btn-filtrar > .arrow-button {
+  -fx-background-color: transparent;  /* sem fundo */
+  -fx-padding: 0;                     /* sem padding */
+  -fx-min-width: 0;                   /* largura mínima zero */
+  -fx-pref-width: 0;                  /* largura preferida zero */
+  -fx-max-width: 0;                   /* largura máxima zero */
+  -fx-opacity: 0;                     /* invisível */
+}
+
+/* ——————————————————————————— */
+/* Botões de Filtragem */
+/* Container do popup de itens */
+.menu-button .open > .menu {
+    -fx-background-color: #4C4F53;
+    -fx-background-radius: 8px;
+    -fx-padding: 5px 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 8,0,0,2);
+}
+
+/* Submenu nativo do btnFiltrar: itens sem cor por padrão */
+.menu-button.botao-listagem .open > .menu .menu-item {
+    -fx-background-color: transparent;   /* mostra o fundo #4C4F53 do container */
+}
+
+/* Hover ou foco numa opção: fundo #8A8B8C */
+.menu-button.botao-listagem .open > .menu .menu-item:hover,
+.menu-button.botao-listagem .open > .menu .menu-item:focused {
+    -fx-background-color: #8A8B8C;
+}
+
+/* Seleção via teclado também fica com a mesma cor */
+.menu-button.botao-listagem .open > .menu .menu-item:selected {
+    -fx-background-color: #8A8B8C;
+}
+
+
+/* Cada opção do menu */
+.menu-button .menu-item {
+    -fx-padding: 8 20 8 20;
+    -fx-text-fill: #F0A818;
+    -fx-font-family: "Poppins";
+    -fx-font-size: 14px;
+}
+
+.menu-button,
+.menu-button .label {
+  -fx-text-fill: #F0A818;      /* mesmo text-fill dos botões laterais */
+}
+
+/* Ajusta padding e gap para que o texto não fique cortado */
+.menu-button {
+  -fx-padding: 12px 20px;       /* topo/baixo 12, esquerda/direita 20 */
+  -fx-graphic-text-gap: 10px;   /* espaço ícone–texto */
+  -fx-alignment: CENTER_LEFT;
+  -fx-min-height: 49px;
+  -fx-pref-height: 49px;
+}
+
+/* Marca de seleção mais discreta */
+.menu-button .menu-item:checked > .label {
+    -fx-text-fill: #F0A818;
+}
+
+/* ——————————————————————————— */
+/* Painel de filtros: cor de fundo e sem borda */
+.painel-filtros {
+    -fx-background-color: #7890A8; /* antes era #4C4F53 */
+    -fx-padding: 15px;
+    -fx-spacing: 10px;
+    -fx-background-radius: 10px;
+    /* remove completamente qualquer borda */
+    -fx-border-width: 0;
+}
+
+/* ——————————————————————————— */
+/* DatePickers dentro do painel devem herdar o estilo .date-picker existente */
+/* (copiando o que já está em .pill-field .date-picker) */
+.painel-filtros .date-picker {
+    -fx-background-color: #BDBDBD;
+    -fx-background-radius: 20px;
+    -fx-padding: 5px 10px;
+}
+
+/* 2) Remove qualquer fundo ou borda do editor (TextField interno) */
+.painel-filtros .date-picker .text-field {
+    -fx-background-color: transparent;            /* transparentes para deixar ver o contêiner */
+    -fx-control-inner-background: transparent;    /* idem */
+    -fx-border-width: 0;                          /* sem borda */
+    -fx-padding: 0;                               /* sem padding extra */
+
+    /* se quiser ajustar fonte e cor do texto: */
+    -fx-text-fill: #181848;
+    -fx-prompt-text-fill: #181848;
+    -fx-font-family: "Poppins";
+    -fx-font-size: 14px;
+}
+
+/* 3) Arrow-button também sem fundo/borda */
+.painel-filtros .date-picker .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-border-width: 0;
+}
+
+.btn-aplicar {
+    -fx-font-size: 18px;
+}
+.btn-cancelar {
+    -fx-font-size: 18px;
+}
+
 /* ——————————————————————————— */
 /* Base compartilhada para todos os botões do menu */
 .menu-button {
@@ -160,6 +282,11 @@
 
 /* ———————————————— */
 /* Modal Button Styles */
+.modal-button {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
 .modal-button,
 .button-pill {
     -fx-background-color: #4C4F53;
@@ -172,6 +299,13 @@
 }
 .modal-button:focused,
 .button-pill:focused {
+    -fx-border-color: #C88200;
+    -fx-border-width: 2;
+    -fx-border-radius: 22;
+}
+
+.modal-button:pressed,
+.modal-button:armed {
     -fx-border-color: #C88200;
     -fx-border-width: 2;
     -fx-border-radius: 22;
@@ -364,6 +498,17 @@
     -fx-padding: 0;
 }
 
+.filter-token {
+    -fx-background-color: #C88200;
+    -fx-background-radius: 12px;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 4 8 4 8;
+}
+.filter-token .label {
+    -fx-text-fill: white;
+}
+
 /* ScrollPane */
 .scroll-pane {
     -fx-background-color: #7890A8;
@@ -391,4 +536,156 @@
 .text-area-pill .content {
     -fx-background-color: #BDBDBD;
     -fx-padding: 10px;
+}
+
+.menu-button.botao-listagem.filter-open {
+    /* top-left e top-right = 22px, bottom-right e bottom-left = 0 */
+    -fx-background-radius: 12 12 0 0;
+}
+
+/* afeta TODO ContextMenu (menus de MenuButton, ContextMenu, etc.) */
+
+.menu-button.botao-listagem:showing {
+    /* top-left e top-right arredondados (22px),
+       bottom-right e bottom-left quadrados (0px) */
+    -fx-background-radius: 12 12 0 0 !important;
+    -fx-border-radius:     12 12 0 0 !important;
+}
+
+.painel-filtros-canto-quadrado {
+    -fx-background-radius: 0 10 10 10;
+    -fx-border-radius:     0 10 10 10;
+}
+
+/* realça o item sob o mouse no ComboBox */
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #6C6E70;  /* cor de fundo ao passar o mouse */
+    -fx-text-fill:    #FFFFFF;      /* texto branco */
+}
+
+/* mantém o item selecionado destacado */
+.combo-box-popup .list-view .list-cell:selected {
+    -fx-background-color: #4C4F53;  /* ou outra cor de destaque */
+    -fx-text-fill:    #F0A818;      /* texto laranja */
+}
+
+/* ─── Submenu nativo do MenuButton “Filtrar” ─── */
+.context-menu {
+  -fx-background-color: #4C4F53 !important;
+  -fx-background-radius: 8px !important;
+  -fx-background-radius: 0 12 12 12 !important;
+}
+
+/* itens “normais” sem cor de fundo (herdam o cinza do container) */
+.context-menu .menu-item {
+  -fx-background-color: transparent !important;
+  -fx-background-radius: 6px;
+}
+
+/* hover, foco ou seleção: fundo #8A8B8C */
+.context-menu .menu-item:hover,
+.context-menu .menu-item:focused,
+.context-menu .menu-item:selected {
+  -fx-background-color: #8A8B8C !important;
+  -fx-text-fill:    #F0A818 !important;
+}
+
+/* remove o ✓ dos RadioMenuItem no submenu nativo do MenuButton */
+.context-menu .radio-menu-item .radio,
+.context-menu .check-menu-item .check-mark {
+    -fx-opacity: 0 !important;       /* esconde o símbolo */
+    -fx-min-width: 0 !important;     /* elimina o espaço reservado */
+    -fx-pref-width: 0 !important;
+    -fx-max-width: 0 !important;
+}
+
+/* ─── Fundo do campo (área que mostra a marca selecionada) ─── */
+.painel-filtros .pill-field .combo-box {
+    -fx-background-color: #7890A8;
+    -fx-background-radius: 20px;
+    -fx-padding: 5px 10px;
+}
+
+/* deixa o TextField interno transparente, exibindo o fundo acima */
+.painel-filtros .pill-field .combo-box .text-field,
+.painel-filtros .pill-field .combo-box .arrow-button {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-border-width: 0;
+    -fx-text-fill:    white;    /* texto branco */
+}
+
+/* ─── Fundo da lista suspensa (popup) ─── */
+.painel-filtros .combo-box-popup .list-view {
+    -fx-background-color: #7890A8;
+    -fx-background-radius: 8px;
+    -fx-padding: 5px 0;
+}
+
+/* itens “normais” sem cor de fundo (herdam o cinza do container) */
+.painel-filtros .combo-box-popup .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill:       white;
+    -fx-font-family:     "Poppins";
+    -fx-font-size:       14px;
+}
+
+/* hover ou seleção do item na lista */
+.painel-filtros .combo-box-popup .list-cell:hover,
+.painel-filtros .combo-box-popup .list-cell:selected {
+    -fx-background-color: #8A8B8C;
+    -fx-text-fill:       white;
+}
+
+.date-picker .arrow-button .arrow {
+    -fx-opacity: 0;
+}
+
+/* 2) Aplica sua imagem no botão */
+.date-picker .arrow-button {
+    -fx-background-color: transparent;    /* preserva só o gráfico */
+    -fx-background-image: url("/icons/calendar.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-size: 24px 24px;       /* ajuste ao tamanho desejado */
+    -fx-padding: 4 4 4 4;                  /* mantém clique confortável */
+    -fx-cursor: hand;
+}
+
+.painel-filtros .date-picker {
+  -fx-pref-width: 180px;    /* ou o valor que você precisar */
+  -fx-min-width: 140px;
+  /* mantém o padding interno, mas abre espaço à direita para o ícone */
+  -fx-padding: 5px 30px 5px 10px;  /* top right bottom left */
+}
+
+/* 2) garante que o botão do calendário tenha tamanho chave para não sumir */
+/*    e não fixe posição absoluta além do seu próprio espaço */
+.painel-filtros .date-picker .arrow-button {
+  -fx-pref-width: 28px;
+  -fx-padding: 0 8px 0 0;    /* empurra o ícone um pouco para dentro */
+  -fx-opacity: 0 !important;
+  -fx-min-width: 0 !important;
+  -fx-max-width: 0 !important;
+}
+
+/* 2) Renderiza o seu ícone no fundo do DatePicker, alinhado à direita */
+/*    e ajusta o padding para não sobrepor o texto */
+.painel-filtros .date-picker {
+    -fx-background-image: url("/icons/calendar.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: right center;
+    -fx-padding: 5px 28px 5px 10px;     /* top right bottom left */
+}
+
+/* cor do texto de cada item (estado “normal”) */
+.painel-filtros .combo-box-popup .list-cell {
+  -fx-text-fill: #181848;
+}
+
+/* hover ou seleção — fundo cinza claro e texto escuro */
+.painel-filtros .combo-box-popup .list-cell:hover,
+.painel-filtros .combo-box-popup .list-cell:selected {
+  -fx-background-color: #BDBDBD;
+  -fx-text-fill:      #181848;
 }
