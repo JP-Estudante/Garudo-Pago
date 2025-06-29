@@ -162,10 +162,10 @@ public class MainView {
         return label;
     }
 
-    private VBox criarEspaçoFlexível() {
-        VBox espaço = new VBox();
-        VBox.setVgrow(espaço, Priority.ALWAYS);
-        return espaço;
+    private VBox criarEspacoFlexivel() {
+        VBox espaco = new VBox();
+        VBox.setVgrow(espaco, Priority.ALWAYS);
+        return espaco;
     }
 
     private VBox criarMenuLateral() {
@@ -192,7 +192,7 @@ public class MainView {
         secaoOutros.getStyleClass().add("menu-section");
 
         // Monta tudo
-        menuLateral.getChildren().addAll(criarLogo(), criarSeparadorLogo(), secaoListagens, secaoCadastros, secaoOutros, criarEspaçoFlexível());
+        menuLateral.getChildren().addAll(criarLogo(), criarSeparadorLogo(), secaoListagens, secaoCadastros, secaoOutros, criarEspacoFlexivel());
 
         // desabilita focus traversal
         for (Button b : List.of(btnListarFaturas, btnListarMarcas, btnArquivadas, btnNovaFatura, btnNovaMarca, btnSalvarEmail)) {
@@ -532,19 +532,19 @@ public class MainView {
         dpDataFim = new DatePicker();
         dpDataFim.setPromptText("Fim do Período");
         dpDataFim.setPrefWidth(150);
-        dpDataFim.setOnAction(e -> aplicarFiltroPeriodo());
         dpDataFim.setOnAction(e -> {
             aplicarFiltroPeriodo();
             filtroPopup.hide();
         });
+
         Label lblDataFim = new Label("Data Final");
         lblDataFim.getStyleClass().add("field-subtitle");
         VBox dataFimBox = new VBox(6, lblDataFim, dpDataFim);
         dataFimBox.getStyleClass().add("pill-field");
 
         // 1) Cria o botão
-        Button btnAplicarFiltro = new Button("Aplicar Filtro");
-        btnAplicarFiltro.getStyleClass().addAll("menu-button", "botao-listagem");
+        Button btnAplicarFiltro = new Button();
+        btnAplicarFiltro.getStyleClass().addAll("modal-button", "btn-aplicar");
 
         // 2) Cria e configura o ícone
         ImageView checkIcon = new ImageView(
@@ -556,6 +556,7 @@ public class MainView {
         btnAplicarFiltro.setGraphic(checkIcon);
         btnAplicarFiltro.setContentDisplay(ContentDisplay.LEFT);
         btnAplicarFiltro.setGraphicTextGap(8);
+        btnAplicarFiltro.setFocusTraversable(false);
 
         // 4) Action: aplica filtro e fecha o popup
         btnAplicarFiltro.setOnAction(e -> {
@@ -564,23 +565,31 @@ public class MainView {
         });
 
         // 5) Monta o HBox de datas (sem alterações)
-        HBox hboxDatas = new HBox(10, dataInicioBox, dataFimBox);
-        hboxDatas.setAlignment(Pos.CENTER_LEFT);
+        VBox dateVBox = new VBox(10, dataInicioBox, dataFimBox);
+        dateVBox.setAlignment(Pos.CENTER_LEFT);
 
-        Button btnRemoverFiltro = new Button("Remover Filtro");
-        btnRemoverFiltro.getStyleClass().addAll("menu-button", "botao-footer");
-        btnRemoverFiltro.setOnAction(e -> {
-            dpDataInicio.setValue(null);
-            dpDataFim.setValue(null);
-            mostrarTodasFaturas();
-            filtroPopup.hide();
-        });
+        Button btnCancelarFiltro = new Button();
+        btnCancelarFiltro.getStyleClass().addAll("modal-button", "btn-cancelar");
+        // ícone de cancel
+        ImageView cancelIcon = new ImageView(
+                new Image(getClass().getResourceAsStream("/icons/cancel.png"))
+        );
+        cancelIcon.setPreserveRatio(true);
+        btnCancelarFiltro.setGraphic(cancelIcon);
+        btnCancelarFiltro.setContentDisplay(ContentDisplay.LEFT);
+        btnCancelarFiltro.setGraphicTextGap(8);
+        btnCancelarFiltro.setFocusTraversable(false);
+        btnCancelarFiltro.setOnAction(e -> filtroPopup.hide());
 
-        HBox hboxBotoes = new HBox(10, btnAplicarFiltro, btnRemoverFiltro);
-        hboxBotoes.setAlignment(Pos.CENTER_LEFT);
 
-        VBox periodContent = new VBox(15, hboxDatas, hboxBotoes);
-        periodContent.getStyleClass().add("painel-filtros"); // fundo #7890A8
+        VBox buttonVBox = new VBox(10, btnAplicarFiltro, btnCancelarFiltro);
+        buttonVBox.setAlignment(Pos.CENTER_LEFT);
+
+        HBox contentHBox = new HBox(20, dateVBox, buttonVBox);
+        contentHBox.setAlignment(Pos.CENTER);
+
+        VBox periodContent = new VBox(contentHBox);
+        periodContent.getStyleClass().addAll("painel-filtros","painel-filtros-canto-quadrado");
         periodContent.setPadding(new Insets(15));
 
         // 5. Conteúdo MARCA para o Popup
@@ -600,11 +609,20 @@ public class MainView {
         });
 
         VBox marcaContent = new VBox(10, lblFiltrarMarca, cbFiltroMarca);
-        marcaContent.getStyleClass().add("painel-filtros");
+        marcaContent.getStyleClass().addAll("painel-filtros","painel-filtros-canto-quadrado");
         marcaContent.setPadding(new Insets(15));
 
         filtroPopup.setAutoHide(true);
         filtroPopup.setHideOnEscape(true);
+
+        filtroPopup.setOnShowing(evt -> {
+            btnFiltrar.getStyleClass().add("filter-open");
+            System.out.println(btnFiltrar.getStyleClass());
+        });
+        filtroPopup.setOnHiding(evt -> {
+            btnFiltrar.getStyleClass().remove("filter-open");
+            System.out.println(btnFiltrar.getStyleClass());
+        });
 
         filterTokens = new HBox(8);
         filterTokens.setAlignment(Pos.CENTER_LEFT);
@@ -815,7 +833,7 @@ public class MainView {
             ImageView cancelIcon = new ImageView(
                     new Image(getClass().getResourceAsStream("/icons/cancel.png"))
             );
-            cancelIcon.setFitHeight(12);
+            cancelIcon.setFitHeight(20);
             cancelIcon.setPreserveRatio(true);
             periodoBtn.setGraphic(cancelIcon);
             periodoBtn.setContentDisplay(ContentDisplay.RIGHT);
@@ -865,7 +883,7 @@ public class MainView {
             ImageView cancelIcon = new ImageView(
                     new Image(getClass().getResourceAsStream("/icons/cancel.png"))
             );
-            cancelIcon.setFitHeight(12);
+            cancelIcon.setFitHeight(20);
             cancelIcon.setPreserveRatio(true);
             marcaBtn.setGraphic(cancelIcon);
             marcaBtn.setContentDisplay(ContentDisplay.RIGHT);

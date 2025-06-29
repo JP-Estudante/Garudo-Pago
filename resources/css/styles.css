@@ -142,6 +142,12 @@
     -fx-border-width: 0;
 }
 
+.btn-aplicar {
+    -fx-font-size: 18px;
+}
+.btn-cancelar {
+    -fx-font-size: 18px;
+}
 
 /* ——————————————————————————— */
 /* Base compartilhada para todos os botões do menu */
@@ -265,6 +271,11 @@
 
 /* ———————————————— */
 /* Modal Button Styles */
+.modal-button {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
 .modal-button,
 .button-pill {
     -fx-background-color: #4C4F53;
@@ -277,6 +288,13 @@
 }
 .modal-button:focused,
 .button-pill:focused {
+    -fx-border-color: #C88200;
+    -fx-border-width: 2;
+    -fx-border-radius: 22;
+}
+
+.modal-button:pressed,
+.modal-button:armed {
     -fx-border-color: #C88200;
     -fx-border-width: 2;
     -fx-border-radius: 22;
@@ -507,4 +525,28 @@
 .text-area-pill .content {
     -fx-background-color: #BDBDBD;
     -fx-padding: 10px;
+}
+
+.menu-button.botao-listagem.filter-open {
+    /* top-left e top-right = 22px, bottom-right e bottom-left = 0 */
+    -fx-background-radius: 12 12 0 0;
+}
+
+/* afeta TODO ContextMenu (menus de MenuButton, ContextMenu, etc.) */
+.context-menu {
+    /* top-left e top-right = 0 (quadrados),
+       bottom-right e bottom-left = 8px (arredondados) */
+    -fx-background-radius: 0 12 12 12 !important;
+}
+
+.menu-button.botao-listagem:showing {
+    /* top-left e top-right arredondados (22px),
+       bottom-right e bottom-left quadrados (0px) */
+    -fx-background-radius: 12 12 0 0 !important;
+    -fx-border-radius:     12 12 0 0 !important;
+}
+
+.painel-filtros-canto-quadrado {
+    -fx-background-radius: 0 10 10 10;
+    -fx-border-radius:     0 10 10 10;
 }

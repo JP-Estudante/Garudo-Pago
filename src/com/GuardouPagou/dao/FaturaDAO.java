@@ -132,8 +132,7 @@ public class FaturaDAO {
                 .collect(Collectors.joining(","));
 
         // 2) SQL com IN-list dinâmica
-        String sql = ""
-                + "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, "
+        String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, "
                 + "       f.vencimento, f.valor, f.status, "
                 + "       m.nome AS marca, m.cor AS marca_cor "
                 + "FROM faturas f "
