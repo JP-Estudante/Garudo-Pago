@@ -493,7 +493,7 @@ public class MainView {
         // 3. MenuButton Filtrar
         filtroToggleGroup = new ToggleGroup();
         miFiltrarPeriodo = new RadioMenuItem("Filtrar por Período");
-        miFiltrarMarca   = new RadioMenuItem("Filtrar por Marca");
+        miFiltrarMarca = new RadioMenuItem("Filtrar por Marca");
         miFiltrarPeriodo.setToggleGroup(filtroToggleGroup);
         miFiltrarMarca.setToggleGroup(filtroToggleGroup);
 
@@ -501,7 +501,7 @@ public class MainView {
         filterIcon.setFitHeight(22);
         filterIcon.setPreserveRatio(true);
         btnFiltrar = new MenuButton("Filtrar", filterIcon, miFiltrarPeriodo, miFiltrarMarca);
-        btnFiltrar.getStyleClass().addAll("menu-button","botao-listagem");
+        btnFiltrar.getStyleClass().addAll("menu-button", "botao-listagem");
         btnFiltrar.setContentDisplay(ContentDisplay.LEFT);
         btnFiltrar.setGraphicTextGap(10);
 
@@ -527,25 +527,41 @@ public class MainView {
         VBox dataFimBox = new VBox(6, lblDataFim, dpDataFim);
         dataFimBox.getStyleClass().add("pill-field");
 
-        HBox hboxDatas = new HBox(10, dataInicioBox, dataFimBox);
-        hboxDatas.setAlignment(Pos.CENTER_LEFT);
+        // 1) Cria o botão
+        Button btnAplicarFiltro = new Button("Aplicar Filtro");
+        btnAplicarFiltro.getStyleClass().addAll("menu-button", "botao-listagem");
 
-        Button btnAplicar = new Button("Aplicar Filtro");
-        btnAplicar.getStyleClass().addAll("menu-button","botao-listagem");
-        btnAplicar.setOnAction(e -> {
+       // 2) Cria e configura o ícone
+        ImageView checkIcon = new ImageView(
+                new Image(getClass().getResourceAsStream("/icons/check.png"))
+        );
+        checkIcon.setPreserveRatio(true);
+
+        // 3) Aplica o ícone ao botão
+        btnAplicarFiltro.setGraphic(checkIcon);
+        btnAplicarFiltro.setContentDisplay(ContentDisplay.LEFT);
+        btnAplicarFiltro.setGraphicTextGap(8);
+
+        // 4) Action: aplica filtro e fecha o popup
+        btnAplicarFiltro.setOnAction(e -> {
             aplicarFiltroPeriodo();
             filtroPopup.hide();
         });
-        Button btnRemover = new Button("Remover Filtro");
-        btnRemover.getStyleClass().addAll("menu-button","botao-footer");
-        btnRemover.setOnAction(e -> {
+
+        // 5) Monta o HBox de datas (sem alterações)
+        HBox hboxDatas = new HBox(10, dataInicioBox, dataFimBox);
+        hboxDatas.setAlignment(Pos.CENTER_LEFT);
+
+        Button btnRemoverFiltro = new Button("Remover Filtro");
+        btnRemoverFiltro.getStyleClass().addAll("menu-button", "botao-footer");
+        btnRemoverFiltro.setOnAction(e -> {
             dpDataInicio.setValue(null);
             dpDataFim.setValue(null);
             mostrarTodasFaturas();
             filtroPopup.hide();
         });
 
-        HBox hboxBotoes = new HBox(10, btnAplicar, btnRemover);
+        HBox hboxBotoes = new HBox(10, btnAplicarFiltro, btnRemoverFiltro);
         hboxBotoes.setAlignment(Pos.CENTER_LEFT);
 
         VBox periodContent = new VBox(15, hboxDatas, hboxBotoes);
@@ -558,8 +574,11 @@ public class MainView {
         ComboBox<Marca> cbFiltroMarca = new ComboBox<>();
         cbFiltroMarca.setPromptText("Selecione uma marca");
         cbFiltroMarca.setPrefWidth(200);
-        try { cbFiltroMarca.setItems(new MarcaDAO().listarMarcas()); }
-        catch(SQLException ex){ ex.printStackTrace(); }
+        try {
+            cbFiltroMarca.setItems(new MarcaDAO().listarMarcas());
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
         cbFiltroMarca.setOnAction(e -> {
             aplicarFiltroMarca();
             filtroPopup.hide();
@@ -587,7 +606,7 @@ public class MainView {
 
         // 8. Toolbar e tabela
         Button btnAtualizar = new Button("Atualizar");
-        btnAtualizar.getStyleClass().addAll("menu-button","botao-listagem");
+        btnAtualizar.getStyleClass().addAll("menu-button", "botao-listagem");
         btnAtualizar.setOnAction(e -> atualizarListaFaturas());
         HBox esp = new HBox();
         HBox.setHgrow(esp, Priority.ALWAYS);
