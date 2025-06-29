@@ -7,6 +7,7 @@ import com.GuardouPagou.dao.NotaFiscalDAO;
 import com.GuardouPagou.models.Fatura;
 import com.GuardouPagou.models.Marca;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -18,7 +19,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.control.ContentDisplay;
+import javafx.stage.Popup;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -42,6 +43,7 @@ public class MainView {
     private VBox filtroContainer;
     private ComboBox<Marca> cbFiltroMarca;
     private ObservableList<Marca> cacheMarcas;
+    private final Popup filtroPopup = new Popup();
 
     public MainView() {
         criarUI();
@@ -158,50 +160,28 @@ public class MainView {
 
         // Botões principais
         btnListarFaturas = criarBotao("Listar Faturas", "/icons/list.png", "botao-listagem");
-        btnListarMarcas   = criarBotao("Listar Marcas",   "/icons/list.png", "botao-listagem");
-        btnArquivadas     = criarBotao("Arquivadas",      "/icons/archive.png", "botao-listagem");
-        btnNovaFatura     = criarBotao("Cadastrar Faturas","/icons/plus.png", "botao-cadastro");
-        btnNovaMarca      = criarBotao("Cadastrar Marca", "/icons/plus.png", "botao-cadastro");
+        btnListarMarcas = criarBotao("Listar Marcas", "/icons/list.png", "botao-listagem");
+        btnArquivadas = criarBotao("Arquivadas", "/icons/archive.png", "botao-listagem");
+        btnNovaFatura = criarBotao("Cadastrar Faturas", "/icons/plus.png", "botao-cadastro");
+        btnNovaMarca = criarBotao("Cadastrar Marca", "/icons/plus.png", "botao-cadastro");
 
         // Seções
-        VBox secaoListagens = new VBox(
-                criarTitulo("Principais Listagens"),
-                btnListarFaturas,
-                btnListarMarcas,
-                btnArquivadas
-        );
+        VBox secaoListagens = new VBox(criarTitulo("Principais Listagens"), btnListarFaturas, btnListarMarcas, btnArquivadas);
         secaoListagens.getStyleClass().add("menu-section");
 
-        VBox secaoCadastros = new VBox(
-                criarTitulo("Novos Cadastros"),
-                btnNovaFatura,
-                btnNovaMarca
-        );
+        VBox secaoCadastros = new VBox(criarTitulo("Novos Cadastros"), btnNovaFatura, btnNovaMarca);
         secaoCadastros.getStyleClass().add("menu-section");
 
         btnSalvarEmail = criarBotao("E-mails de Alerta", "/icons/campaing.png", "botao-listagem");
         btnSalvarEmail.setPrefWidth(220);
-        VBox secaoOutros = new VBox(
-                criarTitulo("Outros"),
-                btnSalvarEmail
-        );
+        VBox secaoOutros = new VBox(criarTitulo("Outros"), btnSalvarEmail);
         secaoOutros.getStyleClass().add("menu-section");
 
         // Monta tudo
-        menuLateral.getChildren().addAll(
-                criarLogo(),
-                criarSeparadorLogo(),
-                secaoListagens,
-                secaoCadastros,
-                secaoOutros,
-                criarEspaçoFlexível()
-        );
+        menuLateral.getChildren().addAll(criarLogo(), criarSeparadorLogo(), secaoListagens, secaoCadastros, secaoOutros, criarEspaçoFlexível());
 
         // desabilita focus traversal
-        for (Button b : List.of(
-                btnListarFaturas, btnListarMarcas, btnArquivadas,
-                btnNovaFatura, btnNovaMarca, btnSalvarEmail
-        )) {
+        for (Button b : List.of(btnListarFaturas, btnListarMarcas, btnArquivadas, btnNovaFatura, btnNovaMarca, btnSalvarEmail)) {
             b.setFocusTraversable(false);
         }
 
@@ -215,7 +195,7 @@ public class MainView {
         // 2) monta os filtros / toolbar (se quiser manter)
         HBox toolbar = new HBox(12, btnFiltrar, new Button("Atualizar"));
         toolbar.setAlignment(Pos.CENTER_RIGHT);
-        ((Button)toolbar.getChildren().get(1)).setOnAction(e -> atualizarListaFaturas());
+        ((Button) toolbar.getChildren().get(1)).setOnAction(e -> atualizarListaFaturas());
         HBox.setHgrow(btnFiltrar, Priority.ALWAYS);
         btnFiltrar.setMaxWidth(Double.MAX_VALUE);
 
@@ -286,7 +266,8 @@ public class MainView {
             protected void updateItem(Integer ordem, boolean empty) {
                 super.updateItem(ordem, empty);
                 if (empty || ordem == null) {
-                    setText(null); setStyle("");
+                    setText(null);
+                    setStyle("");
                 } else {
                     setText(ordem.toString());
                     setTextFill(Color.WHITE);
@@ -301,11 +282,13 @@ public class MainView {
         colunaVencimento.setCellValueFactory(new PropertyValueFactory<>("vencimento"));
         colunaVencimento.setCellFactory(col -> new TableCell<>() {
             private final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
             @Override
             protected void updateItem(LocalDate venc, boolean empty) {
                 super.updateItem(venc, empty);
                 if (empty || venc == null) {
-                    setText(null); setStyle("");
+                    setText(null);
+                    setStyle("");
                 } else {
                     setText(venc.format(fmt));
                     setTextFill(Color.WHITE);
@@ -343,7 +326,8 @@ public class MainView {
             protected void updateItem(String status, boolean empty) {
                 super.updateItem(status, empty);
                 if (empty || status == null) {
-                    setText(null); setStyle("");
+                    setText(null);
+                    setStyle("");
                 } else {
                     setText(status);
                     if ("Vencida".equalsIgnoreCase(status)) {
@@ -361,6 +345,7 @@ public class MainView {
         TableColumn<Fatura, Void> colunaAcoes = new TableColumn<>("Ações");
         colunaAcoes.setCellFactory(col -> new TableCell<>() {
             private final Button btnEmitida = new Button("Emitida");
+
             {
                 btnEmitida.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5px;");
                 btnEmitida.setOnAction(evt -> {
@@ -368,6 +353,7 @@ public class MainView {
                     marcarFaturaComoEmitida(f);
                 });
             }
+
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
@@ -388,9 +374,7 @@ public class MainView {
         colunaAcoes.setPrefWidth(100);
 
         // Adiciona as colunas e os itens à tabela
-        tabela.getColumns().setAll(colunaId, colunaNumeroNota, colunaOrdem,
-                colunaVencimento, colunaMarca,
-                colunaStatus, colunaAcoes);
+        tabela.getColumns().setAll(colunaId, colunaNumeroNota, colunaOrdem, colunaVencimento, colunaMarca, colunaStatus, colunaAcoes);
         tabela.setItems(faturas);
 
         return tabela;
@@ -401,9 +385,7 @@ public class MainView {
         // 1) Cria e estiliza a TableView
         TableView<Marca> tabela = new TableView<>();
         ViewUtils.aplicarEstiloPadrao(tabela);
-        tabela.setColumnResizePolicy(
-                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
-        );
+        tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         // 2) Coluna ID
         TableColumn<Marca, Integer> colunaId = new TableColumn<>("ID");
@@ -419,11 +401,7 @@ public class MainView {
                 } else {
                     setText(id.toString());
                     setTextFill(Color.WHITE);
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-font-weight: bold; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
+                    setStyle("-fx-background-color: transparent; " + "-fx-font-weight: bold; " + "-fx-alignment: CENTER-LEFT;");
                 }
             }
         });
@@ -442,20 +420,13 @@ public class MainView {
                 } else {
                     setText(nome);
                     // pega a cor cadastrada na Marca
-                    String cor = getTableView()
-                            .getItems()
-                            .get(getIndex())
-                            .getCor(); // ex: "#FF0000"
+                    String cor = getTableView().getItems().get(getIndex()).getCor(); // ex: "#FF0000"
                     if (cor != null && cor.matches("#[0-9A-Fa-f]{6}")) {
                         setTextFill(Color.web(cor));
                     } else {
                         setTextFill(Color.WHITE);
                     }
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-font-weight: bold; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
+                    setStyle("-fx-background-color: transparent; " + "-fx-font-weight: bold; " + "-fx-alignment: CENTER-LEFT;");
                 }
             }
         });
@@ -474,17 +445,11 @@ public class MainView {
                 } else if (desc == null || desc.isBlank()) {
                     setText("Nenhuma descrição adicionada");
                     setTextFill(Color.WHITE);
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
+                    setStyle("-fx-background-color: transparent; " + "-fx-alignment: CENTER-LEFT;");
                 } else {
                     setText(desc);
                     setTextFill(Color.WHITE);
-                    setStyle(
-                            "-fx-background-color: transparent; " +
-                                    "-fx-alignment: CENTER-LEFT;"
-                    );
+                    setStyle("-fx-background-color: transparent; " + "-fx-alignment: CENTER-LEFT;");
                 }
             }
         });
@@ -515,20 +480,20 @@ public class MainView {
 
     // MÉTODO criarViewFaturas - ADICIONADO E CORRIGIDO
     public Node criarViewFaturas(ObservableList<Fatura> faturas) {
-        // 1. CRIA UM CONTAINER NOVO E LIMPO PARA A TELA
+        // 1. Container principal
         VBox container = new VBox(18);
         container.setPadding(new Insets(20));
         container.setStyle("-fx-background-color: #BDBDBD;");
 
-        // 2. CRIA O TÍTULO DA TELA
+        // 2. Título
         Label titulo = new Label("LISTAGEM DE FATURAS");
         titulo.getStyleClass().add("h5");
         titulo.setTextFill(Color.web("#F0A818"));
 
-        // 3. INICIALIZA OS COMPONENTES DE FILTRO
-        if (filtroToggleGroup == null) filtroToggleGroup = new ToggleGroup();
+        // 3. MenuButton Filtrar
+        filtroToggleGroup = new ToggleGroup();
         miFiltrarPeriodo = new RadioMenuItem("Filtrar por Período");
-        miFiltrarMarca = new RadioMenuItem("Filtrar por Marca");
+        miFiltrarMarca   = new RadioMenuItem("Filtrar por Marca");
         miFiltrarPeriodo.setToggleGroup(filtroToggleGroup);
         miFiltrarMarca.setToggleGroup(filtroToggleGroup);
 
@@ -536,115 +501,104 @@ public class MainView {
         filterIcon.setFitHeight(22);
         filterIcon.setPreserveRatio(true);
         btnFiltrar = new MenuButton("Filtrar", filterIcon, miFiltrarPeriodo, miFiltrarMarca);
-        btnFiltrar.getStyleClass().addAll("menu-button", "botao-listagem");
+        btnFiltrar.getStyleClass().addAll("menu-button","botao-listagem");
         btnFiltrar.setContentDisplay(ContentDisplay.LEFT);
         btnFiltrar.setGraphicTextGap(10);
 
-        // Componentes do filtro de PERÍODO
+        // 4. Conteúdo PERÍODO para o Popup
         dpDataInicio = new DatePicker();
         dpDataInicio.setPromptText("Início do Período");
         dpDataInicio.setPrefWidth(150);
+        Label lblDataInicio = new Label("Data Inicial");
+        lblDataInicio.getStyleClass().add("field-subtitle");
+        VBox dataInicioBox = new VBox(6, lblDataInicio, dpDataInicio);
+        dataInicioBox.getStyleClass().add("pill-field");
+
         dpDataFim = new DatePicker();
         dpDataFim.setPromptText("Fim do Período");
         dpDataFim.setPrefWidth(150);
-        btnAplicarFiltro = new Button("Aplicar Filtro");
-        btnAplicarFiltro.getStyleClass().addAll("menu-button", "botao-listagem");
-        btnAplicarFiltro.setOnAction(e -> aplicarFiltroPeriodo());
-        btnAplicarFiltro.setFocusTraversable(false);
-        btnRemoverFiltro = new Button("Remover Filtro");
-        btnRemoverFiltro.getStyleClass().addAll("menu-button", "botao-footer");
-        btnRemoverFiltro.setOnAction(e -> {
+        dpDataFim.setOnAction(e -> aplicarFiltroPeriodo());
+        dpDataFim.setOnAction(e -> {
+            aplicarFiltroPeriodo();
+            filtroPopup.hide();
+        });
+        Label lblDataFim = new Label("Data Final");
+        lblDataFim.getStyleClass().add("field-subtitle");
+        VBox dataFimBox = new VBox(6, lblDataFim, dpDataFim);
+        dataFimBox.getStyleClass().add("pill-field");
+
+        HBox hboxDatas = new HBox(10, dataInicioBox, dataFimBox);
+        hboxDatas.setAlignment(Pos.CENTER_LEFT);
+
+        Button btnAplicar = new Button("Aplicar Filtro");
+        btnAplicar.getStyleClass().addAll("menu-button","botao-listagem");
+        btnAplicar.setOnAction(e -> {
+            aplicarFiltroPeriodo();
+            filtroPopup.hide();
+        });
+        Button btnRemover = new Button("Remover Filtro");
+        btnRemover.getStyleClass().addAll("menu-button","botao-footer");
+        btnRemover.setOnAction(e -> {
             dpDataInicio.setValue(null);
             dpDataFim.setValue(null);
             mostrarTodasFaturas();
+            filtroPopup.hide();
         });
 
-        // Sub-container para o filtro de período
-        HBox linhaDataInicio = new HBox(6, new Label("De:   "), dpDataInicio);
-        linhaDataInicio.setAlignment(Pos.CENTER_LEFT);
+        HBox hboxBotoes = new HBox(10, btnAplicar, btnRemover);
+        hboxBotoes.setAlignment(Pos.CENTER_LEFT);
 
-        HBox linhaDataFim = new HBox(6, new Label("Até: "), dpDataFim);
-        linhaDataFim.setAlignment(Pos.CENTER_LEFT);
+        VBox periodContent = new VBox(15, hboxDatas, hboxBotoes);
+        periodContent.getStyleClass().add("painel-filtros"); // fundo #7890A8
+        periodContent.setPadding(new Insets(15));
 
-        VBox filtroDePeriodoContainer = new VBox(10, // Espaçamento vertical de 10px
-                linhaDataInicio,
-                linhaDataFim,
-                new HBox(10, btnAplicarFiltro, btnRemoverFiltro)
-        );
-        filtroDePeriodoContainer.setPadding(new Insets(8));
-        filtroDePeriodoContainer.setVisible(false); // Começa invisível
-        filtroDePeriodoContainer.setManaged(false); // E sem ocupar espaço
-
-        // Componente do filtro de MARCA
-        cbFiltroMarca = new ComboBox<>();
-        cbFiltroMarca.setPromptText("Selecione a Marca");
+        // 5. Conteúdo MARCA para o Popup
+        Label lblFiltrarMarca = new Label("Filtrar por Marca:");
+        lblFiltrarMarca.getStyleClass().add("field-subtitle");
+        ComboBox<Marca> cbFiltroMarca = new ComboBox<>();
+        cbFiltroMarca.setPromptText("Selecione uma marca");
         cbFiltroMarca.setPrefWidth(200);
-        cbFiltroMarca.setVisible(false);
-        cbFiltroMarca.setManaged(false);
-        try {
-            ObservableList<Marca> cacheMarcas = null;
-            if (cacheMarcas == null) {
-                cacheMarcas = new MarcaDAO().listarMarcas();
-            }
-            cbFiltroMarca.setItems(cacheMarcas);
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        cbFiltroMarca.setOnAction(e -> aplicarFiltroMarca());
+        try { cbFiltroMarca.setItems(new MarcaDAO().listarMarcas()); }
+        catch(SQLException ex){ ex.printStackTrace(); }
+        cbFiltroMarca.setOnAction(e -> {
+            aplicarFiltroMarca();
+            filtroPopup.hide();
+        });
 
-        // 4. AGRUPA TODOS OS FILTROS EM UM ÚNICO PAINEL ESTILIZÁVEL
-        VBox painelDeFiltros = new VBox(10);
-        painelDeFiltros.getStyleClass().add("painel-filtros");
-        painelDeFiltros.getChildren().addAll(filtroDePeriodoContainer, cbFiltroMarca);
+        VBox marcaContent = new VBox(10, lblFiltrarMarca, cbFiltroMarca);
+        marcaContent.getStyleClass().add("painel-filtros");
+        marcaContent.setPadding(new Insets(15));
 
-        painelDeFiltros.setFillWidth(false);
+        // 6. Configura Popup (uma vez só)
+        filtroPopup.setAutoHide(true);
+        filtroPopup.setHideOnEscape(true);
 
-        painelDeFiltros.setMaxWidth(Region.USE_PREF_SIZE);
-        painelDeFiltros.setMinWidth(Region.USE_PREF_SIZE);
-
-        painelDeFiltros.setVisible(false);
-        painelDeFiltros.setManaged(false);
-
-        // 5. CONFIGURA OS LISTENERS PARA MOSTRAR/ESCONDER OS FILTROS
+        // 7. Event handlers do MenuButton
         miFiltrarPeriodo.setOnAction(e -> {
-            painelDeFiltros.setVisible(true);
-            painelDeFiltros.setManaged(true);
-            filtroDePeriodoContainer.setVisible(true);
-            filtroDePeriodoContainer.setManaged(true);
-            cbFiltroMarca.setVisible(false);
-            cbFiltroMarca.setManaged(false);
+            filtroPopup.getContent().setAll(periodContent);
+            Bounds b = btnFiltrar.localToScreen(btnFiltrar.getBoundsInLocal());
+            filtroPopup.show(btnFiltrar.getScene().getWindow(), b.getMinX(), b.getMaxY());
         });
         miFiltrarMarca.setOnAction(e -> {
-            painelDeFiltros.setVisible(true);
-            painelDeFiltros.setManaged(true);
-            filtroDePeriodoContainer.setVisible(false);
-            filtroDePeriodoContainer.setManaged(false);
-            cbFiltroMarca.setVisible(true);
-            cbFiltroMarca.setManaged(true);
+            filtroPopup.getContent().setAll(marcaContent);
+            Bounds b = btnFiltrar.localToScreen(btnFiltrar.getBoundsInLocal());
+            filtroPopup.show(btnFiltrar.getScene().getWindow(), b.getMinX(), b.getMaxY());
         });
 
-        // 6. MONTA A BARRA DE FERRAMENTAS (TOOLBAR)
+        // 8. Toolbar e tabela
         Button btnAtualizar = new Button("Atualizar");
-        btnAtualizar.getStyleClass().addAll("menu-button", "botao-listagem");
+        btnAtualizar.getStyleClass().addAll("menu-button","botao-listagem");
         btnAtualizar.setOnAction(e -> atualizarListaFaturas());
-        HBox espacador = new HBox();
-        HBox.setHgrow(espacador, Priority.ALWAYS);
-        HBox toolbar = new HBox(12, btnFiltrar, espacador, btnAtualizar);
+        HBox esp = new HBox();
+        HBox.setHgrow(esp, Priority.ALWAYS);
+        HBox toolbar = new HBox(12, btnFiltrar, esp, btnAtualizar);
         toolbar.setAlignment(Pos.CENTER_LEFT);
 
-        // 7. CRIA A TABELA DE FATURAS
-        TableView<Fatura> tabelaFaturas = criarTabelaFaturas(faturas);
-        VBox.setVgrow(tabelaFaturas, Priority.ALWAYS);
+        TableView<Fatura> tabela = criarTabelaFaturas(faturas);
+        VBox.setVgrow(tabela, Priority.ALWAYS);
 
-        // 8. MONTA A TELA FINAL NO CONTAINER PRINCIPAL
-        container.getChildren().addAll(
-                titulo,
-                toolbar,
-                painelDeFiltros,
-                tabelaFaturas
-        );
-
-        // 9. RETORNA A TELA COMPLETA E PRONTA
+        // 9. Monta a cena
+        container.getChildren().addAll(titulo, toolbar, tabela);
         return container;
     }
 
