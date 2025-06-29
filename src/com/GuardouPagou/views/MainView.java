@@ -508,11 +508,13 @@ public class MainView {
         // 3. MenuButton Filtrar
         filtroToggleGroup = new ToggleGroup();
         miFiltrarPeriodo = new RadioMenuItem("Filtrar por Período");
-        miFiltrarMarca = new RadioMenuItem("Filtrar por Marca");
+        miFiltrarMarca   = new RadioMenuItem("Filtrar por Marca");
         miFiltrarPeriodo.setToggleGroup(filtroToggleGroup);
         miFiltrarMarca.setToggleGroup(filtroToggleGroup);
 
-        ImageView filterIcon = new ImageView(getClass().getResource("/icons/filter_list.png").toExternalForm());
+        ImageView filterIcon = new ImageView(
+                new Image(getClass().getResourceAsStream("/icons/filter_list.png"))
+        );
         filterIcon.setFitHeight(22);
         filterIcon.setPreserveRatio(true);
         btnFiltrar = new MenuButton("Filtrar", filterIcon, miFiltrarPeriodo, miFiltrarMarca);
@@ -520,7 +522,7 @@ public class MainView {
         btnFiltrar.setContentDisplay(ContentDisplay.LEFT);
         btnFiltrar.setGraphicTextGap(10);
 
-        // 4. Conteúdo PERÍODO para o Popup
+        // ─── Conteúdo PERÍODO para o Popup ───
         dpDataInicio = new DatePicker();
         dpDataInicio.setPromptText("Início do Período");
         dpDataInicio.setPrefWidth(150);
@@ -536,55 +538,42 @@ public class MainView {
             aplicarFiltroPeriodo();
             filtroPopup.hide();
         });
-
         Label lblDataFim = new Label("Data Final");
         lblDataFim.getStyleClass().add("field-subtitle");
         VBox dataFimBox = new VBox(6, lblDataFim, dpDataFim);
         dataFimBox.getStyleClass().add("pill-field");
 
-        // 1) Cria o botão
+        // Botões “Aplicar” e “Cancelar” (só ícone)
         Button btnAplicarFiltro = new Button();
         btnAplicarFiltro.getStyleClass().addAll("modal-button", "btn-aplicar");
-
-        // 2) Cria e configura o ícone
         ImageView checkIcon = new ImageView(
                 new Image(getClass().getResourceAsStream("/icons/check.png"))
         );
         checkIcon.setPreserveRatio(true);
-
-        // 3) Aplica o ícone ao botão
         btnAplicarFiltro.setGraphic(checkIcon);
-        btnAplicarFiltro.setContentDisplay(ContentDisplay.LEFT);
-        btnAplicarFiltro.setGraphicTextGap(8);
         btnAplicarFiltro.setFocusTraversable(false);
-
-        // 4) Action: aplica filtro e fecha o popup
+        btnAplicarFiltro.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         btnAplicarFiltro.setOnAction(e -> {
             aplicarFiltroPeriodo();
             filtroPopup.hide();
         });
 
-        // 5) Monta o HBox de datas (sem alterações)
-        VBox dateVBox = new VBox(10, dataInicioBox, dataFimBox);
-        dateVBox.setAlignment(Pos.CENTER_LEFT);
-
         Button btnCancelarFiltro = new Button();
         btnCancelarFiltro.getStyleClass().addAll("modal-button", "btn-cancelar");
-        // ícone de cancel
         ImageView cancelIcon = new ImageView(
                 new Image(getClass().getResourceAsStream("/icons/cancel.png"))
         );
         cancelIcon.setPreserveRatio(true);
         btnCancelarFiltro.setGraphic(cancelIcon);
-        btnCancelarFiltro.setContentDisplay(ContentDisplay.LEFT);
-        btnCancelarFiltro.setGraphicTextGap(8);
         btnCancelarFiltro.setFocusTraversable(false);
+        btnCancelarFiltro.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         btnCancelarFiltro.setOnAction(e -> filtroPopup.hide());
 
-
+        // Layout do período: datas empilhadas + botões empilhados, tudo centralizado
+        VBox dateVBox   = new VBox(10, dataInicioBox, dataFimBox);
+        dateVBox.setAlignment(Pos.CENTER_LEFT);
         VBox buttonVBox = new VBox(10, btnAplicarFiltro, btnCancelarFiltro);
         buttonVBox.setAlignment(Pos.CENTER_LEFT);
-
         HBox contentHBox = new HBox(20, dateVBox, buttonVBox);
         contentHBox.setAlignment(Pos.CENTER);
 
@@ -592,10 +581,10 @@ public class MainView {
         periodContent.getStyleClass().addAll("painel-filtros","painel-filtros-canto-quadrado");
         periodContent.setPadding(new Insets(15));
 
-        // 5. Conteúdo MARCA para o Popup
+        // ─── Conteúdo MARCA para o Popup ───
         Label lblFiltrarMarca = new Label("Filtrar por Marca:");
         lblFiltrarMarca.getStyleClass().add("field-subtitle");
-        ComboBox<Marca> cbFiltroMarca = new ComboBox<>();
+        cbFiltroMarca = new ComboBox<>();
         cbFiltroMarca.setPromptText("Selecione uma marca");
         cbFiltroMarca.setPrefWidth(200);
         try {
@@ -608,27 +597,30 @@ public class MainView {
             filtroPopup.hide();
         });
 
-        VBox marcaContent = new VBox(10, lblFiltrarMarca, cbFiltroMarca);
+        // aplica mesmo estilo “pill” dos DatePickers
+        VBox marcaBox = new VBox(6, lblFiltrarMarca, cbFiltroMarca);
+        marcaBox.getStyleClass().add("pill-field");
+
+        VBox marcaContent = new VBox(marcaBox);
         marcaContent.getStyleClass().addAll("painel-filtros","painel-filtros-canto-quadrado");
         marcaContent.setPadding(new Insets(15));
 
+        // ─── Configura o Popup ───
         filtroPopup.setAutoHide(true);
         filtroPopup.setHideOnEscape(true);
+        filtroPopup.setOnShowing(evt ->
+                btnFiltrar.getStyleClass().add("filter-open")
+        );
+        filtroPopup.setOnHiding(evt ->
+                btnFiltrar.getStyleClass().remove("filter-open")
+        );
 
-        filtroPopup.setOnShowing(evt -> {
-            btnFiltrar.getStyleClass().add("filter-open");
-            System.out.println(btnFiltrar.getStyleClass());
-        });
-        filtroPopup.setOnHiding(evt -> {
-            btnFiltrar.getStyleClass().remove("filter-open");
-            System.out.println(btnFiltrar.getStyleClass());
-        });
-
+        // Container de tokens (filtros ativos)
         filterTokens = new HBox(8);
         filterTokens.setAlignment(Pos.CENTER_LEFT);
-        filterTokens.setPadding(new Insets(0, 0, 0, 10));
+        filterTokens.setPadding(new Insets(0,0,0,10));
 
-        // Event handlers do MenuButton
+        // Handlers do MenuButton
         miFiltrarPeriodo.setOnAction(e -> {
             filtroPopup.getContent().setAll(periodContent);
             Bounds b = btnFiltrar.localToScreen(btnFiltrar.getBoundsInLocal());
@@ -640,19 +632,21 @@ public class MainView {
             filtroPopup.show(btnFiltrar.getScene().getWindow(), b.getMinX(), b.getMaxY());
         });
 
-        // Toolbar e tabela
+        // ─── Monta toolbar e tabela ───
         Button btnAtualizar = new Button("Atualizar");
-        btnAtualizar.getStyleClass().addAll("menu-button", "botao-listagem");
+        btnAtualizar.getStyleClass().addAll("menu-button","botao-listagem");
         btnAtualizar.setOnAction(e -> atualizarListaFaturas());
+
         HBox espacador = new HBox();
         HBox.setHgrow(espacador, Priority.ALWAYS);
+
         HBox toolbar = new HBox(12, btnFiltrar, filterTokens, espacador, btnAtualizar);
         toolbar.setAlignment(Pos.CENTER_LEFT);
 
         this.tabelaFaturas = criarTabelaFaturas(faturas);
         VBox.setVgrow(this.tabelaFaturas, Priority.ALWAYS);
 
-        // Monta a cena usando o campo
+        // 6. Adiciona tudo ao container principal
         container.getChildren().addAll(titulo, toolbar, this.tabelaFaturas);
         return container;
     }

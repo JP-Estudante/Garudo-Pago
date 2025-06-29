@@ -68,6 +68,23 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 8,0,0,2);
 }
 
+/* Submenu nativo do btnFiltrar: itens sem cor por padrão */
+.menu-button.botao-listagem .open > .menu .menu-item {
+    -fx-background-color: transparent;   /* mostra o fundo #4C4F53 do container */
+}
+
+/* Hover ou foco numa opção: fundo #8A8B8C */
+.menu-button.botao-listagem .open > .menu .menu-item:hover,
+.menu-button.botao-listagem .open > .menu .menu-item:focused {
+    -fx-background-color: #8A8B8C;
+}
+
+/* Seleção via teclado também fica com a mesma cor */
+.menu-button.botao-listagem .open > .menu .menu-item:selected {
+    -fx-background-color: #8A8B8C;
+}
+
+
 /* Cada opção do menu */
 .menu-button .menu-item {
     -fx-padding: 8 20 8 20;
@@ -88,12 +105,6 @@
   -fx-alignment: CENTER_LEFT;
   -fx-min-height: 49px;
   -fx-pref-height: 49px;
-}
-
-/* Hover nos itens */
-.menu-button .menu-item:hover {
-    -fx-background-color: #6C6E70;
-    -fx-text-fill:       #FFFFFF;
 }
 
 /* Marca de seleção mais discreta */
@@ -533,11 +544,6 @@
 }
 
 /* afeta TODO ContextMenu (menus de MenuButton, ContextMenu, etc.) */
-.context-menu {
-    /* top-left e top-right = 0 (quadrados),
-       bottom-right e bottom-left = 8px (arredondados) */
-    -fx-background-radius: 0 12 12 12 !important;
-}
 
 .menu-button.botao-listagem:showing {
     /* top-left e top-right arredondados (22px),
@@ -549,4 +555,46 @@
 .painel-filtros-canto-quadrado {
     -fx-background-radius: 0 10 10 10;
     -fx-border-radius:     0 10 10 10;
+}
+
+/* realça o item sob o mouse no ComboBox */
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #6C6E70;  /* cor de fundo ao passar o mouse */
+    -fx-text-fill:    #FFFFFF;      /* texto branco */
+}
+
+/* mantém o item selecionado destacado */
+.combo-box-popup .list-view .list-cell:selected {
+    -fx-background-color: #4C4F53;  /* ou outra cor de destaque */
+    -fx-text-fill:    #F0A818;      /* texto laranja */
+}
+
+/* ─── Submenu nativo do MenuButton “Filtrar” ─── */
+.context-menu {
+  -fx-background-color: #4C4F53 !important;
+  -fx-background-radius: 8px !important;
+  -fx-background-radius: 0 12 12 12 !important;
+}
+
+/* itens “normais” sem cor de fundo (herdam o cinza do container) */
+.context-menu .menu-item {
+  -fx-background-color: transparent !important;
+  -fx-background-radius: 6px;
+}
+
+/* hover, foco ou seleção: fundo #8A8B8C */
+.context-menu .menu-item:hover,
+.context-menu .menu-item:focused,
+.context-menu .menu-item:selected {
+  -fx-background-color: #8A8B8C !important;
+  -fx-text-fill:    #F0A818 !important;
+}
+
+/* remove o ✓ dos RadioMenuItem no submenu nativo do MenuButton */
+.context-menu .radio-menu-item .radio,
+.context-menu .check-menu-item .check-mark {
+    -fx-opacity: 0 !important;       /* esconde o símbolo */
+    -fx-min-width: 0 !important;     /* elimina o espaço reservado */
+    -fx-pref-width: 0 !important;
+    -fx-max-width: 0 !important;
 }
