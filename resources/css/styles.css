@@ -598,3 +598,94 @@
     -fx-pref-width: 0 !important;
     -fx-max-width: 0 !important;
 }
+
+/* ─── Fundo do campo (área que mostra a marca selecionada) ─── */
+.painel-filtros .pill-field .combo-box {
+    -fx-background-color: #7890A8;
+    -fx-background-radius: 20px;
+    -fx-padding: 5px 10px;
+}
+
+/* deixa o TextField interno transparente, exibindo o fundo acima */
+.painel-filtros .pill-field .combo-box .text-field,
+.painel-filtros .pill-field .combo-box .arrow-button {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-border-width: 0;
+    -fx-text-fill:    white;    /* texto branco */
+}
+
+/* ─── Fundo da lista suspensa (popup) ─── */
+.painel-filtros .combo-box-popup .list-view {
+    -fx-background-color: #7890A8;
+    -fx-background-radius: 8px;
+    -fx-padding: 5px 0;
+}
+
+/* itens “normais” sem cor de fundo (herdam o cinza do container) */
+.painel-filtros .combo-box-popup .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill:       white;
+    -fx-font-family:     "Poppins";
+    -fx-font-size:       14px;
+}
+
+/* hover ou seleção do item na lista */
+.painel-filtros .combo-box-popup .list-cell:hover,
+.painel-filtros .combo-box-popup .list-cell:selected {
+    -fx-background-color: #8A8B8C;
+    -fx-text-fill:       white;
+}
+
+.date-picker .arrow-button .arrow {
+    -fx-opacity: 0;
+}
+
+/* 2) Aplica sua imagem no botão */
+.date-picker .arrow-button {
+    -fx-background-color: transparent;    /* preserva só o gráfico */
+    -fx-background-image: url("/icons/calendar.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-size: 24px 24px;       /* ajuste ao tamanho desejado */
+    -fx-padding: 4 4 4 4;                  /* mantém clique confortável */
+    -fx-cursor: hand;
+}
+
+.painel-filtros .date-picker {
+  -fx-pref-width: 180px;    /* ou o valor que você precisar */
+  -fx-min-width: 140px;
+  /* mantém o padding interno, mas abre espaço à direita para o ícone */
+  -fx-padding: 5px 30px 5px 10px;  /* top right bottom left */
+}
+
+/* 2) garante que o botão do calendário tenha tamanho chave para não sumir */
+/*    e não fixe posição absoluta além do seu próprio espaço */
+.painel-filtros .date-picker .arrow-button {
+  -fx-pref-width: 28px;
+  -fx-padding: 0 8px 0 0;    /* empurra o ícone um pouco para dentro */
+  -fx-opacity: 0 !important;
+  -fx-min-width: 0 !important;
+  -fx-max-width: 0 !important;
+}
+
+/* 2) Renderiza o seu ícone no fundo do DatePicker, alinhado à direita */
+/*    e ajusta o padding para não sobrepor o texto */
+.painel-filtros .date-picker {
+    -fx-background-image: url("/icons/calendar.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: right center;
+    -fx-padding: 5px 28px 5px 10px;     /* top right bottom left */
+}
+
+/* cor do texto de cada item (estado “normal”) */
+.painel-filtros .combo-box-popup .list-cell {
+  -fx-text-fill: #181848;
+}
+
+/* hover ou seleção — fundo cinza claro e texto escuro */
+.painel-filtros .combo-box-popup .list-cell:hover,
+.painel-filtros .combo-box-popup .list-cell:selected {
+  -fx-background-color: #BDBDBD;
+  -fx-text-fill:      #181848;
+}

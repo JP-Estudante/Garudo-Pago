@@ -518,7 +518,7 @@ public class MainView {
         filterIcon.setFitHeight(22);
         filterIcon.setPreserveRatio(true);
         btnFiltrar = new MenuButton("Filtrar", filterIcon, miFiltrarPeriodo, miFiltrarMarca);
-        btnFiltrar.getStyleClass().addAll("menu-button", "botao-listagem");
+        btnFiltrar.getStyleClass().addAll("menu-button", "botao-listagem", "btn-filtrar");
         btnFiltrar.setContentDisplay(ContentDisplay.LEFT);
         btnFiltrar.setGraphicTextGap(10);
 

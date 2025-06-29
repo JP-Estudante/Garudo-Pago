@@ -44,7 +44,7 @@ public class NotaFiscalController {
         try {
             ObservableList<Marca> marcas = marcaDAO.listarMarcas();
             view.getMarcaComboBox().getItems().clear();
-            marcas.forEach(marca -> view.getMarcaComboBox().getItems().add(marca.getNome()));
+            view.getMarcaComboBox().setItems(marcas);
         } catch (SQLException e) {
             mostrarAlerta("Erro ao carregar marcas: " + e.getMessage(), Alert.AlertType.ERROR);
         }
@@ -193,7 +193,8 @@ public class NotaFiscalController {
             NotaFiscal nota = new NotaFiscal();
             nota.setNumeroNota(view.getNumeroNotaField().getText());
             nota.setDataEmissao(view.getDataEmissaoPicker().getValue());
-            nota.setMarca(view.getMarcaComboBox().getValue());
+            Marca sel = view.getMarcaComboBox().getValue();
+            nota.setMarca(sel != null ? sel.getNome() : null);
 
             int notaId = notaFiscalDAO.inserirNotaFiscal(nota);
 
