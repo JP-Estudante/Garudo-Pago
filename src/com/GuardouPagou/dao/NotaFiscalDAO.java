@@ -116,4 +116,24 @@ public class NotaFiscalDAO {
 
         return notasArquivadas;
     }
+
+    public NotaFiscal buscarNotaFiscalPorId(int id) throws SQLException {
+        String sql = "SELECT nf.numero_nota, nf.data_emissao, m.nome AS marca " +
+                "FROM notas_fiscais nf LEFT JOIN marcas m ON nf.marca_id = m.id " +
+                "WHERE nf.id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    NotaFiscal nf = new NotaFiscal();
+                    nf.setNumeroNota(rs.getString("numero_nota"));
+                    nf.setDataEmissao(rs.getDate("data_emissao").toLocalDate());
+                    nf.setMarca(rs.getString("marca"));
+                    return nf;
+                }
+            }
+        }
+        return null;
+    }
 }

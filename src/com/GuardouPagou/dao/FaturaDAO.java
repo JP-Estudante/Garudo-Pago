@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -243,6 +244,29 @@ public class FaturaDAO {
             }
         }
 
+        return faturas;
+    }
+
+    public List<Fatura> listarFaturasDaNota(int notaFiscalId) throws SQLException {
+        List<Fatura> faturas = new ArrayList<>();
+        String sql = "SELECT id, nota_fiscal_id, numero_fatura, vencimento, valor, status " +
+                "FROM faturas WHERE nota_fiscal_id = ? ORDER BY numero_fatura";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, notaFiscalId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Fatura f = new Fatura();
+                    f.setId(rs.getInt("id"));
+                    f.setNotaFiscalId(rs.getInt("nota_fiscal_id"));
+                    f.setNumeroFatura(rs.getInt("numero_fatura"));
+                    f.setVencimento(rs.getDate("vencimento").toLocalDate());
+                    f.setValor(rs.getDouble("valor"));
+                    f.setStatus(rs.getString("status"));
+                    faturas.add(f);
+                }
+            }
+        }
         return faturas;
     }
 }
