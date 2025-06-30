@@ -2,6 +2,7 @@ package com.GuardouPagou.controllers;
 
 import com.GuardouPagou.models.Fatura;
 import com.GuardouPagou.models.Marca;
+import com.GuardouPagou.models.NotaFiscal;
 import com.GuardouPagou.views.ArquivadasView;
 import com.GuardouPagou.views.MainView;
 import com.GuardouPagou.views.MarcaView;
@@ -193,12 +194,22 @@ public class MainController {
             modal.initModality(Modality.WINDOW_MODAL);
             modal.setTitle("Nota Fiscal " + nota.getNumeroNota());
 
+            // NOVO: Adicionado o ícone da janela, conforme solicitado.
+            modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/list.png"))));
+
             NotaFiscalDetalhesView detalhesView = new NotaFiscalDetalhesView();
             NotaFiscalDetalhesController controller = new NotaFiscalDetalhesController(detalhesView, modal);
             controller.preencherDados(nota);
 
-            Scene scene = new Scene(detalhesView.getRoot(), 700, 500);
+            Scene scene = new Scene(detalhesView.getRoot(), 700, 570);
             scene.getStylesheets().addAll(view.getRoot().getScene().getStylesheets());
+
+            scene.setOnKeyPressed(ev -> {
+                if (ev.getCode() == KeyCode.ESCAPE) {
+                    modal.close();
+                }
+            });
+
             modal.setScene(scene);
             modal.setResizable(false);
             modal.showAndWait();

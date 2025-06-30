@@ -3,10 +3,13 @@ package com.GuardouPagou.views;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+
+import java.util.Objects;
 
 public class NotaFiscalDetalhesView {
 
@@ -34,15 +37,21 @@ public class NotaFiscalDetalhesView {
     }
 
     private void criarUI() {
-        root.getStyleClass().add("nota-fatura-root");
+        root.getStyleClass().addAll("nota-fatura-root", "detalhes-nota-root");
         root.setStyle("-fx-background-color: #323437; -fx-padding: 20;");
 
         Label titulo = new Label("Detalhes da Nota Fiscal");
         titulo.setFont(Font.font("Poppins", FontWeight.BOLD, 24));
         titulo.setTextFill(Color.web("#F0A818"));
+
+        Label sub1 = new Label("Dados da Nota Fiscal Eletrônica");
+        sub1.setFont(Font.font("Poppins", FontWeight.NORMAL, 16));
+        sub1.setTextFill(Color.web("#7890A8"));
+
         Separator sep1 = new Separator();
         sep1.setStyle("-fx-background-color: #7890A8;");
-        VBox headerBox = new VBox(8, titulo, sep1);
+
+        VBox headerBox = new VBox(8, titulo, sub1, sep1);
         headerBox.setAlignment(Pos.CENTER_LEFT);
 
         // Dados da nota
@@ -50,6 +59,7 @@ public class NotaFiscalDetalhesView {
         lblNumero.getStyleClass().add("field-subtitle");
         numeroNotaField.setEditable(false);
         numeroNotaField.setPrefWidth(250);
+        numeroNotaField.getStyleClass().add("read-only-field");
         VBox numeroBox = new VBox(6, lblNumero, numeroNotaField);
         numeroBox.getStyleClass().add("pill-field");
 
@@ -68,8 +78,18 @@ public class NotaFiscalDetalhesView {
         marcaBox.getStyleClass().add("pill-field");
 
         HBox dadosNota = new HBox(20, numeroBox, dataBox, marcaBox);
-        dadosNota.setPadding(new Insets(15,0,15,0));
+        dadosNota.setPadding(new Insets(15, 0, 15, 0));
         dadosNota.setAlignment(Pos.CENTER_LEFT);
+
+        Label sub2 = new Label("Dados de cada Fatura");
+        sub2.setFont(Font.font("Poppins", FontWeight.NORMAL, 16));
+        sub2.setTextFill(Color.web("#7890A8"));
+
+        Separator sep2 = new Separator();
+        sep2.setStyle("-fx-background-color: #7890A8;");
+
+        VBox faturasHeaderBox = new VBox(8, sub2, sep2);
+        faturasHeaderBox.setAlignment(Pos.CENTER_LEFT);
 
         // Colunas faturas
         vencimentosColumn.setPadding(new Insets(10));
@@ -79,22 +99,14 @@ public class NotaFiscalDetalhesView {
         statusColumn.setPadding(new Insets(10));
         statusColumn.setStyle("-fx-background-color: #7890A8; -fx-background-radius: 5;");
 
-        Label lblVenc = new Label("Vencimento");
-        lblVenc.setTextFill(Color.WHITE);
-        Label lblVal = new Label("Valor (R$)");
-        lblVal.setTextFill(Color.WHITE);
-        Label lblSt = new Label("Status");
-        lblSt.setTextFill(Color.WHITE);
-        vencimentosColumn.getChildren().add(lblVenc);
-        valoresColumn.getChildren().add(lblVal);
-        statusColumn.getChildren().add(lblSt);
-
         ScrollPane spVenc = new ScrollPane(vencimentosColumn);
         spVenc.setFitToWidth(true);
         spVenc.setPrefSize(200, 250);
+
         ScrollPane spVal = new ScrollPane(valoresColumn);
         spVal.setFitToWidth(true);
         spVal.setPrefSize(200, 250);
+
         ScrollPane spStatus = new ScrollPane(statusColumn);
         spStatus.setFitToWidth(true);
         spStatus.setPrefSize(200, 250);
@@ -105,17 +117,32 @@ public class NotaFiscalDetalhesView {
         HBox faturasSection = new HBox(25, spVenc, spVal, spStatus);
         faturasSection.setAlignment(Pos.TOP_LEFT);
 
-        // Botoes
+        // Botões: ícone e fonte maior
+        btnVoltar.getStyleClass().add("modal-button");
+        ImageView backIcon = new ImageView(Objects.requireNonNull(getClass().getResource("/icons/back.png")).toExternalForm());
+        backIcon.setFitHeight(18);
+        backIcon.setFitWidth(18);
+        btnVoltar.setGraphic(backIcon);
+        btnVoltar.setFocusTraversable(false);
+        btnVoltar.setFont(Font.font("Poppins", FontWeight.NORMAL, 16));
+
+        btnEditar.getStyleClass().add("modal-button");
+        ImageView editIcon = new ImageView(Objects.requireNonNull(getClass().getResource("/icons/edit.png")).toExternalForm());
+        editIcon.setFitHeight(20);
+        editIcon.setFitWidth(20);
+        btnEditar.setGraphic(editIcon);
+        btnEditar.setFocusTraversable(false);
+        btnEditar.setFont(Font.font("Poppins", FontWeight.NORMAL, 16));
+
         HBox botoes = new HBox(10, btnVoltar, btnEditar);
         botoes.setAlignment(Pos.CENTER_RIGHT);
-        botoes.setPadding(new Insets(15,0,0,0));
+        botoes.setPadding(new Insets(15, 0, 0, 0));
 
-        VBox container = new VBox(12, headerBox, dadosNota, faturasSection, botoes);
+        VBox container = new VBox(12, headerBox, dadosNota, faturasHeaderBox, faturasSection, botoes);
         container.setAlignment(Pos.TOP_LEFT);
         root.setCenter(container);
     }
 
-    // Getters
     public BorderPane getRoot() { return root; }
     public TextField getNumeroNotaField() { return numeroNotaField; }
     public DatePicker getDataEmissaoPicker() { return dataEmissaoPicker; }

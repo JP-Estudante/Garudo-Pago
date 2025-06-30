@@ -48,6 +48,32 @@
   -fx-padding: 0;
 }
 
+.read-only-field {
+    -fx-highlight-fill: transparent; /* Cor de fundo da seleção */
+    -fx-highlight-text-fill: -fx-text-fill; /* Cor do texto selecionado */
+}
+
+/* Remove a opacidade padrão dos campos desabilitados APENAS na tela de detalhes */
+.detalhes-nota-root .pill-field .date-picker:disabled,
+.detalhes-nota-root .pill-field .combo-box:disabled {
+    -fx-opacity: 1.0;
+}
+
+/* Garante a cor correta do texto (#181848) para o DatePicker desabilitado */
+.detalhes-nota-root .pill-field .date-picker:disabled .text-field {
+    -fx-text-fill: #181848;
+    -fx-opacity: 1.0;
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+}
+
+/* Garante a cor correta do texto (#181848) para o ComboBox desabilitado */
+.detalhes-nota-root .pill-field .combo-box:disabled .list-cell {
+    -fx-text-fill: #181848;
+    -fx-opacity: 1.0;
+    -fx-background-color: transparent;
+}
+
 /* -------- remover seta ▼ do MenuButton Filtrar --------- */
 .btn-filtrar > .arrow-button {
   -fx-background-color: transparent;  /* sem fundo */
@@ -282,6 +308,8 @@
 
 /* ———————————————— */
 /* Modal Button Styles */
+/* ———————————————— */
+/* Modal Button Styles */
 .modal-button {
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
@@ -292,23 +320,27 @@
     -fx-background-color: #4C4F53;
     -fx-text-fill: #F0A818;
     -fx-background-radius: 22;
+    /* --- CORREÇÃO: Adicionada uma borda transparente para reservar espaço --- */
+    -fx-border-width: 2px;
+    -fx-border-color: transparent;
+    -fx-border-radius: 22;
 }
+
 .modal-button:hover,
 .button-pill:hover {
     -fx-background-color: #8A8B8C;
 }
+
+/* O estado 'focused' agora só precisa definir a cor da borda, pois a largura já existe */
 .modal-button:focused,
 .button-pill:focused {
     -fx-border-color: #C88200;
-    -fx-border-width: 2;
-    -fx-border-radius: 22;
 }
 
+/* O estado 'pressed' também só precisa definir a cor */
 .modal-button:pressed,
 .modal-button:armed {
     -fx-border-color: #C88200;
-    -fx-border-width: 2;
-    -fx-border-radius: 22;
 }
 
 /* ———————————————— */
