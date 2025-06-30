@@ -142,6 +142,61 @@ public class FaturaDAO {
         return faturas;
     }
 
+    public ObservableList<Fatura> listarFaturasPorPeriodoEMarcas(
+            LocalDate dataInicial,
+            LocalDate dataFinal,
+            List<String> nomesMarcas
+    ) throws SQLException {
+        ObservableList<Fatura> faturas = FXCollections.observableArrayList();
+
+        if (dataInicial == null || dataFinal == null ||
+                nomesMarcas == null || nomesMarcas.isEmpty()) {
+            return faturas;
+        }
+
+        String placeholders = String.join(",", Collections.nCopies(nomesMarcas.size(), "?"));
+
+        String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, "
+                + "       f.vencimento, f.valor, f.status, "
+                + "       m.nome AS marca, m.cor AS marca_cor "
+                + "FROM faturas f "
+                + "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id "
+                + "JOIN marcas m       ON n.marca_id = m.id "
+                + "WHERE n.arquivada = FALSE "
+                + "  AND f.vencimento BETWEEN ? AND ? "
+                + "  AND m.nome IN (" + placeholders + ") "
+                + "ORDER BY n.numero_nota, f.numero_fatura";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            int index = 1;
+            stmt.setDate(index++, Date.valueOf(dataInicial));
+            stmt.setDate(index++, Date.valueOf(dataFinal));
+
+            for (String nome : nomesMarcas) {
+                stmt.setString(index++, nome);
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Fatura f = new Fatura();
+                    f.setId(rs.getInt("id"));
+                    f.setNotaFiscalId(rs.getInt("nota_fiscal_id"));
+                    f.setNumeroNota(rs.getString("numero_nota"));
+                    f.setNumeroFatura(rs.getInt("numero_fatura"));
+                    f.setVencimento(rs.getDate("vencimento").toLocalDate());
+                    f.setValor(rs.getDouble("valor"));
+                    f.setStatus(rs.getString("status"));
+                    f.setMarca(rs.getString("marca"));
+                    f.setMarcaColor(rs.getString("marca_cor"));
+                    faturas.add(f);
+                }
+            }
+        }
+        return faturas;
+    }
+
     public ObservableList<Fatura> listarFaturas(boolean exibirSomenteArquivadas) throws SQLException {
         ObservableList<Fatura> faturas = FXCollections.observableArrayList();
 

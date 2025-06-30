@@ -26,7 +26,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javafx.scene.layout.HBox;
 
 public class MainView {
@@ -66,13 +65,7 @@ public class MainView {
     }
 
     private void atualizarListaFaturas() {
-        if (miFiltrarPeriodo.isSelected()) {
-            aplicarFiltroPeriodo();
-        } else if (miFiltrarMarca.isSelected()) {
-            aplicarFiltroMarca();
-        } else {
-            mostrarTodasFaturas();
-        }
+        atualizarListaComFiltros();
     }
 
     private void criarUI() {
@@ -758,23 +751,8 @@ public class MainView {
             periodoFilterStart = inicio;
             periodoFilterEnd   = fim;
 
-            // 2) executa a query dentro de try/catch
-            ObservableList<Fatura> f;
-            try {
-                f = new FaturaDAO().listarFaturasPorPeriodo(inicio, fim);
-                mostrarListaFaturas(f);
-            } catch (SQLException ex) {
-                // Substitui printStackTrace pela chamada ao Logger
-                LOGGER.log(Level.SEVERE, "Erro ao tentar filtrar faturas por período.", ex);
-
-                // mostra alerta de erro
-                showAlert(
-                        "Erro ao filtrar por período",
-                        ex.getMessage());
-                // limpa estado para não ficar inconsistente
-                periodoFilterStart = periodoFilterEnd = null;
-                return;
-            }
+            // 2) aplica filtros utilizando o método auxiliar
+            atualizarListaComFiltros();
 
             // 3) remove token anterior de período (caso exista)
             filterTokens.getChildren().removeIf(n -> "periodo".equals(n.getUserData()));
@@ -800,8 +778,8 @@ public class MainView {
             // 6) ao clicar, limpa filtro e remove o token
             periodoBtn.setOnAction(ev -> {
                 periodoFilterStart = periodoFilterEnd = null;
-                mostrarTodasFaturas();
                 filterTokens.getChildren().remove(periodoBtn);
+                atualizarListaComFiltros();
             });
 
             // 7) adiciona o token à barra
@@ -811,32 +789,48 @@ public class MainView {
         filtroPopup.hide();
     }
 
+    private void atualizarListaComFiltros() {
+        try {
+            ObservableList<Fatura> resultado;
+            boolean filtraPeriodo = periodoFilterStart != null && periodoFilterEnd != null;
+            boolean filtraMarca   = !marcaFilters.isEmpty();
+
+            if (filtraPeriodo && filtraMarca) {
+                List<String> nomes = marcaFilters.stream()
+                        .map(Marca::getNome)
+                        .toList();
+                resultado = new FaturaDAO().listarFaturasPorPeriodoEMarcas(
+                        periodoFilterStart,
+                        periodoFilterEnd,
+                        nomes
+                );
+            } else if (filtraPeriodo) {
+                resultado = new FaturaDAO().listarFaturasPorPeriodo(
+                        periodoFilterStart,
+                        periodoFilterEnd
+                );
+            } else if (filtraMarca) {
+                List<String> nomes = marcaFilters.stream()
+                        .map(Marca::getNome)
+                        .toList();
+                resultado = new FaturaDAO().listarFaturasPorMarcas(nomes);
+            } else {
+                resultado = new FaturaDAO().listarFaturas(false);
+            }
+
+            mostrarListaFaturas(resultado);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Erro ao aplicar filtros de faturas", ex);
+            showAlert("Erro ao filtrar faturas", ex.getMessage());
+        }
+    }
+
     @SuppressWarnings("unused")
     private void aplicarFiltroMarca() {
         Marca sel = cbFiltroMarca.getValue();
         if (sel != null && marcaFilters.add(sel)) {
-            // 1) extrai apenas os nomes das marcas atuais
-            List<String> nomes = marcaFilters.stream()
-                    .map(Marca::getNome)
-                    .collect(Collectors.toList());
-
-            try {
-                // 2) chama o novo método do DAO dentro do try
-                ObservableList<Fatura> f = new FaturaDAO()
-                        .listarFaturasPorMarcas(nomes);
-                mostrarListaFaturas(f);
-            } catch (SQLException ex) {
-                // Substitui printStackTrace pela chamada ao Logger
-                LOGGER.log(Level.SEVERE, "Erro ao tentar filtrar faturas por marca.", ex);
-
-                // informa o usuário em um alerta
-                showAlert(
-                        "Erro ao filtrar por marca",
-                        ex.getMessage());
-                // remove a marca adicionada no set para não ficar em estado inconsistente
-                marcaFilters.remove(sel);
-                return;
-            }
+            // 1) aplica filtros utilizando o método auxiliar
+            atualizarListaComFiltros();
 
             // 3) cria o botão-token
             Button marcaBtn = new Button(sel.getNome());
@@ -853,26 +847,8 @@ public class MainView {
             // 4) ao clicar, remove apenas aquela marca e refaz o filtro
             marcaBtn.setOnAction(ev -> {
                 marcaFilters.remove(sel);
-
-                if (marcaFilters.isEmpty()) {
-                    mostrarTodasFaturas();
-                } else {
-                    // repete o mesmo tratamento em try/catch
-                    List<String> restantes = marcaFilters.stream()
-                            .map(Marca::getNome)
-                            .collect(Collectors.toList());
-                    try {
-                        ObservableList<Fatura> nf = new FaturaDAO()
-                                .listarFaturasPorMarcas(restantes);
-                        mostrarListaFaturas(nf);
-                    } catch (SQLException e) {
-                        LOGGER.log(Level.SEVERE, "Erro ao filtrar por marca.", e);
-                        showAlert(
-                                "Erro ao filtrar por marca",
-                                e.getMessage());
-                    }
-                }
                 filterTokens.getChildren().remove(marcaBtn);
+                atualizarListaComFiltros();
             });
 
             // 5) adiciona o token à barra
