@@ -60,11 +60,13 @@ public class FaturaDAO {
 
     public ObservableList<Fatura> listarFaturasPorPeriodo(LocalDate dataInicial, LocalDate dataFinal) throws SQLException {
         ObservableList<Fatura> faturas = FXCollections.observableArrayList();
-        String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, f.vencimento, f.valor, f.status, m.nome AS marca, m.cor AS marca_cor "
-                + "FROM faturas f "
+        String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, "
+                + "f.vencimento, f.valor, f.status, m.nome AS marca, m.cor AS marca_cor "
+                + "FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY nota_fiscal_id ORDER BY vencimento, numero_fatura) AS rn "
+                + "      FROM faturas WHERE status = 'Não Emitida') f "
                 + "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id "
                 + "LEFT JOIN marcas m ON n.marca_id = m.id "
-                + "WHERE n.arquivada = FALSE AND f.vencimento BETWEEN ? AND ? "
+                + "WHERE n.arquivada = FALSE AND f.rn = 1 AND f.vencimento BETWEEN ? AND ? "
                 + "ORDER BY f.vencimento";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -104,14 +106,16 @@ public class FaturaDAO {
                 Collections.nCopies(nomesMarcas.size(), "?")
         );
 
-        // 2) SQL com IN-list dinâmica
+        // 2) SQL com IN-list dinâmica e seleção da próxima fatura não emitida
         String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, "
                 + "       f.vencimento, f.valor, f.status, "
                 + "       m.nome AS marca, m.cor AS marca_cor "
-                + "FROM faturas f "
+                + "FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY nota_fiscal_id ORDER BY vencimento, numero_fatura) AS rn "
+                + "      FROM faturas WHERE status = 'Não Emitida') f "
                 + "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id "
                 + "JOIN marcas m       ON n.marca_id = m.id "
                 + "WHERE n.arquivada = FALSE "
+                + "  AND f.rn = 1 "
                 + "  AND m.nome IN (" + placeholders + ") "
                 + "ORDER BY n.numero_nota, f.numero_fatura";
 
@@ -159,10 +163,12 @@ public class FaturaDAO {
         String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, "
                 + "       f.vencimento, f.valor, f.status, "
                 + "       m.nome AS marca, m.cor AS marca_cor "
-                + "FROM faturas f "
+                + "FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY nota_fiscal_id ORDER BY vencimento, numero_fatura) AS rn "
+                + "      FROM faturas WHERE status = 'Não Emitida') f "
                 + "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id "
                 + "JOIN marcas m       ON n.marca_id = m.id "
                 + "WHERE n.arquivada = FALSE "
+                + "  AND f.rn = 1 "
                 + "  AND f.vencimento BETWEEN ? AND ? "
                 + "  AND m.nome IN (" + placeholders + ") "
                 + "ORDER BY n.numero_nota, f.numero_fatura";
@@ -206,7 +212,7 @@ public class FaturaDAO {
                 .append("m.nome      AS marca, ")
                 .append("m.cor       AS marca_cor, ")
                 .append("n.arquivada ")
-                .append("FROM faturas f ")
+                .append("FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY nota_fiscal_id ORDER BY vencimento, numero_fatura) AS rn FROM faturas WHERE status = 'Não Emitida') f ")
                 .append("JOIN notas_fiscais n ON f.nota_fiscal_id = n.id ")
                 .append("LEFT JOIN marcas m ON n.marca_id = m.id ");
 
@@ -216,7 +222,7 @@ public class FaturaDAO {
             sql.append("WHERE n.arquivada = FALSE ");
         }
 
-        sql.append("ORDER BY n.numero_nota ASC, f.numero_fatura ASC");
+        sql.append("  AND f.rn = 1 ORDER BY n.numero_nota ASC");
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql.toString());
