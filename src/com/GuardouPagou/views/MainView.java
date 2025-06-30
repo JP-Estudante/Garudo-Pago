@@ -12,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.TableRow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -50,6 +51,7 @@ public class MainView {
     private final Set<Marca> marcaFilters = new HashSet<>();
     private HBox filterTokens;
     private TableView<Fatura> tabelaFaturas;
+    private java.util.function.Consumer<Fatura> notaDoubleClickHandler;
 
     public MainView() {
         criarUI();
@@ -62,6 +64,10 @@ public class MainView {
     // NOVO MÉTODO: Responsável apenas por trocar o conteúdo central
     public void setConteudoPrincipal(Node novoConteudo) {
         root.setCenter(novoConteudo);
+    }
+
+    public void setNotaDoubleClickHandler(java.util.function.Consumer<Fatura> handler) {
+        this.notaDoubleClickHandler = handler;
     }
 
     private void atualizarListaFaturas() {
@@ -639,6 +645,15 @@ public class MainView {
         toolbar.setAlignment(Pos.CENTER_LEFT);
 
         this.tabelaFaturas = criarTabelaFaturas(faturas);
+        this.tabelaFaturas.setRowFactory(tv -> {
+            TableRow<Fatura> row = new TableRow<>();
+            row.setOnMouseClicked(ev -> {
+                if (ev.getClickCount() == 2 && !row.isEmpty() && notaDoubleClickHandler != null) {
+                    notaDoubleClickHandler.accept(row.getItem());
+                }
+            });
+            return row;
+        });
         VBox.setVgrow(this.tabelaFaturas, Priority.ALWAYS);
 
         // 6. Adiciona tudo ao container principal

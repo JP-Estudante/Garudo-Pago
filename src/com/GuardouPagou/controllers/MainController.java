@@ -2,17 +2,22 @@ package com.GuardouPagou.controllers;
 
 import com.GuardouPagou.models.Fatura;
 import com.GuardouPagou.models.Marca;
+import com.GuardouPagou.models.NotaFiscal;
 import com.GuardouPagou.views.ArquivadasView;
 import com.GuardouPagou.views.MainView;
 import com.GuardouPagou.views.MarcaView;
 import com.GuardouPagou.views.NotaFaturaView;
+import com.GuardouPagou.views.NotaFiscalDetalhesView;
 import com.GuardouPagou.dao.MarcaDAO;
 import com.GuardouPagou.dao.FaturaDAO;
+import com.GuardouPagou.dao.NotaFiscalDAO;
+import com.GuardouPagou.controllers.NotaFiscalDetalhesController;
 import com.GuardouPagou.controllers.NotaFaturaController;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
@@ -60,6 +65,7 @@ public class MainController {
                 ObservableList<Fatura> faturas = carregarFaturasTask.getValue();
                 Node viewFaturas = view.criarViewFaturas(faturas);
                 view.setConteudoPrincipal(viewFaturas); // Atualiza a tela com o resultado
+                view.setNotaDoubleClickHandler(this::abrirDetalhesNotaFiscal);
             });
 
             // 4. Define o que fazer se a tarefa falhar
@@ -174,5 +180,42 @@ public class MainController {
 
     private boolean validarEmail(String email) {
         return email != null && email.matches("^[\\w.-]+@[\\w.-]+\\.[a-z]{2,}$");
+    }
+
+    private void abrirDetalhesNotaFiscal(Fatura fatura) {
+        try {
+            NotaFiscal nota = new NotaFiscalDAO().buscarNotaFiscalPorId(fatura.getNotaFiscalId());
+            if (nota == null) return;
+            nota.setFaturas(new FaturaDAO().listarFaturasDaNota(fatura.getNotaFiscalId()));
+
+            Stage modal = new Stage();
+            Window owner = view.getRoot().getScene().getWindow();
+            modal.initOwner(owner);
+            modal.initModality(Modality.WINDOW_MODAL);
+            modal.setTitle("Nota Fiscal " + nota.getNumeroNota());
+
+            // NOVO: Adicionado o ícone da janela, conforme solicitado.
+            modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/list.png"))));
+
+            NotaFiscalDetalhesView detalhesView = new NotaFiscalDetalhesView();
+            NotaFiscalDetalhesController controller = new NotaFiscalDetalhesController(detalhesView, modal);
+            controller.preencherDados(nota);
+
+            Scene scene = new Scene(detalhesView.getRoot(), 700, 570);
+            scene.getStylesheets().addAll(view.getRoot().getScene().getStylesheets());
+
+            scene.setOnKeyPressed(ev -> {
+                if (ev.getCode() == KeyCode.ESCAPE) {
+                    modal.close();
+                }
+            });
+
+            modal.setScene(scene);
+            modal.setResizable(false);
+            modal.showAndWait();
+        } catch (Exception ex) {
+            Alert a = new Alert(Alert.AlertType.ERROR, "Erro ao abrir detalhes: " + ex.getMessage());
+            a.showAndWait();
+        }
     }
 }
