@@ -11,6 +11,8 @@ import com.GuardouPagou.views.NotaFiscalDetalhesView;
 import com.GuardouPagou.dao.MarcaDAO;
 import com.GuardouPagou.dao.FaturaDAO;
 import com.GuardouPagou.dao.NotaFiscalDAO;
+import com.GuardouPagou.dao.EmailDAO;
+import com.GuardouPagou.views.EmailView;
 import com.GuardouPagou.controllers.NotaFiscalDetalhesController;
 import com.GuardouPagou.controllers.NotaFaturaController;
 import javafx.collections.ObservableList;
@@ -164,14 +166,41 @@ public class MainController {
             modal.showAndWait();
         });
 
-        view.getBtnSalvarEmail().setOnAction(e -> {
-            String email = view.getEmailField().getText();
-            if (validarEmail(email)) {
-                atualizarConteudo("E-mail para alertas salvo: " + email);
-            } else {
-                atualizarConteudo("E-mail inválido!");
-            }
-        });
+// CÓDIGO CORRIGIDO E FUNCIONAL PARA ABRIR A MODAL DE E-MAILS
+view.getBtnSalvarEmail().setOnAction(e -> {
+    Stage modal = new Stage();
+    Window owner = view.getRoot().getScene().getWindow();
+    modal.initOwner(owner);
+    modal.initModality(Modality.WINDOW_MODAL);
+    modal.setTitle("Gerenciar E-mails para Alertas");
+
+    // Adiciona o ícone da janela
+    try {
+        modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/campaing.png"))));
+    } catch (NullPointerException ex) {
+        System.err.println("Ícone /icons/campaing.png não encontrado.");
+    }
+
+    // Cria a View e o Controller da funcionalidade de E-mail
+    EmailView emailView = new EmailView();
+    new EmailController(emailView); // O controller já se anexa à view e carrega os dados
+
+    Scene scene = new Scene(emailView.getRoot(), 500, 450);
+    
+    // Aplica a mesma folha de estilos da cena principal
+    scene.getStylesheets().addAll(view.getRoot().getScene().getStylesheets());
+
+    // Permite fechar a modal com a tecla ESC
+    scene.setOnKeyPressed(ev -> {
+        if (ev.getCode() == KeyCode.ESCAPE) {
+            modal.close();
+        }
+    });
+
+    modal.setScene(scene);
+    modal.setResizable(false);
+    modal.showAndWait(); // Bloqueia a janela principal até que a modal de e-mail seja fechada
+});
     }
 
     private void atualizarConteudo(String texto) {

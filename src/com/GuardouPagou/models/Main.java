@@ -2,6 +2,7 @@ package com.GuardouPagou.models;
 
 import com.GuardouPagou.views.MainView;
 import com.GuardouPagou.controllers.MainController;
+import com.GuardouPagou.services.VerificadorFaturasAgendado;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -55,6 +56,9 @@ public class Main extends Application {
         primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        VerificadorFaturasAgendado verificador = new VerificadorFaturasAgendado();
+        verificador.iniciar();
     }
 
     public static void main(String[] args) {
