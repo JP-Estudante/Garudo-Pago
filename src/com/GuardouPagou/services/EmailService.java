@@ -18,12 +18,10 @@ public class EmailService {
     private static final Logger LOGGER = Logger.getLogger(EmailService.class.getName());
 
     // --- CONFIGURAÇÕES DO SERVIDOR DE E-MAIL (SMTP) ---
-    // IMPORTANTE: Substitua pelos dados do seu servidor de e-mail.
-    // Exemplo para o Gmail. Se usar, lembre-se de criar uma "Senha de App".
     private static final String HOST = "smtp.gmail.com";
     private static final String PORT = "587";
-    private static final String USERNAME = "gabrielberleifrs@gmail.com"; // SEU E-MAIL
-    private static final String PASSWORD = "54GBsellback?";   // SUA SENHA DE APP
+    private static final String USERNAME = "Seu email aqui"; // SEU E-MAIL
+    private static final String PASSWORD = "Senha de app aqui";   // SUA SENHA DE APP
 
     private final Session session;
 
@@ -52,42 +50,46 @@ public class EmailService {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(USERNAME));
 
-            // Adiciona todos os destinatários
+            // CORREÇÃO: Usar BCC (Cópia Oculta) para proteger a privacidade dos destinatários.
+            // O e-mail é enviado para o próprio remetente e os outros ficam em cópia oculta.
+            message.setRecipient(Message.RecipientType.TO, new InternetAddress(USERNAME));
             for (String email : destinatarios) {
-                message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
+                // Adiciona cada e-mail cadastrado como um destinatário em cópia oculta.
+                message.addRecipient(Message.RecipientType.BCC, new InternetAddress(email));
             }
 
-            message.setSubject("[ALERTA] Fatura(s) prestes a vencer");
+            message.setSubject("[ALERTA] Guardou-Pagou: Fatura(s) com vencimento próximo");
             message.setText(construirCorpoEmail(faturas));
 
             Transport.send(message);
             LOGGER.info("E-mail de alerta enviado com sucesso para: " + String.join(", ", destinatarios));
 
+        } catch (AuthenticationFailedException authEx) {
+            LOGGER.log(Level.SEVERE, "Falha na autenticação do e-mail. Verifique se o USERNAME e a SENHA DE APP estão corretos em EmailService.java.", authEx);
         } catch (MessagingException e) {
-            LOGGER.log(Level.SEVERE, "Falha ao enviar e-mail de alerta.", e);
+            LOGGER.log(Level.SEVERE, "Falha ao enviar e-mail de alerta. Verifique a conexão com a internet e as configurações de SMTP.", e);
         }
     }
 
     private String construirCorpoEmail(List<Fatura> faturas) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Olá! As seguintes faturas estão próximas do vencimento:\n\n");
+        sb.append("Olá!\n\nAs seguintes faturas estão próximas do vencimento:\n\n");
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
         for (Fatura fatura : faturas) {
-            sb.append(String.format("- NF %s | Marca: %s | Vencimento: %s | Valor: %s\n",
+            sb.append(String.format("- NF %s | Fornecedor: %s | Vencimento: %s | Valor: %s\n",
                     fatura.getNumeroNota(),
-                    fatura.getMarca(),
+                    fatura.getMarca(), // Supondo que 'getMarca' retorne o fornecedor
                     fatura.getVencimento().format(dateFormatter),
                     currencyFormatter.format(fatura.getValor())
             ));
         }
 
-        sb.append("\nPor favor, verifique e realize o pagamento dentro do prazo.\n\n");
-        sb.append("---\n\n");
-        sb.append("Mensagem automática do sistema, favor não responder!\n\n");
-        sb.append("Att,\nGuardou-Pagou");
+        sb.append("\nPor favor, verifique o sistema para realizar o pagamento dentro do prazo.\n\n");
+        sb.append("---\n");
+        sb.append("Esta é uma mensagem automática do sistema Guardou-Pagou. Favor não responder.\n");
 
         return sb.toString();
     }
