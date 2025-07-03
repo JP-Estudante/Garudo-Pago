@@ -269,52 +269,33 @@ public class FaturaDAO {
         }
         return faturas;
     }
-    
-    // Adicione este método dentro da classe FaturaDAO
 
-/**
- * Lista todas as faturas não emitidas cujo vencimento ocorre nos próximos 'dias'.
- * @param dias O número de dias a partir de hoje para verificar o vencimento.
- * @return Uma lista de faturas próximas do vencimento.
- * @throws SQLException se ocorrer um erro de banco de dados.
- */
-public List<Fatura> listarFaturasProximasDoVencimento(int dias) throws SQLException {
-    List<Fatura> faturas = new ArrayList<>();
-    LocalDate hoje = LocalDate.now();
-    LocalDate dataLimite = hoje.plusDays(dias);
-
-    // Este SQL busca a próxima fatura pendente de cada nota fiscal que não esteja arquivada
-    // e cujo vencimento esteja entre hoje e a data limite.
-    String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, "
-            + "       f.vencimento, f.valor, f.status, "
-            + "       m.nome AS marca, m.cor AS marca_cor "
-            + "FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY nota_fiscal_id ORDER BY vencimento) AS rn "
-            + "      FROM faturas WHERE status = 'Não Emitida') f "
-            + "JOIN notas_fiscais n ON f.nota_fiscal_id = n.id "
-            + "JOIN marcas m       ON n.marca_id = m.id "
-            + "WHERE n.arquivada = FALSE "
-            + "  AND f.rn = 1 " // Garante que pegamos apenas a próxima fatura a vencer de cada nota
-            + "  AND f.vencimento BETWEEN ? AND ? "
-            + "ORDER BY f.vencimento";
-
-    try (Connection conn = DatabaseConnection.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-        stmt.setDate(1, Date.valueOf(hoje));
-        stmt.setDate(2, Date.valueOf(dataLimite));
-
-        try (ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                Fatura fatura = new Fatura();
-                fatura.setNumeroNota(rs.getString("numero_nota"));
-                fatura.setVencimento(rs.getDate("vencimento").toLocalDate());
-                fatura.setValor(rs.getDouble("valor"));
-                fatura.setMarca(rs.getString("marca"));
-                faturas.add(fatura);
+    public List<Fatura> buscarFaturasPendentesAte(LocalDate dataLimite) throws SQLException {
+        List<Fatura> faturas = new ArrayList<>();
+        String sql =
+                "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, " +
+                        "       f.vencimento, f.valor, f.status, m.nome AS marca, m.cor AS marca_cor " +
+                        "FROM faturas f " +
+                        "  JOIN notas_fiscais n ON f.nota_fiscal_id = n.id " +
+                        "  LEFT JOIN marcas m ON n.marca_id = m.id " +
+                        "WHERE f.status = 'Não Emitida' " +
+                        "  AND f.vencimento BETWEEN CURRENT_DATE AND ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, Date.valueOf(dataLimite));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Fatura f = new Fatura();
+                    f.setId(rs.getInt("id"));
+                    f.setNotaFiscalId(rs.getInt("nota_fiscal_id"));
+                    f.setNumeroNota(rs.getString("numero_nota"));
+                    f.setMarca(rs.getString("marca"));
+                    f.setVencimento(rs.getDate("vencimento").toLocalDate());
+                    f.setValor(rs.getDouble("valor"));
+                    faturas.add(f);
+                }
             }
         }
+        return faturas;
     }
-    return faturas;
-}
-    
 }

@@ -3,18 +3,10 @@ package com.GuardouPagou.controllers;
 import com.GuardouPagou.models.Fatura;
 import com.GuardouPagou.models.Marca;
 import com.GuardouPagou.models.NotaFiscal;
-import com.GuardouPagou.views.ArquivadasView;
-import com.GuardouPagou.views.MainView;
-import com.GuardouPagou.views.MarcaView;
-import com.GuardouPagou.views.NotaFaturaView;
-import com.GuardouPagou.views.NotaFiscalDetalhesView;
+import com.GuardouPagou.views.*;
 import com.GuardouPagou.dao.MarcaDAO;
 import com.GuardouPagou.dao.FaturaDAO;
 import com.GuardouPagou.dao.NotaFiscalDAO;
-import com.GuardouPagou.dao.EmailDAO;
-import com.GuardouPagou.views.EmailView;
-import com.GuardouPagou.controllers.NotaFiscalDetalhesController;
-import com.GuardouPagou.controllers.NotaFaturaController;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -117,7 +109,7 @@ public class MainController {
             modal.initModality(Modality.WINDOW_MODAL);
             modal.setTitle("Cadastro de Nota Fiscal");
 
-            modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/plus.png"))));
+            modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/note-plus.png"))));
 
             NotaFaturaView notaView = new NotaFaturaView();
             new NotaFaturaController(notaView);
@@ -145,7 +137,7 @@ public class MainController {
             modal.initModality(Modality.WINDOW_MODAL);
             modal.setTitle("Cadastro de Marca");
 
-            modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/plus.png"))));
+            modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/note-plus.png"))));
 
             MarcaView marcaView = new MarcaView();
             new MarcaController(marcaView);
@@ -166,41 +158,7 @@ public class MainController {
             modal.showAndWait();
         });
 
-// CÓDIGO CORRIGIDO E FUNCIONAL PARA ABRIR A MODAL DE E-MAILS
-view.getBtnSalvarEmail().setOnAction(e -> {
-    Stage modal = new Stage();
-    Window owner = view.getRoot().getScene().getWindow();
-    modal.initOwner(owner);
-    modal.initModality(Modality.WINDOW_MODAL);
-    modal.setTitle("Gerenciar E-mails para Alertas");
-
-    // Adiciona o ícone da janela
-    try {
-        modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/campaing.png"))));
-    } catch (NullPointerException ex) {
-        System.err.println("Ícone /icons/campaing.png não encontrado.");
-    }
-
-    // Cria a View e o Controller da funcionalidade de E-mail
-    EmailView emailView = new EmailView();
-    new EmailController(emailView); // O controller já se anexa à view e carrega os dados
-
-    Scene scene = new Scene(emailView.getRoot(), 500, 450);
-    
-    // Aplica a mesma folha de estilos da cena principal
-    scene.getStylesheets().addAll(view.getRoot().getScene().getStylesheets());
-
-    // Permite fechar a modal com a tecla ESC
-    scene.setOnKeyPressed(ev -> {
-        if (ev.getCode() == KeyCode.ESCAPE) {
-            modal.close();
-        }
-    });
-
-    modal.setScene(scene);
-    modal.setResizable(false);
-    modal.showAndWait(); // Bloqueia a janela principal até que a modal de e-mail seja fechada
-});
+        view.getBtnSalvarEmail().setOnAction(e -> abrirGerenciadorEmails());
     }
 
     private void atualizarConteudo(String texto) {
@@ -209,6 +167,31 @@ view.getBtnSalvarEmail().setOnAction(e -> {
 
     private boolean validarEmail(String email) {
         return email != null && email.matches("^[\\w.-]+@[\\w.-]+\\.[a-z]{2,}$");
+    }
+
+    private void abrirGerenciadorEmails() {
+        Stage modal = new Stage();
+        Window owner = view.getRoot().getScene().getWindow();
+        modal.initOwner(owner);
+        modal.initModality(Modality.WINDOW_MODAL);
+        modal.setTitle("E-mails de Alerta");
+
+        modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/campaing.png"))));
+
+        AlertaEmailView alertaView = new AlertaEmailView();
+        new AlertaEmailController(alertaView);
+
+        Scene scene = new Scene(alertaView.getRoot(), 500, 350);
+        scene.getStylesheets().addAll(view.getRoot().getScene().getStylesheets());
+        scene.setOnKeyPressed(ev -> {
+            if (ev.getCode() == KeyCode.ESCAPE) {
+                modal.close();
+            }
+        });
+
+        modal.setScene(scene);
+        modal.setResizable(false);
+        modal.showAndWait();
     }
 
     private void abrirDetalhesNotaFiscal(Fatura fatura) {
