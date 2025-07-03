@@ -66,6 +66,11 @@ CREATE TABLE faturas (
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE alerta_emails (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE
+);
+
 UPDATE notas_fiscais n
 SET marca_id = m.id
 FROM marcas m
@@ -151,8 +156,10 @@ manifest.mf
 ## 💡 Observações
 
 * Certifique-se de adicionar o `postgresql-42.7.5.jar` ao **classpath** do projeto no NetBeans ou no seu ambiente Java.
+* Para o envio de e-mails instale `jakarta.mail-2.1.2.jar` e `jakarta.activation-2.1.2.jar` no classpath.
 * Configure corretamente o **usuário, senha e URL** do banco de dados no seu código Java para a conexão funcionar.
 * O arquivo `DataBaseConnection.java` está na raiz do projeto caso não tenha ou foi perdido.
+* Configure as variáveis de ambiente `MAIL_HOST`, `MAIL_USER` e `MAIL_PASS` para as credenciais do servidor SMTP.
 
 ---
 

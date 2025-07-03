@@ -2,6 +2,7 @@ package com.GuardouPagou.models;
 
 import com.GuardouPagou.views.MainView;
 import com.GuardouPagou.controllers.MainController;
+import com.GuardouPagou.services.AlertaService;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -11,6 +12,7 @@ import javafx.stage.Stage;
 import java.util.Objects;
 
 public class Main extends Application {
+    private AlertaService alertaService;
     @Override
     public void start(Stage primaryStage) {
         // 🅰️ Carregando a fonte Poppins antes de qualquer tela
@@ -36,6 +38,9 @@ public class Main extends Application {
         MainView mainView = new MainView();
         new MainController(mainView);
 
+        alertaService = new AlertaService();
+        alertaService.iniciar();
+
         Scene scene = new Scene(mainView.getRoot(), 950, 700);
 
         scene.getStylesheets().add(
@@ -55,6 +60,13 @@ public class Main extends Application {
         primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    @Override
+    public void stop() {
+        if (alertaService != null) {
+            alertaService.parar();
+        }
     }
 
     public static void main(String[] args) {

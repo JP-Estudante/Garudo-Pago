@@ -269,4 +269,29 @@ public class FaturaDAO {
         }
         return faturas;
     }
+
+    public List<Fatura> buscarFaturasPendentesAte(LocalDate dataLimite) throws SQLException {
+        List<Fatura> faturas = new ArrayList<>();
+        String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, m.nome AS marca, f.vencimento, f.valor " +
+                "FROM faturas f JOIN notas_fiscais n ON f.nota_fiscal_id = n.id " +
+                "LEFT JOIN marcas m ON n.marca_id = m.id " +
+                "WHERE f.status = 'Pendente' AND f.vencimento BETWEEN CURRENT_DATE AND ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, Date.valueOf(dataLimite));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Fatura f = new Fatura();
+                    f.setId(rs.getInt("id"));
+                    f.setNotaFiscalId(rs.getInt("nota_fiscal_id"));
+                    f.setNumeroNota(rs.getString("numero_nota"));
+                    f.setMarca(rs.getString("marca"));
+                    f.setVencimento(rs.getDate("vencimento").toLocalDate());
+                    f.setValor(rs.getDouble("valor"));
+                    faturas.add(f);
+                }
+            }
+        }
+        return faturas;
+    }
 }

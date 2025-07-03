@@ -164,14 +164,7 @@ public class MainController {
             modal.showAndWait();
         });
 
-        view.getBtnSalvarEmail().setOnAction(e -> {
-            String email = view.getEmailField().getText();
-            if (validarEmail(email)) {
-                atualizarConteudo("E-mail para alertas salvo: " + email);
-            } else {
-                atualizarConteudo("E-mail inválido!");
-            }
-        });
+        view.getBtnSalvarEmail().setOnAction(e -> abrirGerenciadorEmails());
     }
 
     private void atualizarConteudo(String texto) {
@@ -180,6 +173,31 @@ public class MainController {
 
     private boolean validarEmail(String email) {
         return email != null && email.matches("^[\\w.-]+@[\\w.-]+\\.[a-z]{2,}$");
+    }
+
+    private void abrirGerenciadorEmails() {
+        Stage modal = new Stage();
+        Window owner = view.getRoot().getScene().getWindow();
+        modal.initOwner(owner);
+        modal.initModality(Modality.WINDOW_MODAL);
+        modal.setTitle("E-mails de Alerta");
+
+        modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/campaing.png"))));
+
+        AlertaEmailView alertaView = new AlertaEmailView();
+        new AlertaEmailController(alertaView);
+
+        Scene scene = new Scene(alertaView.getRoot(), 450, 350);
+        scene.getStylesheets().addAll(view.getRoot().getScene().getStylesheets());
+        scene.setOnKeyPressed(ev -> {
+            if (ev.getCode() == KeyCode.ESCAPE) {
+                modal.close();
+            }
+        });
+
+        modal.setScene(scene);
+        modal.setResizable(false);
+        modal.showAndWait();
     }
 
     private void abrirDetalhesNotaFiscal(Fatura fatura) {
