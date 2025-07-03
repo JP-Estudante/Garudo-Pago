@@ -181,7 +181,7 @@ public class MainController {
         AlertaEmailView alertaView = new AlertaEmailView();
         new AlertaEmailController(alertaView);
 
-        Scene scene = new Scene(alertaView.getRoot(), 450, 350);
+        Scene scene = new Scene(alertaView.getRoot(), 500, 350);
         scene.getStylesheets().addAll(view.getRoot().getScene().getStylesheets());
         scene.setOnKeyPressed(ev -> {
             if (ev.getCode() == KeyCode.ESCAPE) {
