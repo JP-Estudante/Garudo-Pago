@@ -272,10 +272,14 @@ public class FaturaDAO {
 
     public List<Fatura> buscarFaturasPendentesAte(LocalDate dataLimite) throws SQLException {
         List<Fatura> faturas = new ArrayList<>();
-        String sql = "SELECT f.id, f.nota_fiscal_id, n.numero_nota, m.nome AS marca, f.vencimento, f.valor " +
-                "FROM faturas f JOIN notas_fiscais n ON f.nota_fiscal_id = n.id " +
-                "LEFT JOIN marcas m ON n.marca_id = m.id " +
-                "WHERE f.status = 'Pendente' AND f.vencimento BETWEEN CURRENT_DATE AND ?";
+        String sql =
+                "SELECT f.id, f.nota_fiscal_id, n.numero_nota, f.numero_fatura, " +
+                        "       f.vencimento, f.valor, f.status, m.nome AS marca, m.cor AS marca_cor " +
+                        "FROM faturas f " +
+                        "  JOIN notas_fiscais n ON f.nota_fiscal_id = n.id " +
+                        "  LEFT JOIN marcas m ON n.marca_id = m.id " +
+                        "WHERE f.status = 'Não Emitida' " +
+                        "  AND f.vencimento BETWEEN CURRENT_DATE AND ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setDate(1, Date.valueOf(dataLimite));

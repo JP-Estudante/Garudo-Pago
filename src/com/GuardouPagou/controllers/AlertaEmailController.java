@@ -17,7 +17,7 @@ public class AlertaEmailController {
         init();
     }
 
-    private void init() {
+    private void init()  {
         try {
             view.getTabela().setItems(dao.listarEmails());
         } catch (SQLException e) {

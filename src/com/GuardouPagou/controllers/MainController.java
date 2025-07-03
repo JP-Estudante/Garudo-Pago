@@ -3,16 +3,10 @@ package com.GuardouPagou.controllers;
 import com.GuardouPagou.models.Fatura;
 import com.GuardouPagou.models.Marca;
 import com.GuardouPagou.models.NotaFiscal;
-import com.GuardouPagou.views.ArquivadasView;
-import com.GuardouPagou.views.MainView;
-import com.GuardouPagou.views.MarcaView;
-import com.GuardouPagou.views.NotaFaturaView;
-import com.GuardouPagou.views.NotaFiscalDetalhesView;
+import com.GuardouPagou.views.*;
 import com.GuardouPagou.dao.MarcaDAO;
 import com.GuardouPagou.dao.FaturaDAO;
 import com.GuardouPagou.dao.NotaFiscalDAO;
-import com.GuardouPagou.controllers.NotaFiscalDetalhesController;
-import com.GuardouPagou.controllers.NotaFaturaController;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -115,7 +109,7 @@ public class MainController {
             modal.initModality(Modality.WINDOW_MODAL);
             modal.setTitle("Cadastro de Nota Fiscal");
 
-            modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/plus.png"))));
+            modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/note-plus.png"))));
 
             NotaFaturaView notaView = new NotaFaturaView();
             new NotaFaturaController(notaView);
@@ -143,7 +137,7 @@ public class MainController {
             modal.initModality(Modality.WINDOW_MODAL);
             modal.setTitle("Cadastro de Marca");
 
-            modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/plus.png"))));
+            modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/note-plus.png"))));
 
             MarcaView marcaView = new MarcaView();
             new MarcaController(marcaView);

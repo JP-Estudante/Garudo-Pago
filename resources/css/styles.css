@@ -403,6 +403,22 @@
   -fx-font-size: 18px;
 }
 
+.table-padrao .table-cell {
+    -fx-text-fill: #FFFFFF;
+}
+
+/* Fundo da linha selecionada */
+.table-padrao .table-row-cell:selected {
+    -fx-background-color: #030348;
+}
+
+/* Garantir texto branco também na linha selecionada */
+.table-padrao .table-row-cell:selected .table-cell {
+    -fx-text-fill: #FFFFFF;
+}
+
+
+
 /* ———————————————— */
 /* Cadastro de Marca Styles */
 .cadastro-marca-root {

@@ -168,8 +168,8 @@ public class MainView {
         btnListarFaturas = criarBotao("Listar Faturas", "/icons/list.png", "botao-listagem");
         btnListarMarcas = criarBotao("Listar Marcas", "/icons/list.png", "botao-listagem");
         btnArquivadas = criarBotao("Arquivadas", "/icons/archive.png", "botao-listagem");
-        btnNovaFatura = criarBotao("Cadastrar Faturas", "/icons/plus.png", "botao-cadastro");
-        btnNovaMarca = criarBotao("Cadastrar Marca", "/icons/plus.png", "botao-cadastro");
+        btnNovaFatura = criarBotao("Cadastrar Faturas", "/icons/note-plus.png", "botao-cadastro");
+        btnNovaMarca = criarBotao("Cadastrar Marca", "/icons/note-plus.png", "botao-cadastro");
 
         // Seções
         VBox secaoListagens = new VBox(criarTitulo("Principais Listagens"), btnListarFaturas, btnListarMarcas, btnArquivadas);
