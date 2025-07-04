@@ -170,4 +170,4 @@ git clone https://github.com/seu-usuario/Guardou-Pagou.git
 cd Guardou-Pagou
 ```
 
-Consulte o [Manual do Usuário](./src/MANUALUSUARIO.md) para aprender a usar o Guardou-Pagou.
+ Consulte o [Manual do Usuário](./src/MANUALUSUARIO.md) para aprender a usar o Guardou-Pagou.
