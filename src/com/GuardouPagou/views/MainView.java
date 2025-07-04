@@ -19,6 +19,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Popup;
 
 import java.sql.SQLException;
@@ -31,6 +32,7 @@ import javafx.scene.layout.HBox;
 
 public class MainView {
     private static final Logger LOGGER = Logger.getLogger(MainView.class.getName());
+    private static final double MARCA_FONT_SIZE = 22;
 
     private MenuButton btnFiltrar;
     private RadioMenuItem miFiltrarPeriodo;
@@ -209,7 +211,6 @@ public class MainView {
         tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         // Chama os métodos auxiliares para criar cada coluna
-        TableColumn<Fatura, Integer> colunaId = criarColunaIdFatura();
         TableColumn<Fatura, String> colunaNumeroNota = criarColunaNumeroNotaFatura();
         TableColumn<Fatura, Integer> colunaOrdem = criarColunaOrdemFatura();
         TableColumn<Fatura, LocalDate> colunaVencimento = criarColunaVencimentoFatura();
@@ -217,7 +218,7 @@ public class MainView {
         TableColumn<Fatura, String> colunaStatus = criarColunaStatusFatura();
 
         // Adiciona as colunas e os itens à tabela
-        tabela.getColumns().setAll(List.of(colunaId, colunaNumeroNota, colunaOrdem, colunaVencimento, colunaMarca, colunaStatus));
+        tabela.getColumns().setAll(List.of(colunaNumeroNota, colunaOrdem, colunaVencimento, colunaMarca, colunaStatus));
         tabela.setItems(faturas);
 
         return tabela;
@@ -324,8 +325,23 @@ public class MainView {
                 } else {
                     setText(marca);
                     String cor = getTableView().getItems().get(getIndex()).getMarcaColor();
-                    setTextFill(Color.web(cor));
-                    setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
+                    if (cor != null && cor.matches("#[0-9A-Fa-f]{6}")) {
+                        Text txtNode = new Text(marca);
+                        txtNode.setFill(Color.web(cor));
+                        txtNode.setStroke(Color.BLACK);
+                        txtNode.setStrokeWidth(1);
+                        txtNode.setFont(Font.font(getFont().getFamily(), FontWeight.BOLD, MARCA_FONT_SIZE));
+                        setGraphic(txtNode);
+                        setText(null);
+                        setStyle("-fx-alignment: CENTER_LEFT; -fx-background-color: transparent;");
+                        setFont(Font.font(getFont().getFamily(), FontWeight.BOLD, MARCA_FONT_SIZE));
+                    } else {
+                        setGraphic(null);
+                        setText(marca);
+                        setTextFill(Color.BLACK);
+                        setFont(Font.font(getFont().getFamily(), FontWeight.BOLD, MARCA_FONT_SIZE));
+                        setStyle("-fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-background-color: transparent;");
+                    }
                 }
             }
         });
@@ -413,15 +429,11 @@ public class MainView {
         container.setPadding(new Insets(20));
         container.setStyle("-fx-background-color: #BDBDBD;");
 
-        Label titulo = new Label("LISTAGEM DE MARCAS");
-        titulo.setStyle("-fx-text-fill: #F0A818; -fx-font-size: 18px; -fx-font-weight: bold;");
+        Label titulo = new Label("Listagem de Marcas");
+        titulo.getStyleClass().add("h2");
+        titulo.setTextFill(Color.web("#181848"));
 
         HBox toolbar = new HBox(10);
-        Button btnAtualizar = new Button("Atualizar");
-        btnAtualizar.setStyle("-fx-background-color: #C88200; -fx-text-fill: #000000; -fx-font-weight: bold;");
-        btnAtualizar.setOnAction(e -> atualizarListaMarcas());
-
-        toolbar.getChildren().add(btnAtualizar);
         toolbar.setAlignment(Pos.CENTER_RIGHT);
 
         container.getChildren().addAll(titulo, toolbar, tabela);
