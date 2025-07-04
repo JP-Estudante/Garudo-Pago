@@ -3,6 +3,7 @@ package com.GuardouPagou.controllers;
 import com.GuardouPagou.models.Fatura;
 import com.GuardouPagou.models.NotaFiscal;
 import com.GuardouPagou.views.NotaFiscalDetalhesView;
+import com.GuardouPagou.dao.NotaFiscalDAO;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
@@ -17,6 +18,9 @@ public class NotaFiscalDetalhesController {
 
     private final NotaFiscalDetalhesView view;
     private final Stage stage;
+    private NotaFiscal nota;
+    private String numeroNotaOriginal;
+    private boolean editMode = false;
     private static final Locale PT_BR = Locale.forLanguageTag("pt-BR");
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy", PT_BR);
     private static final NumberFormat CURRENCY_FMT = NumberFormat.getCurrencyInstance(PT_BR);
@@ -29,12 +33,12 @@ public class NotaFiscalDetalhesController {
 
     private void configurarBotoes() {
         view.getBtnVoltar().setOnAction(e -> stage.close());
-        view.getBtnEditar().setOnAction(e -> {
-            // placeholder para implementação futura
-        });
+        view.getBtnEditar().setOnAction(e -> alternarEdicaoOuSalvar());
     }
 
     public void preencherDados(NotaFiscal nota) {
+        this.nota = nota;
+        this.numeroNotaOriginal = nota.getNumeroNota();
         view.getNumeroNotaField().setText(nota.getNumeroNota());
         view.getDataEmissaoPicker().setValue(nota.getDataEmissao());
         view.getMarcaComboBox().setItems(FXCollections.observableArrayList(nota.getMarca()));
@@ -74,6 +78,55 @@ public class NotaFiscalDetalhesController {
             view.getStatusColumn().getChildren().add(statusBox);
 
             index++;
+        }
+    }
+
+    private void alternarEdicaoOuSalvar() {
+        if (!editMode) {
+            habilitarEdicao(true);
+            trocarParaSalvar();
+            editMode = true;
+        } else {
+            salvarAlteracoes();
+            habilitarEdicao(false);
+            trocarParaEditar();
+            editMode = false;
+        }
+    }
+
+    private void habilitarEdicao(boolean enable) {
+        view.getNumeroNotaField().setEditable(enable);
+        view.getDataEmissaoPicker().setDisable(!enable);
+        view.getMarcaComboBox().setDisable(!enable);
+    }
+
+    private void trocarParaSalvar() {
+        view.getBtnEditar().setText("Salvar");
+        view.getBtnEditar().setGraphic(new javafx.scene.image.ImageView(new javafx.scene.image.Image(
+                java.util.Objects.requireNonNull(getClass().getResourceAsStream("/icons/save.png"))
+        )));
+    }
+
+    private void trocarParaEditar() {
+        view.getBtnEditar().setText("Editar");
+        view.getBtnEditar().setGraphic(new javafx.scene.image.ImageView(new javafx.scene.image.Image(
+                java.util.Objects.requireNonNull(getClass().getResourceAsStream("/icons/edit.png"))
+        )));
+    }
+
+    private void salvarAlteracoes() {
+        NotaFiscal nova = new NotaFiscal();
+        nova.setNumeroNota(view.getNumeroNotaField().getText());
+        nova.setDataEmissao(view.getDataEmissaoPicker().getValue());
+        nova.setMarca(view.getMarcaComboBox().getValue());
+        try {
+            new NotaFiscalDAO().atualizarNotaFiscal(numeroNotaOriginal, nova);
+            nota = nova;
+            numeroNotaOriginal = nova.getNumeroNota();
+        } catch (Exception ex) {
+            javafx.scene.control.Alert a = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR,
+                    "Erro ao salvar: " + ex.getMessage());
+            a.showAndWait();
         }
     }
 }

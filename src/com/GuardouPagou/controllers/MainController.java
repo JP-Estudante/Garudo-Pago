@@ -60,6 +60,7 @@ public class MainController {
                 Node viewFaturas = view.criarViewFaturas(faturas);
                 view.setConteudoPrincipal(viewFaturas); // Atualiza a tela com o resultado
                 view.setNotaDoubleClickHandler(this::abrirDetalhesNotaFiscal);
+                configurarInteracoesTabela();
             });
 
             // 4. Define o que fazer se a tarefa falhar
@@ -192,6 +193,48 @@ public class MainController {
         modal.setScene(scene);
         modal.setResizable(false);
         modal.showAndWait();
+    }
+
+    private void configurarInteracoesTabela() {
+        var tabela = view.getTabelaFaturas();
+        if (tabela == null) return;
+
+        Button btnDetalhes = view.getBtnDetalhes();
+        btnDetalhes.setDisable(true);
+
+        tabela.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
+            btnDetalhes.setDisable(newV == null);
+        });
+
+        btnDetalhes.setOnAction(e -> {
+            Fatura f = tabela.getSelectionModel().getSelectedItem();
+            if (f != null) abrirDetalhesNotaFiscal(f);
+        });
+
+        tabela.setOnKeyPressed(ev -> {
+            if (ev.getCode() == KeyCode.ENTER) {
+                Fatura f = tabela.getSelectionModel().getSelectedItem();
+                if (f != null) abrirDetalhesNotaFiscal(f);
+            } else if (ev.getCode() == KeyCode.ESCAPE) {
+                if (tabela.getSelectionModel().getSelectedItem() != null) {
+                    tabela.getSelectionModel().clearSelection();
+                } else {
+                    view.mostrarTelaInicial();
+                }
+            }
+        });
+
+        var container = view.getFaturasViewContainer();
+        if (container != null) {
+            container.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, ev -> {
+                var n = (javafx.scene.Node) ev.getTarget();
+                while (n != null) {
+                    if (n == tabela) return;
+                    n = n.getParent();
+                }
+                tabela.getSelectionModel().clearSelection();
+            });
+        }
     }
 
     private void abrirDetalhesNotaFiscal(Fatura fatura) {

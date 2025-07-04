@@ -51,6 +51,8 @@ public class MainView {
     private final Set<Marca> marcaFilters = new HashSet<>();
     private HBox filterTokens;
     private TableView<Fatura> tabelaFaturas;
+    private Button btnDetalhes;
+    private VBox faturasContainer;
     private java.util.function.Consumer<Fatura> notaDoubleClickHandler;
 
     public MainView() {
@@ -207,10 +209,9 @@ public class MainView {
         TableColumn<Fatura, LocalDate> colunaVencimento = criarColunaVencimentoFatura();
         TableColumn<Fatura, String> colunaMarca = criarColunaMarcaFatura();
         TableColumn<Fatura, String> colunaStatus = criarColunaStatusFatura();
-        TableColumn<Fatura, Void> colunaAcoes = criarColunaAcoesFatura();
 
         // Adiciona as colunas e os itens à tabela
-        tabela.getColumns().setAll(List.of(colunaId, colunaNumeroNota, colunaOrdem, colunaVencimento, colunaMarca, colunaStatus, colunaAcoes));
+        tabela.getColumns().setAll(List.of(colunaId, colunaNumeroNota, colunaOrdem, colunaVencimento, colunaMarca, colunaStatus));
         tabela.setItems(faturas);
 
         return tabela;
@@ -331,49 +332,28 @@ public class MainView {
         coluna.setCellValueFactory(new PropertyValueFactory<>("status"));
         coluna.setPrefWidth(120);
         coluna.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(String status, boolean empty) {
-                super.updateItem(status, empty);
-                if (empty || status == null) {
-                    setText(null); setStyle("");
-                } else {
-                    setText(status);
-                    setTextFill("Vencida".equalsIgnoreCase(status) ? Color.web("#f0a818") : Color.WHITE);
-                    setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
-                }
-            }
-        });
-        return coluna;
-    }
+            private final MenuItem miNaoEmitida = new MenuItem("Não Emitida");
+            private final MenuItem miEmitida = new MenuItem("Emitida");
+            private final MenuButton menu = new MenuButton();
 
-    @SuppressWarnings("unused")
-    private TableColumn<Fatura, Void> criarColunaAcoesFatura() {
-        TableColumn<Fatura, Void> coluna = new TableColumn<>("Ações");
-        coluna.setPrefWidth(100);
-        coluna.setCellFactory(col -> new TableCell<>() {
-            private final Button btnEmitida = new Button("Emitida");
             {
-                btnEmitida.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5px;");
-                btnEmitida.setOnAction(evt -> {
+                menu.getItems().addAll(miNaoEmitida, miEmitida);
+                miEmitida.setOnAction(e -> {
                     Fatura f = getTableView().getItems().get(getIndex());
                     marcarFaturaComoEmitida(f);
                 });
             }
 
             @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+                if (empty || status == null) {
                     setGraphic(null);
                 } else {
-                    Fatura f = getTableView().getItems().get(getIndex());
-                    if ("Emitida".equalsIgnoreCase(f.getStatus()) || "Vencida".equalsIgnoreCase(f.getStatus())) {
-                        setGraphic(null);
-                    } else {
-                        HBox box = new HBox(btnEmitida);
-                        box.setAlignment(Pos.CENTER);
-                        setGraphic(box);
-                    }
+                    menu.setText(status);
+                    menu.setDisable("Emitida".equalsIgnoreCase(status) || "Vencida".equalsIgnoreCase(status));
+                    setGraphic(menu);
+                    setStyle("-fx-alignment: CENTER_LEFT; -fx-background-color: transparent;");
                 }
             }
         });
@@ -499,6 +479,7 @@ public class MainView {
         VBox container = new VBox(18);
         container.setPadding(new Insets(20));
         container.setStyle("-fx-background-color: #BDBDBD;");
+        this.faturasContainer = container;
 
         // 2. Título
         Label titulo = new Label("LISTAGEM DE FATURAS");
@@ -634,14 +615,14 @@ public class MainView {
         });
 
         // ─── Monta toolbar e tabela ───
-        Button btnAtualizar = new Button("Atualizar");
-        btnAtualizar.getStyleClass().addAll("menu-button","botao-listagem");
-        btnAtualizar.setOnAction(e -> atualizarListaFaturas());
+        btnDetalhes = new Button("Detalhes");
+        btnDetalhes.getStyleClass().addAll("menu-button","botao-listagem");
+        btnDetalhes.setDisable(true);
 
         HBox espacador = new HBox();
         HBox.setHgrow(espacador, Priority.ALWAYS);
 
-        HBox toolbar = new HBox(12, btnFiltrar, filterTokens, espacador, btnAtualizar);
+        HBox toolbar = new HBox(12, filterTokens, espacador, btnFiltrar, btnDetalhes);
         toolbar.setAlignment(Pos.CENTER_LEFT);
 
         this.tabelaFaturas = criarTabelaFaturas(faturas);
@@ -897,6 +878,18 @@ public class MainView {
 
     public Button getBtnSalvarEmail() {
         return btnSalvarEmail;
+    }
+
+    public TableView<Fatura> getTabelaFaturas() { return tabelaFaturas; }
+
+    public Button getBtnDetalhes() { return btnDetalhes; }
+
+    public VBox getFaturasViewContainer() { return faturasContainer; }
+
+    public void mostrarTelaInicial() {
+        StackPane painelCentral = new StackPane(labelText);
+        painelCentral.setStyle("-fx-background-color: #BDBDBD;");
+        root.setCenter(painelCentral);
     }
 
     public Label getConteudoLabel() {
