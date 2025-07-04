@@ -336,7 +336,9 @@ public class MainView {
     private TableColumn<Fatura, String> criarColunaStatusFatura() {
         TableColumn<Fatura, String> coluna = new TableColumn<>("STATUS");
         coluna.setCellValueFactory(new PropertyValueFactory<>("status"));
-        coluna.setPrefWidth(120);
+        coluna.setMinWidth(180);
+        coluna.setPrefWidth(180);
+        coluna.setMaxWidth(180);
         coluna.setCellFactory(col -> new TableCell<>() {
             private final MenuItem miNaoEmitida = new MenuItem("Não Emitida");
             private final MenuItem miEmitida = new MenuItem("Emitida");
@@ -345,6 +347,12 @@ public class MainView {
             {
                 menu.getItems().addAll(miNaoEmitida, miEmitida);
                 menu.getStyleClass().add("fatura-status-menu");
+                menu.contextMenuProperty().addListener((obs, oldCtx, newCtx) -> {
+                    if (newCtx != null) {
+                        newCtx.getStyleClass().add("fatura-status-popup");
+                        // (aqui fica também o binding de largura que você já tinha)
+                    }
+                });
                 setAlignment(Pos.CENTER_LEFT);
                 miEmitida.setOnAction(e -> {
                     Fatura f = getTableView().getItems().get(getIndex());

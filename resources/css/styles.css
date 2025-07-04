@@ -744,17 +744,59 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Estilo do MenuButton na coluna de Status das faturas                 */
+/* Estilo do MenuButton na coluna de Status das faturas             */
 /* ------------------------------------------------------------------ */
 .fatura-status-menu {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-    -fx-background-radius: 0;
-    -fx-padding: 0 6 0 6;
-    -fx-text-fill: #FFFFFF;   /* mesma cor das células */
+    /* Fundo, raio e padding */
+    -fx-background-color: #7890A8;
+    -fx-background-radius: 8px;
+    -fx-padding: 6px 12px;
+
+    /* Texto em Poppins 16px e cor #181848 */
+    -fx-font-family: "Poppins";
+    -fx-font-size: 16px;
+    -fx-text-fill: #181848;
+
+    /* Preenche a célula */
     -fx-alignment: CENTER_LEFT;
+    -fx-max-width: Infinity;
+}
+
+/* Sobrescreve cor de texto apenas para este botão */
+.fatura-status-menu {
+  -fx-text-fill: #181848 !important;
+}
+
+/* Garante que o label interno também seja afetado */
+.fatura-status-menu .label {
+  -fx-text-fill: #181848 !important;
 }
 
 .fatura-status-menu:hover {
-    -fx-background-color: #6C6E70; /* leve destaque ao passar o mouse */
+    /* Cor ao passar o mouse */
+    -fx-background-color: #BDBDBD;
 }
+
+/* Itens do menu com largura fixa = largura da coluna */
+.fatura-status-menu .menu-item {
+    -fx-pref-width: 180px;    /* ajuste esse valor à largura da coluna */
+    -fx-padding:    6px 12px;
+    -fx-text-fill:  #181848;
+}
+
+/* Opcional: se quiser garantir o container do popup também */
+.context-menu {
+    -fx-pref-width: 180px;    /* mesma largura */
+}
+
+.menu-button.fatura-status-menu:showing {
+  -fx-background-radius: 8px 8px 0 0;   /* TL TR BR BL */
+}
+
+/* 2) Para o popup (ContextMenu), só arredonda os cantos de baixo */
+.context-menu.fatura-status-popup {
+    -fx-background-color: #BDBDBD !important;
+    -fx-background-radius: 0 0 8px 8px !important;
+    -fx-padding: 0 !important;
+}
+
