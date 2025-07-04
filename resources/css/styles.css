@@ -53,6 +53,11 @@
     -fx-highlight-text-fill: -fx-text-fill; /* Cor do texto selecionado */
 }
 
+/* mostra “not-allowed” quando o campo está apenas para visualização */
+.cursor-unavailable {
+    -fx-cursor: not-allowed;
+}
+
 /* Remove a opacidade padrão dos campos desabilitados APENAS na tela de detalhes */
 .detalhes-nota-root .pill-field .date-picker:disabled,
 .detalhes-nota-root .pill-field .combo-box:disabled {

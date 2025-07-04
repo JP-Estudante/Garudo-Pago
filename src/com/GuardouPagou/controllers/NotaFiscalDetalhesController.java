@@ -146,24 +146,32 @@ public class NotaFiscalDetalhesController {
         for (Fatura f : nota.getFaturas()) {
             Label lblSubtituloVenc = new Label("Vencimento Fatura " + index + ":");
             lblSubtituloVenc.getStyleClass().add("field-subtitle");
-            Label lv = new Label(DATE_FMT.format(f.getVencimento()));
-            VBox vencimentoBox = new VBox(5, lblSubtituloVenc, lv);
+            javafx.scene.control.DatePicker dp = new javafx.scene.control.DatePicker(f.getVencimento());
+            dp.setDisable(true);
+            dp.getStyleClass().addAll("read-only-field", "cursor-unavailable");
+            VBox vencimentoBox = new VBox(5, lblSubtituloVenc, dp);
             vencimentoBox.getStyleClass().add("pill-field");
             vencimentoBox.setPadding(new Insets(4, 10, 4, 10));
             view.getVencimentosColumn().getChildren().add(vencimentoBox);
 
             Label lblSubtituloValor = new Label("Valor Fatura " + index + ":");
             lblSubtituloValor.getStyleClass().add("field-subtitle");
-            Label val = new Label(CURRENCY_FMT.format(f.getValor()));
-            VBox valorBox = new VBox(5, lblSubtituloValor, val);
+            TextField tf = new TextField(CURRENCY_FMT.format(f.getValor()));
+            tf.setEditable(false);
+            tf.getStyleClass().addAll("read-only-field", "cursor-unavailable");
+            VBox valorBox = new VBox(5, lblSubtituloValor, tf);
             valorBox.getStyleClass().add("pill-field");
             valorBox.setPadding(new Insets(4, 10, 4, 10));
             view.getValoresColumn().getChildren().add(valorBox);
 
             Label lblSubtituloStatus = new Label("Status Fatura " + index + ":");
             lblSubtituloStatus.getStyleClass().add("field-subtitle");
-            Label st = new Label(f.getStatus());
-            VBox statusBox = new VBox(5, lblSubtituloStatus, st);
+            javafx.scene.control.ComboBox<String> cb = new javafx.scene.control.ComboBox<>();
+            cb.getItems().addAll("Não Emitida", "Emitida");
+            cb.setValue(f.getStatus());
+            cb.setDisable(true);
+            cb.getStyleClass().add("cursor-unavailable");
+            VBox statusBox = new VBox(5, lblSubtituloStatus, cb);
             statusBox.getStyleClass().add("pill-field");
             statusBox.setPadding(new Insets(4, 10, 4, 10));
             view.getStatusColumn().getChildren().add(statusBox);
