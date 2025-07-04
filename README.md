@@ -533,4 +533,3 @@ CONTRIBUTING.md
 README.md
 build.xml
 manifest.mf
-```
