@@ -344,6 +344,8 @@ public class MainView {
 
             {
                 menu.getItems().addAll(miNaoEmitida, miEmitida);
+                menu.getStyleClass().add("fatura-status-menu");
+                setAlignment(Pos.CENTER_LEFT);
                 miEmitida.setOnAction(e -> {
                     Fatura f = getTableView().getItems().get(getIndex());
                     marcarFaturaComoEmitida(f);
@@ -359,7 +361,6 @@ public class MainView {
                     menu.setText(status);
                     menu.setDisable("Emitida".equalsIgnoreCase(status) || "Vencida".equalsIgnoreCase(status));
                     setGraphic(menu);
-                    setStyle("-fx-alignment: CENTER_LEFT; -fx-background-color: transparent;");
                 }
             }
         });

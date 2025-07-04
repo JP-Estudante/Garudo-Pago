@@ -742,3 +742,19 @@
   -fx-background-color: #BDBDBD;
   -fx-text-fill:      #181848;
 }
+
+/* ------------------------------------------------------------------ */
+/* Estilo do MenuButton na coluna de Status das faturas                 */
+/* ------------------------------------------------------------------ */
+.fatura-status-menu {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0;
+    -fx-padding: 0 6 0 6;
+    -fx-text-fill: #FFFFFF;   /* mesma cor das células */
+    -fx-alignment: CENTER_LEFT;
+}
+
+.fatura-status-menu:hover {
+    -fx-background-color: #6C6E70; /* leve destaque ao passar o mouse */
+}
