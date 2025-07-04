@@ -119,7 +119,10 @@ public class NotaFiscalDetalhesController {
                 }
             }
 
-            nota = nova;
+            // Atualiza objeto existente para manter lista de faturas em memória
+            nota.setNumeroNota(nova.getNumeroNota());
+            nota.setDataEmissao(nova.getDataEmissao());
+            nota.setMarca(nova.getMarca());
             numeroNotaOriginal = nova.getNumeroNota();
             mostrarCamposSomenteLeitura();
         } catch (Exception ex) {
