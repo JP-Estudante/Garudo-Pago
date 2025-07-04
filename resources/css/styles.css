@@ -372,11 +372,16 @@
 }
 
 /* cabeçalho: fundo + borda inferior */
-.table-padrao .column-header-background {
+.table-padrao > .column-header-background {
   -fx-background-color: #7890A8;
   -fx-border-style: none none solid none;
   -fx-border-width: 0 0 1px 0;
   -fx-border-color: transparent transparent #181848 transparent;
+}
+
+/* also target nested headers in case of composite columns */
+.table-padrao .column-header-background {
+  -fx-background-color: #7890A8;
 }
 
 /* 1) Zera borda das linhas (TableRow) para não interferir */

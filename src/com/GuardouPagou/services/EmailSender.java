@@ -6,11 +6,19 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import java.util.List;
 import java.util.Properties;
+import javax.xml.transform.Source;
 
 public class EmailSender {
-    private static final String USER = System.getenv("MAIL_USER");
-    private static final String PASS = System.getenv("MAIL_PASS");
-    private static final String HOST = System.getenv("MAIL_HOST");
+
+    //Usando Intellij
+//    private static final String USER = System.getenv("MAIL_USER");
+//    private static final String PASS = System.getenv("MAIL_PASS");
+//    private static final String HOST = System.getenv("MAIL_HOST");
+
+    //Usando NetBeans
+    //private static final String USER = System.getProperty("MAIL_USER");
+    //private static final String PASS = System.getProperty("MAIL_PASS");
+    //private static final String HOST = System.getProperty("MAIL_HOST");
 
     public static void enviarAlerta(String destinatario, List<Fatura> faturas) throws MessagingException {
         if (USER == null || PASS == null || HOST == null) return;

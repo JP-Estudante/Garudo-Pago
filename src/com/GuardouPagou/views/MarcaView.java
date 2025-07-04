@@ -25,7 +25,7 @@ public class MarcaView {
     }
 
     private void criarUI() {
-        // Raiz e CSS
+        // ——— RAIZ ———
         root = new BorderPane();
         root.setStyle("-fx-background-color: #323437; -fx-padding: 20;");
 
@@ -33,20 +33,26 @@ public class MarcaView {
         lblTitulo = new Label("Cadastro de Marcas");
         lblTitulo.setFont(Font.font("Poppins", FontWeight.BOLD, 24));
         lblTitulo.setTextFill(Color.web("#F0A818"));
+
         lblSubtitle = new Label("Dados da nova marca");
         lblSubtitle.setFont(Font.font("Poppins", FontWeight.NORMAL, 14));
         lblSubtitle.setTextFill(Color.web("#7890A8"));
+
         Separator sep1 = new Separator();
         sep1.setStyle("-fx-background-color: #7890A8;");
+
         VBox headerBox = new VBox(5, lblTitulo, lblSubtitle, sep1);
         headerBox.setAlignment(Pos.CENTER_LEFT);
+        headerBox.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(headerBox, Priority.ALWAYS);
 
         // ——— CAMPOS “PILL” ———
-        // Cria HBox que conterá os três campos e centraliza
-        HBox pillFields = new HBox(15);
-        pillFields.setAlignment(Pos.CENTER);
+        pillFields = new HBox(15);
+        pillFields.setAlignment(Pos.CENTER_LEFT);
+        pillFields.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(pillFields, Priority.ALWAYS);
 
-        // ID (com largura aumentada)
+        // ID
         lblId = new Label();
         lblId.setTextFill(Color.web("#181848"));
         Label idLabel = new Label("# ID - Marca:");
@@ -58,114 +64,95 @@ public class MarcaView {
         // Nome da Marca
         tfNome = new TextField();
         tfNome.setPromptText("Digite um nome");
+        tfNome.setMaxWidth(Double.MAX_VALUE);
         Label nomeLabel = new Label("Nome da Marca:");
         nomeLabel.getStyleClass().add("field-subtitle");
         VBox nomeBox = new VBox(3, nomeLabel, tfNome);
         nomeBox.getStyleClass().add("pill-field");
+        HBox.setHgrow(nomeBox, Priority.ALWAYS);
 
         // Cor
         colorPicker = new ColorPicker();
+        colorPicker.setMaxWidth(Double.MAX_VALUE);
         Label corLabel = new Label("Cor:");
         corLabel.getStyleClass().add("field-subtitle");
         VBox corBox = new VBox(3, corLabel, colorPicker);
         corBox.getStyleClass().add("pill-field");
         colorPicker.getStyleClass().add("pill-color-picker");
+        HBox.setHgrow(corBox, Priority.ALWAYS);
 
-        // Adiciona os três campos e centraliza-os
-        HBox pillContainer = new HBox(pillFields);
-        pillContainer.setAlignment(Pos.CENTER);
         pillFields.getChildren().addAll(idBox, nomeBox, corBox);
 
         // ——— DESCRIÇÃO ———
-        taDescricao = new TextArea();
-            
-        taDescricao.setPrefWidth(600);
-        taDescricao.setPrefHeight(200);
-        
-        taDescricao.setPromptText("Descrição (opcional, até 500 caracteres)");
-        taDescricao.setWrapText(true);
-        taDescricao.setPrefRowCount(5);
-        taDescricao.getStyleClass().add("text-area-pill");
-
-        // rótulo de descrição
         Label descLabel = new Label("Descrição");
         descLabel.getStyleClass().add("field-subtitle");
 
-        // contador de caracteres
+        taDescricao = new TextArea();
+        taDescricao.setPromptText("Descrição (opcional, até 500 caracteres)");
+        taDescricao.setWrapText(true);
+        taDescricao.getStyleClass().add("text-area-pill");
+        taDescricao.setMaxWidth(Double.MAX_VALUE);
+        taDescricao.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(taDescricao, Priority.ALWAYS);
+
         lblDescCounter = new Label("0/500");
         lblDescCounter.getStyleClass().add("desc-counter");
-
-        // HBox para alinhar contador à direita
         HBox counterBox = new HBox(lblDescCounter);
         counterBox.setAlignment(Pos.CENTER_RIGHT);
 
-        // VBox de descrição: label, textarea e counter
         VBox descBox = new VBox(5, descLabel, taDescricao, counterBox);
         descBox.setStyle(
-                "-fx-background-color: #BDBDBD; "
-                + "-fx-background-radius: 10; "
-                + "-fx-padding: 10;"
+                "-fx-background-color: #BDBDBD; " +
+                        "-fx-background-radius: 10; " +
+                        "-fx-padding: 10;"
         );
+        descBox.setMaxWidth(Double.MAX_VALUE);
+        descBox.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(descBox, Priority.ALWAYS);
 
         // ——— BOTÕES ———
         btnLimpar = new Button("Limpar");
         btnLimpar.getStyleClass().addAll("modal-button", "icon-clean");
         btnLimpar.setFont(Font.font("Poppins", FontWeight.BOLD, 16));
+        btnLimpar.setPrefSize(120, 40);
 
         btnGravar = new Button("Gravar");
         btnGravar.getStyleClass().addAll("modal-button", "icon-save");
         btnGravar.setFont(Font.font("Poppins", FontWeight.BOLD, 16));
-
-                btnLimpar.setPrefSize(120, 40);
         btnGravar.setPrefSize(120, 40);
-        
+
         HBox buttonBox = new HBox(10, btnLimpar, btnGravar);
         buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.prefWidthProperty().bind(descBox.widthProperty());
         buttonBox.setPadding(new Insets(10, 0, 0, 0));
 
-        // ——— MONTA CONTAINER PRINCIPAL ———
+        // ——— CONTAINER PRINCIPAL ———
         VBox container = new VBox(15,
                 headerBox,
-                pillContainer, // usa o container centralizado
+                pillFields,
                 descBox,
                 buttonBox
         );
         container.setAlignment(Pos.TOP_LEFT);
+        container.setMaxWidth(Double.MAX_VALUE);
+        container.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(container, Priority.ALWAYS);
 
-        root.setCenter(container);
+        // ——— MAIN CONTAINER PARA PREENCHER TELA ———
+        HBox mainContainer = new HBox(container);
+        mainContainer.setAlignment(Pos.TOP_LEFT);
+        mainContainer.setFillHeight(true);
+        HBox.setHgrow(container, Priority.ALWAYS);
+
+        root.setCenter(mainContainer);
     }
 
     // === GETTERS ===
-    public BorderPane getRoot() {
-        return root;
-    }
-
-    public TextField getNomeField() {
-        return tfNome;
-    }
-
-    public TextArea getDescricaoArea() {
-        return taDescricao;
-    }
-
-    public ColorPicker getCorPicker() {
-        return colorPicker;
-    }
-
-    public Button getLimparButton() {
-        return btnLimpar;
-    }
-
-    public Button getSalvarButton() {
-        return btnGravar;
-    }
-
-    public void setNextId(int id) {
-        lblId.setText(String.format("%04d", id));
-    }
-
-    public Label getDescCounterLabel() {
-        return lblDescCounter;
-    }
+    public BorderPane getRoot() { return root; }
+    public TextField getNomeField() { return tfNome; }
+    public TextArea getDescricaoArea() { return taDescricao; }
+    public ColorPicker getCorPicker() { return colorPicker; }
+    public Button getLimparButton() { return btnLimpar; }
+    public Button getSalvarButton() { return btnGravar; }
+    public void setNextId(int id) { lblId.setText(String.format("%04d", id)); }
+    public Label getDescCounterLabel() { return lblDescCounter; }
 }
