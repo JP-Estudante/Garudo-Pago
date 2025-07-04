@@ -200,11 +200,12 @@ public class MainController {
         if (tabela == null) return;
 
         Button btnDetalhes = view.getBtnDetalhes();
-        btnDetalhes.setDisable(true);
-
-        tabela.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
-            btnDetalhes.setDisable(newV == null);
-        });
+        // limpa bindings anteriores caso o método seja chamado novamente
+        btnDetalhes.disableProperty().unbind();
+        // vincula a propriedade disable do botão à seleção atual
+        btnDetalhes.disableProperty().bind(
+                tabela.getSelectionModel().selectedItemProperty().isNull()
+        );
 
         btnDetalhes.setOnAction(e -> {
             Fatura f = tabela.getSelectionModel().getSelectedItem();
