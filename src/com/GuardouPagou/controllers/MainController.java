@@ -224,18 +224,6 @@ public class MainController {
                 }
             }
         });
-
-        var container = view.getFaturasViewContainer();
-        if (container != null) {
-            container.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, ev -> {
-                var n = (javafx.scene.Node) ev.getTarget();
-                while (n != null) {
-                    if (n == tabela) return;
-                    n = n.getParent();
-                }
-                tabela.getSelectionModel().clearSelection();
-            });
-        }
     }
 
     private void abrirDetalhesNotaFiscal(Fatura fatura) {
