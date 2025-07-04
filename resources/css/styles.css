@@ -624,9 +624,9 @@
 
 /* ─── Submenu nativo do MenuButton “Filtrar” ─── */
 .context-menu {
-  -fx-background-color: #4C4F53 !important;
-  -fx-background-radius: 8px !important;
-  -fx-background-radius: 0 12 12 12 !important;
+  -fx-background-color: #4C4F53;
+  -fx-background-radius: 8px;
+  -fx-background-radius: 0 12 12 12;
 }
 
 /* itens “normais” sem cor de fundo (herdam o cinza do container) */
@@ -743,60 +743,60 @@
   -fx-text-fill:      #181848;
 }
 
-/* ------------------------------------------------------------------ */
-/* Estilo do MenuButton na coluna de Status das faturas             */
-/* ------------------------------------------------------------------ */
+/* -------------------------------------------------------
+   BOTÃO na célula: fatura-status-menu
+------------------------------------------------------- */
 .fatura-status-menu {
-    /* Fundo, raio e padding */
     -fx-background-color: #7890A8;
     -fx-background-radius: 8px;
     -fx-padding: 6px 12px;
-
-    /* Texto em Poppins 16px e cor #181848 */
     -fx-font-family: "Poppins";
     -fx-font-size: 16px;
-    -fx-text-fill: #181848;
-
-    /* Preenche a célula */
+    -fx-text-fill: #181848 !important;
     -fx-alignment: CENTER_LEFT;
-    -fx-max-width: Infinity;
 }
-
-/* Sobrescreve cor de texto apenas para este botão */
-.fatura-status-menu {
-  -fx-text-fill: #181848 !important;
-}
-
-/* Garante que o label interno também seja afetado */
 .fatura-status-menu .label {
-  -fx-text-fill: #181848 !important;
+    -fx-text-fill: #181848 !important;
 }
-
+.menu-button.fatura-status-menu:showing {
+    -fx-background-radius: 8px 8px 0 0;
+}
 .fatura-status-menu:hover {
-    /* Cor ao passar o mouse */
     -fx-background-color: #BDBDBD;
 }
 
-/* Itens do menu com largura fixa = largura da coluna */
-.fatura-status-menu .menu-item {
-    -fx-pref-width: 180px;    /* ajuste esse valor à largura da coluna */
-    -fx-padding:    6px 12px;
-    -fx-text-fill:  #181848;
+.fatura-status-menu > .arrow-button {
+  -fx-opacity: 0;
+  -fx-pref-width: 0;
+  -fx-max-width: 0;
 }
 
-/* Opcional: se quiser garantir o container do popup também */
-.context-menu {
-    -fx-pref-width: 180px;    /* mesma largura */
+.menu-button.fatura-status-menu .open > .menu {
+    -fx-background-color: #FFECB3;   /* coloque aqui a cor que você quiser */
+    -fx-background-radius: 8px;      /* mantém os cantos arredondados */
+    -fx-padding: 4px 0;              /* um pouquinho de padding em cima/baixo */
 }
 
-.menu-button.fatura-status-menu:showing {
-  -fx-background-radius: 8px 8px 0 0;   /* TL TR BR BL */
-}
-
-/* 2) Para o popup (ContextMenu), só arredonda os cantos de baixo */
+/* -------------------------------------------------------
+   POPUP (ContextMenu) customizado: fatura-status-popup
+------------------------------------------------------- */
 .context-menu.fatura-status-popup {
     -fx-background-color: #BDBDBD !important;
     -fx-background-radius: 0 0 8px 8px !important;
     -fx-padding: 0 !important;
 }
 
+.context-menu {
+    -fx-pref-width: 180px;    /* mesma largura */
+}
+
+/* itens dentro DESSE popup apenas */
+.context-menu.fatura-status-popup .menu-item {
+    -fx-pref-width: 100%;      /* preenche toda a largura do popup */
+    -fx-padding: 8px 12px !important;
+    -fx-text-fill: #181848 !important;
+    -fx-background-color: transparent;
+}
+.context-menu.fatura-status-popup .menu-item:hover {
+    -fx-background-color: #181848;
+}

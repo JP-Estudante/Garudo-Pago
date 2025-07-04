@@ -341,19 +341,35 @@ public class MainView {
         coluna.setMaxWidth(180);
         coluna.setCellFactory(col -> new TableCell<>() {
             private final MenuItem miNaoEmitida = new MenuItem("Não Emitida");
-            private final MenuItem miEmitida = new MenuItem("Emitida");
-            private final MenuButton menu = new MenuButton();
+            private final MenuItem miEmitida   = new MenuItem("Emitida");
+            private final MenuButton menu      = new MenuButton();
 
             {
+                // 1) monta itens e estilo
                 menu.getItems().addAll(miNaoEmitida, miEmitida);
                 menu.getStyleClass().add("fatura-status-menu");
-                menu.contextMenuProperty().addListener((obs, oldCtx, newCtx) -> {
-                    if (newCtx != null) {
-                        newCtx.getStyleClass().add("fatura-status-popup");
-                        // (aqui fica também o binding de largura que você já tinha)
+                setAlignment(Pos.CENTER_LEFT);
+
+                // 2) força criação e estilização do ContextMenu ANTES do primeiro show()
+                ContextMenu ctx = menu.getContextMenu();
+                if (ctx != null) {
+                    ctx.getStyleClass().add("fatura-status-popup");
+                    ctx.prefWidthProperty().bind(menu.widthProperty());
+                }
+
+                // 3) remove seta e abre ao clicar em qualquer parte
+                menu.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+                    Node arrow = menu.lookup(".arrow-button");
+                    if (arrow != null) {
+                        arrow.setVisible(false);
+                        arrow.setManaged(false);
                     }
                 });
-                setAlignment(Pos.CENTER_LEFT);
+                menu.setOnMouseClicked(e -> {
+                    if (!menu.isDisabled()) menu.show();
+                });
+
+                // 4) ação “Emitida”
                 miEmitida.setOnAction(e -> {
                     Fatura f = getTableView().getItems().get(getIndex());
                     marcarFaturaComoEmitida(f);
