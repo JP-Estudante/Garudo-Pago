@@ -513,9 +513,9 @@ public class MainView {
         this.faturasContainer = container;
 
         // 2. Título
-        Label titulo = new Label("LISTAGEM DE FATURAS");
-        titulo.getStyleClass().add("h5");
-        titulo.setTextFill(Color.web("#F0A818"));
+        Label titulo = new Label("Listagem de Faturas");
+        titulo.getStyleClass().add("h2");
+        titulo.setTextFill(Color.web("#181848"));
 
         // 3. MenuButton Filtrar
         ToggleGroup filtroToggleGroup = new ToggleGroup();
