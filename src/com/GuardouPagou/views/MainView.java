@@ -735,9 +735,9 @@ public class MainView {
         }
     }
 
-    private void showAlert(String titulo, String msg) {
+    private void showAlert(String msg) {
         Alert a = new Alert(Alert.AlertType.ERROR);
-        a.setTitle(titulo);
+        a.setTitle("Erro ao filtrar faturas");
         a.setHeaderText(null);
         a.setContentText(msg);
         a.showAndWait();
@@ -839,7 +839,7 @@ public class MainView {
             mostrarListaFaturas(resultado);
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "Erro ao aplicar filtros de faturas", ex);
-            showAlert("Erro ao filtrar faturas", ex.getMessage());
+            showAlert(ex.getMessage());
         }
     }
 
@@ -875,25 +875,6 @@ public class MainView {
         filtroPopup.hide();
     }
 
-    private void mostrarTodasFaturas() {
-        try {
-            // 1. Busca os dados
-            ObservableList<Fatura> faturas = new FaturaDAO().listarFaturas(false);
-
-            // 2. Cria a view com base nos dados
-            Node viewFaturas = criarViewFaturas(faturas);
-
-            // 3. Define a view como o conteúdo principal, substituindo o antigo
-            setConteudoPrincipal(viewFaturas);
-
-        } catch (SQLException ex) {
-            LOGGER.log(Level.SEVERE, "Erro ao carregar todas as faturas.", ex);
-            // Lógica para tratar o erro
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao carregar todas as faturas: " + ex.getMessage());
-            alert.showAndWait();
-        }
-    }
-
     public Button getBtnListarFaturas() {
         return btnListarFaturas;
     }
@@ -916,10 +897,6 @@ public class MainView {
 
     public Button getBtnSalvarEmail() {
         return btnSalvarEmail;
-    }
-
-    public TextField getEmailField() {
-        return emailField;
     }
 
     public Label getConteudoLabel() {
