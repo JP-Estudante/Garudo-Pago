@@ -7,10 +7,11 @@ import com.GuardouPagou.dao.NotaFiscalDAO;
 import com.GuardouPagou.dao.MarcaDAO;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -23,6 +24,7 @@ public class NotaFiscalDetalhesController {
     private String numeroNotaOriginal;
     private boolean editMode = false;
     private java.util.List<javafx.scene.control.DatePicker> dpVencimentos;
+    private java.util.List<javafx.scene.control.TextField> tfValores;
     private java.util.List<javafx.scene.control.ComboBox<String>> cbStatus;
     private static final Locale PT_BR = Locale.forLanguageTag("pt-BR");
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy", PT_BR);
@@ -110,10 +112,13 @@ public class NotaFiscalDetalhesController {
             new NotaFiscalDAO().atualizarNotaFiscal(numeroNotaOriginal, nova);
 
             // Atualiza cada fatura conforme os controles de edição
-            if (dpVencimentos != null && cbStatus != null) {
+            if (dpVencimentos != null && cbStatus != null && tfValores != null) {
                 for (int i = 0; i < nota.getFaturas().size(); i++) {
                     Fatura f = nota.getFaturas().get(i);
                     f.setVencimento(dpVencimentos.get(i).getValue());
+                    String txt = tfValores.get(i).getText();
+                    String clean = txt.replaceAll("[^\\d,]", "").replace(",", ".");
+                    f.setValor(clean.isEmpty() ? 0.0 : Double.parseDouble(clean));
                     f.setStatus(cbStatus.get(i).getValue());
                     new com.GuardouPagou.dao.FaturaDAO().atualizarFatura(f);
                 }
@@ -169,8 +174,10 @@ public class NotaFiscalDetalhesController {
 
     private void mostrarCamposEdicao() {
         dpVencimentos = new java.util.ArrayList<>();
+        tfValores = new java.util.ArrayList<>();
         cbStatus = new java.util.ArrayList<>();
         view.getVencimentosColumn().getChildren().clear();
+        view.getValoresColumn().getChildren().clear();
         view.getStatusColumn().getChildren().clear();
 
         int idx = 1;
@@ -183,6 +190,15 @@ public class NotaFiscalDetalhesController {
             boxVen.setPadding(new Insets(4, 10, 4, 10));
             view.getVencimentosColumn().getChildren().add(boxVen);
             dpVencimentos.add(dp);
+
+            Label lblVal = new Label("Valor Fatura " + idx + ":");
+            lblVal.getStyleClass().add("field-subtitle");
+            TextField tf = criarValorField(f.getValor());
+            VBox boxVal = new VBox(5, lblVal, tf);
+            boxVal.getStyleClass().add("pill-field");
+            boxVal.setPadding(new Insets(4, 10, 4, 10));
+            view.getValoresColumn().getChildren().add(boxVal);
+            tfValores.add(tf);
 
             Label lblSt = new Label("Status Fatura " + idx + ":");
             lblSt.getStyleClass().add("field-subtitle");
@@ -197,5 +213,28 @@ public class NotaFiscalDetalhesController {
 
             idx++;
         }
+    }
+
+    private TextField criarValorField(double valorInicial) {
+        TextField tf = new TextField(CURRENCY_FMT.format(valorInicial));
+        tf.setPrefWidth(150);
+        final boolean[] updating = { false };
+
+        tf.textProperty().addListener((obs, oldText, newText) -> {
+            if (updating[0]) return;
+            updating[0] = true;
+
+            String digits = newText.replaceAll("\\D", "");
+            long cents = digits.isEmpty() ? 0L : Long.parseLong(digits);
+            BigDecimal value = BigDecimal.valueOf(cents, 2);
+
+            String formatted = CURRENCY_FMT.format(value);
+            tf.setText(formatted);
+            tf.positionCaret(formatted.length());
+
+            updating[0] = false;
+        });
+
+        return tf;
     }
 }

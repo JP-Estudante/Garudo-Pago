@@ -299,14 +299,15 @@ public class FaturaDAO {
         return faturas;
     }
 
-    // Novo método para atualizar vencimento e status de uma fatura
+    // Novo método para atualizar vencimento, valor e status de uma fatura
     public boolean atualizarFatura(Fatura fatura) throws SQLException {
-        String sql = "UPDATE faturas SET vencimento = ?, status = ? WHERE id = ?";
+        String sql = "UPDATE faturas SET vencimento = ?, valor = ?, status = ? WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setDate(1, Date.valueOf(fatura.getVencimento()));
-            stmt.setString(2, fatura.getStatus());
-            stmt.setInt(3, fatura.getId());
+            stmt.setDouble(2, fatura.getValor());
+            stmt.setString(3, fatura.getStatus());
+            stmt.setInt(4, fatura.getId());
             return stmt.executeUpdate() > 0;
         }
     }
