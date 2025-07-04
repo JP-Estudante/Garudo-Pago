@@ -265,12 +265,15 @@ public class MainController {
                 }
             });
 
-            modal.setScene(scene);
-            modal.setResizable(false);
-            modal.showAndWait();
-        } catch (Exception ex) {
-            Alert a = new Alert(Alert.AlertType.ERROR, "Erro ao abrir detalhes: " + ex.getMessage());
-            a.showAndWait();
-        }
+        modal.setScene(scene);
+        modal.setResizable(false);
+        modal.showAndWait();
+
+        // Recarrega a listagem para refletir possíveis edições
+        view.recarregarListaFaturas();
+    } catch (Exception ex) {
+        Alert a = new Alert(Alert.AlertType.ERROR, "Erro ao abrir detalhes: " + ex.getMessage());
+        a.showAndWait();
     }
+}
 }

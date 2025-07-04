@@ -76,6 +76,12 @@ public class MainView {
         atualizarListaComFiltros();
     }
 
+    // Novo: torna público para que o controller possa chamar quando
+    // a tela de detalhes for fechada e seja necessário recarregar a lista
+    public void recarregarListaFaturas() {
+        atualizarListaFaturas();
+    }
+
     private void criarUI() {
         root = new BorderPane();
         root.getStyleClass().add("main-root");

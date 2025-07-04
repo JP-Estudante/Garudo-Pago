@@ -4,6 +4,7 @@ import com.GuardouPagou.models.Fatura;
 import com.GuardouPagou.models.NotaFiscal;
 import com.GuardouPagou.views.NotaFiscalDetalhesView;
 import com.GuardouPagou.dao.NotaFiscalDAO;
+import com.GuardouPagou.dao.MarcaDAO;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
@@ -21,6 +22,8 @@ public class NotaFiscalDetalhesController {
     private NotaFiscal nota;
     private String numeroNotaOriginal;
     private boolean editMode = false;
+    private java.util.List<javafx.scene.control.DatePicker> dpVencimentos;
+    private java.util.List<javafx.scene.control.ComboBox<String>> cbStatus;
     private static final Locale PT_BR = Locale.forLanguageTag("pt-BR");
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy", PT_BR);
     private static final NumberFormat CURRENCY_FMT = NumberFormat.getCurrencyInstance(PT_BR);
@@ -41,44 +44,18 @@ public class NotaFiscalDetalhesController {
         this.numeroNotaOriginal = nota.getNumeroNota();
         view.getNumeroNotaField().setText(nota.getNumeroNota());
         view.getDataEmissaoPicker().setValue(nota.getDataEmissao());
-        view.getMarcaComboBox().setItems(FXCollections.observableArrayList(nota.getMarca()));
-        view.getMarcaComboBox().getSelectionModel().selectFirst();
 
-        view.getVencimentosColumn().getChildren().clear();
-        view.getValoresColumn().getChildren().clear();
-        view.getStatusColumn().getChildren().clear();
-
-        int index = 1;
-        for (Fatura f : nota.getFaturas()) {
-            // --- Vencimento ---
-            Label lblSubtituloVenc = new Label("Vencimento Fatura " + index + ":");
-            lblSubtituloVenc.getStyleClass().add("field-subtitle");
-            Label lv = new Label(DATE_FMT.format(f.getVencimento()));
-            VBox vencimentoBox = new VBox(5, lblSubtituloVenc, lv); // VBox com subtítulo e dado
-            vencimentoBox.getStyleClass().add("pill-field");
-            vencimentoBox.setPadding(new Insets(4, 10, 4, 10));
-            view.getVencimentosColumn().getChildren().add(vencimentoBox);
-
-            // --- Valor ---
-            Label lblSubtituloValor = new Label("Valor Fatura " + index + ":");
-            lblSubtituloValor.getStyleClass().add("field-subtitle");
-            Label val = new Label(CURRENCY_FMT.format(f.getValor()));
-            VBox valorBox = new VBox(5, lblSubtituloValor, val);
-            valorBox.getStyleClass().add("pill-field");
-            valorBox.setPadding(new Insets(4, 10, 4, 10));
-            view.getValoresColumn().getChildren().add(valorBox);
-
-            // --- Status ---
-            Label lblSubtituloStatus = new Label("Status Fatura " + index + ":");
-            lblSubtituloStatus.getStyleClass().add("field-subtitle");
-            Label st = new Label(f.getStatus());
-            VBox statusBox = new VBox(5, lblSubtituloStatus, st);
-            statusBox.getStyleClass().add("pill-field");
-            statusBox.setPadding(new Insets(4, 10, 4, 10));
-            view.getStatusColumn().getChildren().add(statusBox);
-
-            index++;
+        try {
+            var marcas = new MarcaDAO().listarMarcas().stream()
+                    .map(com.GuardouPagou.models.Marca::getNome)
+                    .toList();
+            view.getMarcaComboBox().setItems(FXCollections.observableArrayList(marcas));
+        } catch (Exception ex) {
+            view.getMarcaComboBox().setItems(FXCollections.observableArrayList(nota.getMarca()));
         }
+        view.getMarcaComboBox().getSelectionModel().select(nota.getMarca());
+
+        mostrarCamposSomenteLeitura();
     }
 
     private void alternarEdicaoOuSalvar() {
@@ -98,20 +75,30 @@ public class NotaFiscalDetalhesController {
         view.getNumeroNotaField().setEditable(enable);
         view.getDataEmissaoPicker().setDisable(!enable);
         view.getMarcaComboBox().setDisable(!enable);
+
+        if (enable) {
+            mostrarCamposEdicao();
+        } else {
+            mostrarCamposSomenteLeitura();
+        }
     }
 
     private void trocarParaSalvar() {
         view.getBtnEditar().setText("Salvar");
-        view.getBtnEditar().setGraphic(new javafx.scene.image.ImageView(new javafx.scene.image.Image(
+        javafx.scene.image.ImageView icon = new javafx.scene.image.ImageView(new javafx.scene.image.Image(
                 java.util.Objects.requireNonNull(getClass().getResourceAsStream("/icons/save.png"))
-        )));
+        ));
+        icon.setFitHeight(20); icon.setFitWidth(20);
+        view.getBtnEditar().setGraphic(icon);
     }
 
     private void trocarParaEditar() {
         view.getBtnEditar().setText("Editar");
-        view.getBtnEditar().setGraphic(new javafx.scene.image.ImageView(new javafx.scene.image.Image(
+        javafx.scene.image.ImageView icon = new javafx.scene.image.ImageView(new javafx.scene.image.Image(
                 java.util.Objects.requireNonNull(getClass().getResourceAsStream("/icons/edit.png"))
-        )));
+        ));
+        icon.setFitHeight(20); icon.setFitWidth(20);
+        view.getBtnEditar().setGraphic(icon);
     }
 
     private void salvarAlteracoes() {
@@ -121,12 +108,91 @@ public class NotaFiscalDetalhesController {
         nova.setMarca(view.getMarcaComboBox().getValue());
         try {
             new NotaFiscalDAO().atualizarNotaFiscal(numeroNotaOriginal, nova);
+
+            // Atualiza cada fatura conforme os controles de edição
+            if (dpVencimentos != null && cbStatus != null) {
+                for (int i = 0; i < nota.getFaturas().size(); i++) {
+                    Fatura f = nota.getFaturas().get(i);
+                    f.setVencimento(dpVencimentos.get(i).getValue());
+                    f.setStatus(cbStatus.get(i).getValue());
+                    new com.GuardouPagou.dao.FaturaDAO().atualizarFatura(f);
+                }
+            }
+
             nota = nova;
             numeroNotaOriginal = nova.getNumeroNota();
+            mostrarCamposSomenteLeitura();
         } catch (Exception ex) {
             javafx.scene.control.Alert a = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR,
                     "Erro ao salvar: " + ex.getMessage());
             a.showAndWait();
+        }
+    }
+
+    private void mostrarCamposSomenteLeitura() {
+        view.getVencimentosColumn().getChildren().clear();
+        view.getValoresColumn().getChildren().clear();
+        view.getStatusColumn().getChildren().clear();
+
+        int index = 1;
+        for (Fatura f : nota.getFaturas()) {
+            Label lblSubtituloVenc = new Label("Vencimento Fatura " + index + ":");
+            lblSubtituloVenc.getStyleClass().add("field-subtitle");
+            Label lv = new Label(DATE_FMT.format(f.getVencimento()));
+            VBox vencimentoBox = new VBox(5, lblSubtituloVenc, lv);
+            vencimentoBox.getStyleClass().add("pill-field");
+            vencimentoBox.setPadding(new Insets(4, 10, 4, 10));
+            view.getVencimentosColumn().getChildren().add(vencimentoBox);
+
+            Label lblSubtituloValor = new Label("Valor Fatura " + index + ":");
+            lblSubtituloValor.getStyleClass().add("field-subtitle");
+            Label val = new Label(CURRENCY_FMT.format(f.getValor()));
+            VBox valorBox = new VBox(5, lblSubtituloValor, val);
+            valorBox.getStyleClass().add("pill-field");
+            valorBox.setPadding(new Insets(4, 10, 4, 10));
+            view.getValoresColumn().getChildren().add(valorBox);
+
+            Label lblSubtituloStatus = new Label("Status Fatura " + index + ":");
+            lblSubtituloStatus.getStyleClass().add("field-subtitle");
+            Label st = new Label(f.getStatus());
+            VBox statusBox = new VBox(5, lblSubtituloStatus, st);
+            statusBox.getStyleClass().add("pill-field");
+            statusBox.setPadding(new Insets(4, 10, 4, 10));
+            view.getStatusColumn().getChildren().add(statusBox);
+
+            index++;
+        }
+    }
+
+    private void mostrarCamposEdicao() {
+        dpVencimentos = new java.util.ArrayList<>();
+        cbStatus = new java.util.ArrayList<>();
+        view.getVencimentosColumn().getChildren().clear();
+        view.getStatusColumn().getChildren().clear();
+
+        int idx = 1;
+        for (Fatura f : nota.getFaturas()) {
+            Label lblVen = new Label("Vencimento Fatura " + idx + ":");
+            lblVen.getStyleClass().add("field-subtitle");
+            javafx.scene.control.DatePicker dp = new javafx.scene.control.DatePicker(f.getVencimento());
+            VBox boxVen = new VBox(5, lblVen, dp);
+            boxVen.getStyleClass().add("pill-field");
+            boxVen.setPadding(new Insets(4, 10, 4, 10));
+            view.getVencimentosColumn().getChildren().add(boxVen);
+            dpVencimentos.add(dp);
+
+            Label lblSt = new Label("Status Fatura " + idx + ":");
+            lblSt.getStyleClass().add("field-subtitle");
+            javafx.scene.control.ComboBox<String> cb = new javafx.scene.control.ComboBox<>();
+            cb.getItems().addAll("Não Emitida", "Emitida");
+            cb.setValue(f.getStatus());
+            VBox boxSt = new VBox(5, lblSt, cb);
+            boxSt.getStyleClass().add("pill-field");
+            boxSt.setPadding(new Insets(4, 10, 4, 10));
+            view.getStatusColumn().getChildren().add(boxSt);
+            cbStatus.add(cb);
+
+            idx++;
         }
     }
 }
