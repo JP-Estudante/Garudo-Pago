@@ -632,9 +632,12 @@ public class MainView {
         HBox toolbar = new HBox(12, filterTokens, btnFiltrar, espacador, btnDetalhes);
         toolbar.setAlignment(Pos.CENTER_LEFT);
 
+        // Espaçador para posicionar a toolbar à direita
+        Region headerSpacer = new Region();
+        HBox.setHgrow(headerSpacer, Priority.ALWAYS);
 
         // 8. Agrupa título e toolbar no mesmo eixo Y
-        HBox header = new HBox(20, titulo, toolbar);
+        HBox header = new HBox(20, titulo, headerSpacer, toolbar);
         header.setAlignment(Pos.CENTER_LEFT);
 
         // 9. Cria e configura a tabela
