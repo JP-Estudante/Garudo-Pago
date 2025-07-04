@@ -60,6 +60,7 @@ public class MainController {
                 Node viewFaturas = view.criarViewFaturas(faturas);
                 view.setConteudoPrincipal(viewFaturas); // Atualiza a tela com o resultado
                 view.setNotaDoubleClickHandler(this::abrirDetalhesNotaFiscal);
+                configurarInteracoesTabela();
             });
 
             // 4. Define o que fazer se a tarefa falhar
@@ -194,6 +195,37 @@ public class MainController {
         modal.showAndWait();
     }
 
+    private void configurarInteracoesTabela() {
+        var tabela = view.getTabelaFaturas();
+        if (tabela == null) return;
+
+        Button btnDetalhes = view.getBtnDetalhes();
+        // limpa bindings anteriores caso o método seja chamado novamente
+        btnDetalhes.disableProperty().unbind();
+        // vincula a propriedade disable do botão à seleção atual
+        btnDetalhes.disableProperty().bind(
+                tabela.getSelectionModel().selectedItemProperty().isNull()
+        );
+
+        btnDetalhes.setOnAction(e -> {
+            Fatura f = tabela.getSelectionModel().getSelectedItem();
+            if (f != null) abrirDetalhesNotaFiscal(f);
+        });
+
+        tabela.setOnKeyPressed(ev -> {
+            if (ev.getCode() == KeyCode.ENTER) {
+                Fatura f = tabela.getSelectionModel().getSelectedItem();
+                if (f != null) abrirDetalhesNotaFiscal(f);
+            } else if (ev.getCode() == KeyCode.ESCAPE) {
+                if (tabela.getSelectionModel().getSelectedItem() != null) {
+                    tabela.getSelectionModel().clearSelection();
+                } else {
+                    view.mostrarTelaInicial();
+                }
+            }
+        });
+    }
+
     private void abrirDetalhesNotaFiscal(Fatura fatura) {
         try {
             NotaFiscal nota = new NotaFiscalDAO().buscarNotaFiscalPorId(fatura.getNotaFiscalId());
@@ -222,12 +254,15 @@ public class MainController {
                 }
             });
 
-            modal.setScene(scene);
-            modal.setResizable(false);
-            modal.showAndWait();
-        } catch (Exception ex) {
-            Alert a = new Alert(Alert.AlertType.ERROR, "Erro ao abrir detalhes: " + ex.getMessage());
-            a.showAndWait();
-        }
+        modal.setScene(scene);
+        modal.setResizable(false);
+        modal.showAndWait();
+
+        // Recarrega a listagem para refletir possíveis edições
+        view.recarregarListaFaturas();
+    } catch (Exception ex) {
+        Alert a = new Alert(Alert.AlertType.ERROR, "Erro ao abrir detalhes: " + ex.getMessage());
+        a.showAndWait();
     }
+}
 }

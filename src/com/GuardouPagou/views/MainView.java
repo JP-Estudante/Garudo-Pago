@@ -51,6 +51,8 @@ public class MainView {
     private final Set<Marca> marcaFilters = new HashSet<>();
     private HBox filterTokens;
     private TableView<Fatura> tabelaFaturas;
+    private Button btnDetalhes;
+    private VBox faturasContainer;
     private java.util.function.Consumer<Fatura> notaDoubleClickHandler;
 
     public MainView() {
@@ -72,6 +74,12 @@ public class MainView {
 
     private void atualizarListaFaturas() {
         atualizarListaComFiltros();
+    }
+
+    // Novo: torna público para que o controller possa chamar quando
+    // a tela de detalhes for fechada e seja necessário recarregar a lista
+    public void recarregarListaFaturas() {
+        atualizarListaFaturas();
     }
 
     private void criarUI() {
@@ -207,10 +215,9 @@ public class MainView {
         TableColumn<Fatura, LocalDate> colunaVencimento = criarColunaVencimentoFatura();
         TableColumn<Fatura, String> colunaMarca = criarColunaMarcaFatura();
         TableColumn<Fatura, String> colunaStatus = criarColunaStatusFatura();
-        TableColumn<Fatura, Void> colunaAcoes = criarColunaAcoesFatura();
 
         // Adiciona as colunas e os itens à tabela
-        tabela.getColumns().setAll(List.of(colunaId, colunaNumeroNota, colunaOrdem, colunaVencimento, colunaMarca, colunaStatus, colunaAcoes));
+        tabela.getColumns().setAll(List.of(colunaId, colunaNumeroNota, colunaOrdem, colunaVencimento, colunaMarca, colunaStatus));
         tabela.setItems(faturas);
 
         return tabela;
@@ -329,51 +336,55 @@ public class MainView {
     private TableColumn<Fatura, String> criarColunaStatusFatura() {
         TableColumn<Fatura, String> coluna = new TableColumn<>("STATUS");
         coluna.setCellValueFactory(new PropertyValueFactory<>("status"));
-        coluna.setPrefWidth(120);
+        coluna.setMinWidth(180);
+        coluna.setPrefWidth(180);
+        coluna.setMaxWidth(180);
         coluna.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(String status, boolean empty) {
-                super.updateItem(status, empty);
-                if (empty || status == null) {
-                    setText(null); setStyle("");
-                } else {
-                    setText(status);
-                    setTextFill("Vencida".equalsIgnoreCase(status) ? Color.web("#f0a818") : Color.WHITE);
-                    setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
-                }
-            }
-        });
-        return coluna;
-    }
+            private final MenuItem miNaoEmitida = new MenuItem("Não Emitida");
+            private final MenuItem miEmitida   = new MenuItem("Emitida");
+            private final MenuButton menu      = new MenuButton();
 
-    @SuppressWarnings("unused")
-    private TableColumn<Fatura, Void> criarColunaAcoesFatura() {
-        TableColumn<Fatura, Void> coluna = new TableColumn<>("Ações");
-        coluna.setPrefWidth(100);
-        coluna.setCellFactory(col -> new TableCell<>() {
-            private final Button btnEmitida = new Button("Emitida");
             {
-                btnEmitida.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5px;");
-                btnEmitida.setOnAction(evt -> {
+                // 1) monta itens e estilo
+                menu.getItems().addAll(miNaoEmitida, miEmitida);
+                menu.getStyleClass().add("fatura-status-menu");
+                setAlignment(Pos.CENTER_LEFT);
+
+                // 2) força criação e estilização do ContextMenu ANTES do primeiro show()
+                ContextMenu ctx = menu.getContextMenu();
+                if (ctx != null) {
+                    ctx.getStyleClass().add("fatura-status-popup");
+                    ctx.prefWidthProperty().bind(menu.widthProperty());
+                }
+
+                // 3) remove seta e abre ao clicar em qualquer parte
+                menu.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+                    Node arrow = menu.lookup(".arrow-button");
+                    if (arrow != null) {
+                        arrow.setVisible(false);
+                        arrow.setManaged(false);
+                    }
+                });
+                menu.setOnMouseClicked(e -> {
+                    if (!menu.isDisabled()) menu.show();
+                });
+
+                // 4) ação “Emitida”
+                miEmitida.setOnAction(e -> {
                     Fatura f = getTableView().getItems().get(getIndex());
                     marcarFaturaComoEmitida(f);
                 });
             }
 
             @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+                if (empty || status == null) {
                     setGraphic(null);
                 } else {
-                    Fatura f = getTableView().getItems().get(getIndex());
-                    if ("Emitida".equalsIgnoreCase(f.getStatus()) || "Vencida".equalsIgnoreCase(f.getStatus())) {
-                        setGraphic(null);
-                    } else {
-                        HBox box = new HBox(btnEmitida);
-                        box.setAlignment(Pos.CENTER);
-                        setGraphic(box);
-                    }
+                    menu.setText(status);
+                    menu.setDisable("Emitida".equalsIgnoreCase(status) || "Vencida".equalsIgnoreCase(status));
+                    setGraphic(menu);
                 }
             }
         });
@@ -499,6 +510,7 @@ public class MainView {
         VBox container = new VBox(18);
         container.setPadding(new Insets(20));
         container.setStyle("-fx-background-color: #BDBDBD;");
+        this.faturasContainer = container;
 
         // 2. Título
         Label titulo = new Label("LISTAGEM DE FATURAS");
@@ -634,14 +646,14 @@ public class MainView {
         });
 
         // ─── Monta toolbar e tabela ───
-        Button btnAtualizar = new Button("Atualizar");
-        btnAtualizar.getStyleClass().addAll("menu-button","botao-listagem");
-        btnAtualizar.setOnAction(e -> atualizarListaFaturas());
+        btnDetalhes = new Button("Detalhes");
+        btnDetalhes.getStyleClass().addAll("menu-button","botao-listagem");
+        btnDetalhes.setDisable(true);
 
         HBox espacador = new HBox();
         HBox.setHgrow(espacador, Priority.ALWAYS);
 
-        HBox toolbar = new HBox(12, btnFiltrar, filterTokens, espacador, btnAtualizar);
+        HBox toolbar = new HBox(12, filterTokens, espacador, btnFiltrar, btnDetalhes);
         toolbar.setAlignment(Pos.CENTER_LEFT);
 
         this.tabelaFaturas = criarTabelaFaturas(faturas);
@@ -897,6 +909,18 @@ public class MainView {
 
     public Button getBtnSalvarEmail() {
         return btnSalvarEmail;
+    }
+
+    public TableView<Fatura> getTabelaFaturas() { return tabelaFaturas; }
+
+    public Button getBtnDetalhes() { return btnDetalhes; }
+
+    public VBox getFaturasViewContainer() { return faturasContainer; }
+
+    public void mostrarTelaInicial() {
+        StackPane painelCentral = new StackPane(labelText);
+        painelCentral.setStyle("-fx-background-color: #BDBDBD;");
+        root.setCenter(painelCentral);
     }
 
     public Label getConteudoLabel() {

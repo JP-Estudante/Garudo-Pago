@@ -117,7 +117,7 @@ public class NotaFiscalDAO {
         return notasArquivadas;
     }
 
-    public NotaFiscal buscarNotaFiscalPorId(int id) throws SQLException {
+public NotaFiscal buscarNotaFiscalPorId(int id) throws SQLException {
         String sql = "SELECT nf.numero_nota, nf.data_emissao, m.nome AS marca " +
                 "FROM notas_fiscais nf LEFT JOIN marcas m ON nf.marca_id = m.id " +
                 "WHERE nf.id = ?";
@@ -135,5 +135,24 @@ public class NotaFiscalDAO {
             }
         }
         return null;
+    }
+
+    public boolean atualizarNotaFiscal(String numeroNotaOriginal, NotaFiscal nota) throws SQLException {
+        String sql = "UPDATE notas_fiscais SET numero_nota = ?, data_emissao = ?, marca_id = ? WHERE numero_nota = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, nota.getNumeroNota());
+            stmt.setDate(2, Date.valueOf(nota.getDataEmissao()));
+
+            Integer marcaId = new MarcaDAO().obterIdPorNome(nota.getMarca());
+            if (marcaId != null) {
+                stmt.setInt(3, marcaId);
+            } else {
+                stmt.setNull(3, java.sql.Types.INTEGER);
+            }
+
+            stmt.setString(4, numeroNotaOriginal);
+            return stmt.executeUpdate() > 0;
+        }
     }
 }
