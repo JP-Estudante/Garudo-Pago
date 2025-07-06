@@ -1,16 +1,22 @@
-
-# IntelliJ
+# IntelliJ IDEA
 .idea/
 *.iml
 out/
 
 # NetBeans
 nbproject/
-build/
-dist/
 .nb-gradle/
 
-# Java
+# Build directories and artifacts
+build/
+dist/
+
+# NetBeans specific build files
+nbbuild.xml
+build.xml
+manifest.mf
+
+# Java compiled classes and logs
 *.class
 *.log
 
@@ -20,13 +26,5 @@ dist/
 # J2ME
 .mtj.tmp/
 
-# Ignorar classe local de conexão com o banco
-src/com/GuardouPagou/models/DatabaseConnection.java
-=======
-/build/
-dist/
-nbbuild.xml
-nbproject/
-manifest.mf
-build.xml
-
+# Local database connection properties
+resources/properties/database.properties
