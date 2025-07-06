@@ -1,4 +1,4 @@
-# 📘 Manual de instalação - GuardouPagou
+# 📕 Manual de instalação - GuardouPagou
 
 ## Clonando o Repositório
 
@@ -123,7 +123,7 @@ Antes de executar o projeto, instale os seguintes componentes:
     -   **database.properties**
     -   **email.properties**
 
-<a name="snippet-database.properties"></a>
+<a id="snippet-database.properties"></a>
 3.  Exemplo do conteúdo para **database.properties**:
 
     ```properties
@@ -133,7 +133,7 @@ Antes de executar o projeto, instale os seguintes componentes:
     db.password=sua_senha
     ```
     
-<a name="snippet-email.properties"></a>
+<a id="snippet-email.properties"></a>
 4.  Exemplo de conteúdo para **email.properties**:
 
     ```properties
@@ -184,8 +184,8 @@ Após concluir todos os passos, clique em **Run Project (F6)** para iniciar o Gu
 ### 3. Criar Arquivos de Propriedades
 
 -   Dentro de `src/main/resources/`, crie a pasta `properties` e adicione:
-  -   **database.properties** (mesmo conteúdo do exemplo [acima](snippet-database.properties))
-  -   **email.properties** (mesmo conteúdo do exemplo [acima](snippet-email.properties))
+  -   **database.properties** (mesmo conteúdo do exemplo [acima](#snippet-database.properties))
+  -   **email.properties** (mesmo conteúdo do exemplo [acima](#snippet-email.properties))
 
 ### 4. Configurar Execução
 
