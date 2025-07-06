@@ -28,3 +28,4 @@ manifest.mf
 
 # Local database connection properties
 resources/properties/database.properties
+resources/properties/email.properties

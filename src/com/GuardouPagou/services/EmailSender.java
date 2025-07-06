@@ -4,30 +4,50 @@ import com.GuardouPagou.models.Fatura;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
-import javax.xml.transform.Source;
 
 public class EmailSender {
 
-    //Usando Intellij
-    private static final String USER = System.getenv("MAIL_USER");
-    private static final String PASS = System.getenv("MAIL_PASS");
-    private static final String HOST = System.getenv("MAIL_HOST");
+    private static final Properties config = new Properties();
+    private static final String USER;
+    private static final String PASS;
+    private static final String HOST;
+    private static final String PORT;
+    private static final boolean AUTH;
+    private static final boolean STARTTLS;
 
-    //Usando NetBeans
-    //private static final String USER = System.getProperty("MAIL_USER");
-    //private static final String PASS = System.getProperty("MAIL_PASS");
-    //private static final String HOST = System.getProperty("MAIL_HOST");
+    static {
+        try (InputStream in = EmailSender.class
+                .getClassLoader()
+                .getResourceAsStream("properties/email.properties")) {
+            if (in == null) {
+                throw new RuntimeException("Não foi possível encontrar email.properties");
+            }
+            config.load(in);
+        } catch (IOException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+
+        USER     = config.getProperty("mail.user");
+        PASS     = config.getProperty("mail.pass");
+        HOST     = config.getProperty("mail.host");
+        PORT     = config.getProperty("mail.port", "587");
+        AUTH     = Boolean.parseBoolean(config.getProperty("mail.auth", "true"));
+        STARTTLS = Boolean.parseBoolean(config.getProperty("mail.starttls", "true"));
+    }
 
     public static void enviarAlerta(String destinatario, List<Fatura> faturas) throws MessagingException {
         if (USER == null || PASS == null || HOST == null) return;
 
         Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.auth", String.valueOf(AUTH));
+        props.put("mail.smtp.starttls.enable", String.valueOf(STARTTLS));
         props.put("mail.smtp.host", HOST);
-        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.port", PORT);
 
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
