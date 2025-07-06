@@ -319,29 +319,32 @@ public class MainView {
             @Override
             protected void updateItem(String marca, boolean empty) {
                 super.updateItem(marca, empty);
+
                 if (empty || marca == null) {
+                    // limpa tudo para evitar reaproveitamento de gráficos/textos anteriores
                     setText(null);
+                    setGraphic(null);
                     setStyle("");
+                    return;
+                }
+
+                // --- resto da lógica de exibição ---
+                String cor = getTableView().getItems().get(getIndex()).getMarcaColor();
+                if (cor != null && cor.matches("#[0-9A-Fa-f]{6}")) {
+                    Text txtNode = new Text(marca);
+                    txtNode.setFill(Color.web(cor));
+                    txtNode.setStroke(Color.BLACK);
+                    txtNode.setStrokeWidth(1);
+                    txtNode.setFont(Font.font(getFont().getFamily(), FontWeight.BOLD, MARCA_FONT_SIZE));
+                    setGraphic(txtNode);
+                    setText(null);
+                    setStyle("-fx-alignment: CENTER_LEFT; -fx-background-color: transparent;");
                 } else {
+                    setGraphic(null);
                     setText(marca);
-                    String cor = getTableView().getItems().get(getIndex()).getMarcaColor();
-                    if (cor != null && cor.matches("#[0-9A-Fa-f]{6}")) {
-                        Text txtNode = new Text(marca);
-                        txtNode.setFill(Color.web(cor));
-                        txtNode.setStroke(Color.BLACK);
-                        txtNode.setStrokeWidth(1);
-                        txtNode.setFont(Font.font(getFont().getFamily(), FontWeight.BOLD, MARCA_FONT_SIZE));
-                        setGraphic(txtNode);
-                        setText(null);
-                        setStyle("-fx-alignment: CENTER_LEFT; -fx-background-color: transparent;");
-                        setFont(Font.font(getFont().getFamily(), FontWeight.BOLD, MARCA_FONT_SIZE));
-                    } else {
-                        setGraphic(null);
-                        setText(marca);
-                        setTextFill(Color.BLACK);
-                        setFont(Font.font(getFont().getFamily(), FontWeight.BOLD, MARCA_FONT_SIZE));
-                        setStyle("-fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-background-color: transparent;");
-                    }
+                    setTextFill(Color.BLACK);
+                    setFont(Font.font(getFont().getFamily(), FontWeight.BOLD, MARCA_FONT_SIZE));
+                    setStyle("-fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-background-color: transparent;");
                 }
             }
         });

@@ -11,9 +11,9 @@ import javax.xml.transform.Source;
 public class EmailSender {
 
     //Usando Intellij
-//    private static final String USER = System.getenv("MAIL_USER");
-//    private static final String PASS = System.getenv("MAIL_PASS");
-//    private static final String HOST = System.getenv("MAIL_HOST");
+    private static final String USER = System.getenv("MAIL_USER");
+    private static final String PASS = System.getenv("MAIL_PASS");
+    private static final String HOST = System.getenv("MAIL_HOST");
 
     //Usando NetBeans
     //private static final String USER = System.getProperty("MAIL_USER");
