@@ -1,4 +1,4 @@
-# 📘 Manual do Usuário – Guardou-Pagou
+# 📗 Manual do Usuário – Guardou-Pagou
 
 ## 💼 Sobre o Produto
 O **Guardou-Pagou** é um software para registrar notas fiscais e controlar o pagamento de faturas. Ele ajuda comerciantes e administradores a acompanhar vencimentos, emitir documentos e receber avisos automáticos por e-mail.
