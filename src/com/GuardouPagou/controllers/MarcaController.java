@@ -1,7 +1,7 @@
 package com.GuardouPagou.controllers;
 
 import com.GuardouPagou.dao.MarcaDAO;
-import com.GuardouPagou.views.MarcaView;
+import com.GuardouPagou.views.MarcaCadastroView;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
@@ -17,10 +17,10 @@ public class MarcaController {
 
     private static final Logger LOGGER = Logger.getLogger(MarcaController.class.getName());
 
-    private final MarcaView view;
+    private final MarcaCadastroView view;
     private final MarcaDAO  marcaDAO;
 
-    public MarcaController(MarcaView view) {
+    public MarcaController(MarcaCadastroView view) {
         this.view    = view;
         this.marcaDAO = new MarcaDAO();
         init();

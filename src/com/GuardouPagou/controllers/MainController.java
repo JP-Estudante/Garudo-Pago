@@ -29,6 +29,7 @@ public class MainController {
 
     private MainView view;
     private Button botaoSelecionado;
+    private FaturaView faturaView;
 
     public MainController(MainView view) {
         this.view = view;
@@ -57,10 +58,11 @@ public class MainController {
             // 3. Define o que fazer QUANDO a tarefa for bem-sucedida
             carregarFaturasTask.setOnSucceeded(event -> {
                 ObservableList<Fatura> faturas = carregarFaturasTask.getValue();
-                Node viewFaturas = view.criarViewFaturas(faturas);
-                view.setConteudoPrincipal(viewFaturas); // Atualiza a tela com o resultado
-                view.setNotaDoubleClickHandler(this::abrirDetalhesNotaFiscal);
-                configurarInteracoesTabela();
+                faturaView = new FaturaView(faturas);
+                faturaView.setNotaDoubleClickHandler(this::abrirDetalhesNotaFiscal);
+                faturaView.setArquivadasNavigateAction(() -> view.getBtnArquivadas().fire());
+                view.setConteudoPrincipal(faturaView.getRoot());
+                configurarInteracoesTabela(faturaView);
             });
 
             // 4. Define o que fazer se a tarefa falhar
@@ -78,12 +80,9 @@ public class MainController {
                 // 1. Busca os dados
                 ObservableList<Marca> marcas = new MarcaDAO().listarMarcas();
 
-                // 2. Solicita à View que crie o Node (a tela) com os dados
-                Node viewMarcas = view.criarViewMarcas(marcas);
 
-                // 3. Define a tela criada como o conteúdo principal
-                view.setConteudoPrincipal(viewMarcas);
-
+                MarcaView marcaView = new MarcaView(marcas);
+                view.setConteudoPrincipal(marcaView.getRoot());
             } catch (SQLException ex) {
                 view.getConteudoLabel().setText("Erro ao carregar marcas.");
                 ex.printStackTrace();
@@ -140,10 +139,10 @@ public class MainController {
 
             modal.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/note-plus.png"))));
 
-            MarcaView marcaView = new MarcaView();
-            new MarcaController(marcaView);
+            MarcaCadastroView marcaCadastroView = new MarcaCadastroView();
+            new MarcaController(marcaCadastroView);
 
-            Scene scene = new Scene(marcaView.getRoot(), 650, 400);
+            Scene scene = new Scene(marcaCadastroView.getRoot(), 650, 400);
             scene.getStylesheets().addAll(
                     view.getRoot().getScene().getStylesheets()
             );
@@ -195,11 +194,11 @@ public class MainController {
         modal.showAndWait();
     }
 
-    private void configurarInteracoesTabela() {
-        var tabela = view.getTabelaFaturas();
+    private void configurarInteracoesTabela(FaturaView fv) {
+        var tabela = fv.getTabelaFaturas();
         if (tabela == null) return;
 
-        Button btnDetalhes = view.getBtnDetalhes();
+        Button btnDetalhes = fv.getBtnDetalhes();
         // limpa bindings anteriores caso o método seja chamado novamente
         btnDetalhes.disableProperty().unbind();
         // vincula a propriedade disable do botão à seleção atual
@@ -257,12 +256,14 @@ public class MainController {
         modal.setScene(scene);
         modal.setResizable(false);
         modal.showAndWait();
-
-        // Recarrega a listagem para refletir possíveis edições
-        view.recarregarListaFaturas();
+        // Recarrega a listagem para refletir possíveis edicoes
+        if (faturaView != null) {
+            faturaView.recarregarListaFaturas();
+        }
     } catch (Exception ex) {
         Alert a = new Alert(Alert.AlertType.ERROR, "Erro ao abrir detalhes: " + ex.getMessage());
         a.showAndWait();
     }
 }
 }
+
