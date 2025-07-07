@@ -40,3 +40,6 @@ O **Guardou-Pagou** é um software para registrar notas fiscais e controlar o pa
 ### 6. Receber alertas por e-mail
 - O sistema envia avisos quando faltam até três dias para o vencimento de uma fatura.
 - Cadastre e-mails na tela de configuração para receber as notificações.
+
+## 🛠️ Suporte
+Em caso de dúvidas ou sugestões, acesse o suporte do repositório ou envie e-mail para suporte@guardoupagou.com
