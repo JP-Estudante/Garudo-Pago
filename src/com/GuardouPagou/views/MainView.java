@@ -410,36 +410,37 @@ public class MainView {
         return coluna;
     }
 
-    // MÉTODO criarViewMarcas - CORRIGIDO E ORIGINAL
     @SuppressWarnings("unused")
     public Node criarViewMarcas(ObservableList<Marca> marcas) {
         // 1. Cria a tabela
         TableView<Marca> tabela = new TableView<>();
         ViewUtils.aplicarEstiloPadrao(tabela);
         tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        tabela.setItems(marcas);
 
-        // 2. Cria as colunas chamando os novos métodos auxiliares
+        // 2. Cria as colunas
         TableColumn<Marca, Integer> colunaId = criarColunaIdMarca();
         TableColumn<Marca, String> colunaNome = criarColunaNomeMarca();
         TableColumn<Marca, String> colunaDescricao = criarColunaDescricaoMarca();
+        tabela.getColumns().setAll(colunaId, colunaNome, colunaDescricao);
 
-        // 3. Monta a tabela
-        tabela.getColumns().setAll(List.of(colunaId, colunaNome, colunaDescricao));
-        tabela.setItems(marcas);
-
-        // 4. Monta o layout da tela
-        VBox container = new VBox(20);
-        container.setPadding(new Insets(20));
-        container.setStyle("-fx-background-color: #BDBDBD;");
-
+        // 3. Layout principal - agora com VBox.setVgrow para ocupar o máximo
         Label titulo = new Label("Listagem de Marcas");
         titulo.getStyleClass().add("h2");
         titulo.setTextFill(Color.web("#181848"));
 
         HBox toolbar = new HBox(10);
         toolbar.setAlignment(Pos.CENTER_RIGHT);
+        // Você pode adicionar botões à toolbar se quiser
 
+        VBox container = new VBox(8); // margem vertical reduzida entre itens
+        container.setPadding(new Insets(20, 20, 20, 20));
+        container.setStyle("-fx-background-color: #BDBDBD;");
         container.getChildren().addAll(titulo, toolbar, tabela);
+
+        // --- Ajuste fundamental: faz a tabela crescer e ocupar o restante do espaço ---
+        VBox.setVgrow(tabela, Priority.ALWAYS);
+
         return container;
     }
 
